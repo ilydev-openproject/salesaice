@@ -1,0 +1,280 @@
+// src/pages/ProdukPage.jsx
+import { useState, useEffect } from 'react';
+import { collection, getDocs, addDoc, deleteDoc, doc, updateDoc, query, orderBy } from 'firebase/firestore';
+import { Package, Plus, Trash2, TrendingUp, Wallet, Tag, Box, CheckCircle2, XCircle, Eye, EyeOff, Pencil } from 'lucide-react';
+import { db } from '../lib/firebase';
+
+export default function ProdukPage() {
+    const [produkList, setProdukList] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const [showForm, setShowForm] = useState(false);
+    const [editingProdukId, setEditingProdukId] = useState(null);
+
+    const [nama, setNama] = useState('');
+    const [hargaPerBox, setHargaPerBox] = useState('');
+    const [hargaJualPerPcs, setHargaJualPerPcs] = useState('');
+    const [isiPerBox, setIsiPerBox] = useState('');
+    const [available, setAvailable] = useState(true);
+    const [foto, setFoto] = useState('');
+    const [searchTerm, setSearchTerm] = useState('');
+
+    useEffect(() => {
+        const loadProduk = async () => {
+            try {
+                // Order by createdAt to show newest first, or by nama for alphabetical
+                const q = query(collection(db, 'produk'), orderBy('createdAt', 'desc'));
+                const snapshot = await getDocs(q);
+                const list = snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
+                setProdukList(list);
+            } catch (error) {
+                console.error('Error load produk:', error);
+                alert('Gagal memuat produk. Cek koneksi internet.');
+            } finally {
+                setLoading(false);
+            }
+        };
+        loadProduk();
+    }, []);
+
+    const toggleForm = () => {
+        setShowForm(!showForm);
+        setEditingProdukId(null); // Reset editing state
+        if (!showForm) {
+            setNama('');
+            setHargaPerBox('');
+            setHargaJualPerPcs('');
+            setIsiPerBox('');
+            setAvailable(true);
+            setFoto('');
+        }
+    };
+
+    const bukaFormEdit = (produk) => {
+        setEditingProdukId(produk.id);
+        setNama(produk.nama);
+        setHargaPerBox(produk.hargaPerBox);
+        setHargaJualPerPcs(produk.hargaJualPerPcs);
+        setIsiPerBox(produk.isiPerBox);
+        setAvailable(produk.available);
+        setFoto(produk.foto || '');
+        setShowForm(true);
+    };
+
+    const simpanProduk = async (e) => {
+        e.preventDefault();
+        if (!nama || !hargaPerBox || !hargaJualPerPcs || !isiPerBox) {
+            alert('Semua field wajib diisi!');
+            return;
+        }
+
+        const produkData = {
+            nama: nama.trim(),
+            available: available,
+            hargaPerBox: parseFloat(hargaPerBox),
+            hargaJualPerPcs: parseFloat(hargaJualPerPcs),
+            isiPerBox: parseInt(isiPerBox),
+            foto: foto.trim() || 'https://via.placeholder.com/100?text=Produk',
+        };
+
+        try {
+            if (editingProdukId) {
+                // Update
+                const produkRef = doc(db, 'produk', editingProdukId);
+                await updateDoc(produkRef, produkData);
+            } else {
+                // Create
+                await addDoc(collection(db, 'produk'), {
+                    ...produkData,
+                    // Use server timestamp for better consistency
+                    createdAt: new Date(),
+                });
+            }
+
+            const snapshot = await getDocs(collection(db, 'produk'));
+            const list = snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
+            setProdukList(list);
+            toggleForm(); // Close and reset form
+        } catch (error) {
+            console.error('Error saving produk:', error);
+            alert('Gagal menyimpan produk.');
+        }
+    };
+
+    const toggleAvailable = async (produk) => {
+        const newStatus = !produk.available;
+        try {
+            await updateDoc(doc(db, 'produk', produk.id), { available: newStatus });
+            setProdukList(produkList.map((p) => (p.id === produk.id ? { ...p, available: newStatus } : p)));
+        } catch (error) {
+            console.error('Error update status:', error);
+        }
+    };
+
+    const hapusProduk = async (id) => {
+        if (!confirm('Hapus produk ini?')) return;
+        try {
+            await deleteDoc(doc(db, 'produk', id));
+            setProdukList(produkList.filter((p) => p.id !== id));
+        } catch (error) {
+            console.error('Error hapus produk:', error);
+            alert('Gagal menghapus produk.');
+        }
+    };
+
+    const filteredProduk = produkList.filter((produk) => produk.nama.toLowerCase().includes(searchTerm.toLowerCase())).sort((a, b) => (a.hargaJualPerPcs ?? 0) - (b.hargaJualPerPcs ?? 0));
+
+    // ✅ Fallback untuk data yang mungkin undefined
+    const safeRender = (produk) => {
+        const hargaPerBox = produk.hargaPerBox ?? 0;
+        const hargaJualPerPcs = produk.hargaJualPerPcs ?? 0;
+        const isiPerBox = produk.isiPerBox ?? 1;
+
+        const pendapatanToko = hargaJualPerPcs * isiPerBox;
+        const keuntunganToko = pendapatanToko - hargaPerBox;
+        const marginPersen = hargaPerBox > 0 ? ((keuntunganToko / hargaPerBox) * 100).toFixed(1) : 0;
+
+        const isAvailable = produk.available;
+
+        return (
+            <div key={produk.id} className={`bg-slate-300 rounded-2xl mb-4 shadow-sm border ${!isAvailable ? 'border-red-200 bg-red-50/50' : 'border-gray-100'} overflow-hidden`}>
+                <div className="flex-1">
+                    {/* Header Card */}
+                    <div className="p-4 flex justify-between items-start gap-4">
+                        <div className="flex items-center gap-4">
+                            <img
+                                src={produk.foto || 'https://via.placeholder.com/80?text=Produk'}
+                                alt={produk.nama}
+                                className={`w-16 h-16 object-cover rounded-lg border border-gray-200 ${!isAvailable ? 'grayscale' : ''}`}
+                                onError={(e) => {
+                                    e.target.src = 'https://via.placeholder.com/80?text=Produk';
+                                }}
+                            />
+                            <div>
+                                <h3 className={`font-bold text-slate-800 text-base ${!isAvailable ? 'line-through text-slate-500' : ''}`}>{produk.nama}</h3>
+                                <span className={`mt-1 px-2 py-0.5 rounded-full text-xs font-semibold inline-flex items-center gap-1 ${isAvailable ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>
+                                    {isAvailable ? <CheckCircle2 size={12} /> : <XCircle size={12} />}
+                                    {isAvailable ? 'Tersedia' : 'Stok Habis'}
+                                </span>
+                            </div>
+                        </div>
+                        <div className="flex gap-2">
+                            <button onClick={() => toggleAvailable(produk)} className="p-2 rounded-full hover:bg-slate-100 text-slate-500 transition-colors">
+                                {isAvailable ? <EyeOff size={16} /> : <Eye size={16} />}
+                            </button>
+                            <button onClick={() => bukaFormEdit(produk)} className="p-2 rounded-full hover:bg-blue-100 text-blue-500 transition-colors">
+                                <Pencil size={16} />
+                            </button>
+                            <button onClick={() => hapusProduk(produk.id)} className="p-2 rounded-full hover:bg-red-100 text-red-500 transition-colors">
+                                <Trash2 size={16} />
+                            </button>
+                        </div>
+                    </div>
+
+                    {/* Detail Harga */}
+                    <div className="px-4 pb-4 grid grid-cols-3 gap-2 text-xs">
+                        <div className="bg-slate-100 p-2 rounded-lg">
+                            <div className="flex items-center gap-1.5 text-slate-500 font-medium">
+                                <Wallet size={14} /> Modal
+                            </div>
+                            <div className="font-bold text-slate-800 mt-1">Rp{hargaPerBox.toLocaleString('id-ID')}</div>
+                        </div>
+                        <div className="bg-slate-100 p-2 rounded-lg">
+                            <div className="flex items-center gap-1.5 text-slate-500 font-medium">
+                                <Tag size={14} /> Jual
+                            </div>
+                            <div className="font-bold text-slate-800 mt-1">Rp{hargaJualPerPcs.toLocaleString('id-ID')}</div>
+                        </div>
+                        <div className="bg-slate-100 p-2 rounded-lg">
+                            <div className="flex items-center gap-1.5 text-slate-500 font-medium">
+                                <Box size={14} /> Isi
+                            </div>
+                            <div className="font-bold text-slate-800 mt-1">{isiPerBox} pcs</div>
+                        </div>
+                    </div>
+
+                    {/* Keuntungan */}
+                    <div className={`px-4 py-2 flex justify-between items-center ${keuntunganToko >= 0 ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>
+                        <div className="flex items-center gap-2 font-bold text-sm">
+                            <TrendingUp size={18} />
+                            <span>Keuntungan Toko</span>
+                        </div>
+                        <div className="text-right">
+                            <div className="font-extrabold text-base">Rp{keuntunganToko.toLocaleString('id-ID')} /box</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        );
+    };
+
+    if (loading) {
+        return <div className="p-5 text-center text-purple-700 min-h-[calc(100vh-120px)] flex items-center justify-center">Memuat katalog...</div>;
+    }
+
+    return (
+        <div className="p-5 pb-20 max-w-md mx-auto">
+            <div className="flex justify-between items-center mb-6">
+                <h2 className="text-2xl font-bold text-slate-800 flex items-center gap-2">
+                    <Package className="text-purple-600" />
+                    Katalog Produk
+                </h2>
+                <button onClick={toggleForm} className="bg-purple-600 text-white px-4 py-2 rounded-full font-semibold flex items-center gap-2 hover:bg-purple-700 transition shadow-md hover:shadow-lg">
+                    <Plus size={18} /> {showForm && !editingProdukId ? 'Batal' : 'Tambah'}
+                </button>
+            </div>
+
+            {/* Search and Filter */}
+            <div className="mb-6 flex flex-col sm:flex-row gap-3">
+                <input type="text" placeholder="Cari produk..." value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} className="w-full p-3 text-slate-700 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500" />
+            </div>
+            {/* Form Tambah Produk */}
+            <div className={`fixed inset-0 z-50 transition-colors duration-300 ${showForm ? 'bg-black/40' : 'bg-transparent pointer-events-none'}`}>
+                <div className={`absolute inset-y-0 left-0 w-full max-w-md bg-white shadow-2xl transition-transform duration-300 ease-in-out transform ${showForm ? 'translate-x-0' : '-translate-x-full'}`}>
+                    <div className="h-full flex flex-col">
+                        <form onSubmit={simpanProduk} className="flex-1 flex flex-col p-5 overflow-y-auto">
+                            <h3 className="font-bold text-purple-800 mb-4 text-lg">{editingProdukId ? 'Edit Produk' : 'Tambah Produk'}</h3>
+                            <div className="flex-grow space-y-3">
+                                <input type="text" placeholder="Nama Produk" value={nama} onChange={(e) => setNama(e.target.value)} className="w-full p-3 text-slate-700 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500" required />
+                                <input type="number" placeholder="Harga per Box ke Toko (Rp)" value={hargaPerBox} onChange={(e) => setHargaPerBox(e.target.value)} className="w-full p-3 text-slate-700 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500" required />
+                                <input type="number" placeholder="Harga Jual Toko per Pcs (Rp)" value={hargaJualPerPcs} onChange={(e) => setHargaJualPerPcs(e.target.value)} className="w-full p-3 text-slate-700 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500" required />
+                                <input type="number" placeholder="Isi per Box (pcs)" value={isiPerBox} onChange={(e) => setIsiPerBox(e.target.value)} className="w-full p-3 text-slate-700 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500" required />
+                                <label className="flex items-center cursor-pointer">
+                                    <input type="checkbox" checked={available} onChange={(e) => setAvailable(e.target.checked)} className="mr-2 h-4 w-4 text-purple-600 rounded focus:ring-purple-500" />
+                                    <span className="text-gray-700">Tersedia untuk ditawarkan</span>
+                                </label>
+                                <input type="text" placeholder="URL Foto (opsional)" value={foto} onChange={(e) => setFoto(e.target.value)} className="w-full p-3 text-slate-700 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500" />
+                            </div>
+                            <div className="flex gap-2 mt-4">
+                                <button type="button" onClick={toggleForm} className="flex-1 py-3 border border-slate-300 text-slate-700 rounded-lg font-semibold hover:bg-slate-50 transition">
+                                    Batal
+                                </button>
+                                <button type="submit" className="flex-1 py-3 bg-purple-600 text-white rounded-lg font-semibold hover:bg-purple-700 transition">
+                                    {editingProdukId ? 'Update' : 'Simpan'}
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            {/* Daftar Produk */}
+            {loading ? (
+                <div className="text-center text-purple-700 py-10">Memuat katalog...</div>
+            ) : filteredProduk.length === 0 ? (
+                <div className="text-center text-gray-500 py-10">Belum ada produk.</div>
+            ) : (
+                <div>
+                    {filteredProduk.map((produk) => {
+                        // ✅ Pastikan field wajib ada
+                        if (produk.hargaPerBox == null || produk.hargaJualPerPcs == null || produk.isiPerBox == null) {
+                            // Log error or handle gracefully if data is malformed
+                            console.warn('Produk dengan data tidak lengkap:', produk);
+                            return null; // Skip rendering malformed products
+                        }
+                        return safeRender(produk);
+                    })}
+                </div>
+            )}
+        </div>
+    );
+}
