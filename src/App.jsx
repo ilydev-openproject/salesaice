@@ -115,7 +115,7 @@ export default function App() {
                     backgroundColor: 'white',
                     display: 'flex',
                     justifyContent: 'space-around',
-                    padding: '12px 0',
+                    padding: '8px 0',
                     borderTop: '1px solid #eee',
                     maxWidth: '500px',
                     margin: '0 auto',
@@ -131,13 +131,13 @@ export default function App() {
                         alignItems: 'center',
                         background: 'none',
                         border: 'none',
-                        fontSize: '12px',
+                        fontSize: '10px',
                         outline: 'none',
                         cursor: 'pointer',
                     }}
                 >
-                    <Home size={20} color={activePage === 'home' ? '#402566' : '#999'} />
-                    <span style={{ marginTop: '4px', color: activePage === 'home' ? '#402566' : '#999' }}>Beranda</span>
+                    <Home size={18} color={activePage === 'home' ? '#402566' : '#999'} />
+                    <span style={{ marginTop: '2px', color: activePage === 'home' ? '#402566' : '#999' }}>Beranda</span>
                 </button>
                 <button
                     onClick={() => setActivePage('visit')}
@@ -147,17 +147,17 @@ export default function App() {
                         alignItems: 'center',
                         background: 'none',
                         border: 'none',
+                        fontSize: '10px',
                         outline: 'none',
-                        fontSize: '12px',
                         cursor: 'pointer',
                     }}
                 >
-                    <MapPin size={20} color={activePage === 'visit' ? '#402566' : '#999'} />
-                    <span style={{ marginTop: '4px', color: activePage === 'visit' ? '#402566' : '#999' }}>Kunjungan</span>
+                    <MapPin size={18} color={activePage === 'visit' ? '#402566' : '#999'} />
+                    <span style={{ marginTop: '2px', color: activePage === 'visit' ? '#402566' : '#999' }}>Kunjungan</span>
                 </button>
-                <button onClick={() => setActivePage('produk')} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', background: 'none', border: 'none', outline: 'none', fontSize: '12px', cursor: 'pointer' }}>
-                    <Package size={20} color={activePage === 'produk' ? '#402566' : '#999'} />
-                    <span style={{ marginTop: '4px', color: activePage === 'produk' ? '#402566' : '#999' }}>Produk</span>
+                <button onClick={() => setActivePage('produk')} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', background: 'none', border: 'none', outline: 'none', fontSize: '10px', cursor: 'pointer' }}>
+                    <Package size={18} color={activePage === 'produk' ? '#402566' : '#999'} />
+                    <span style={{ marginTop: '2px', color: activePage === 'produk' ? '#402566' : '#999' }}>Produk</span>
                 </button>
                 <button
                     onClick={() => setActivePage('toko')}
@@ -167,13 +167,13 @@ export default function App() {
                         alignItems: 'center',
                         background: 'none',
                         border: 'none',
+                        fontSize: '10px',
                         outline: 'none',
-                        fontSize: '12px',
                         cursor: 'pointer',
                     }}
                 >
-                    <Store size={20} color={activePage === 'toko' ? '#402566' : '#999'} />
-                    <span style={{ marginTop: '4px', color: activePage === 'toko' ? '#402566' : '#999' }}>Toko</span>
+                    <Store size={18} color={activePage === 'toko' ? '#402566' : '#999'} />
+                    <span style={{ marginTop: '2px', color: activePage === 'toko' ? '#402566' : '#999' }}>Toko</span>
                 </button>
             </div>
         </div>
