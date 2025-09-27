@@ -1,162 +1,86 @@
 // src/pages/HomePage.jsx
-import { useState, useEffect } from 'react';
+import { MapPin, Package, Wallet, Plus } from 'lucide-react';
 
-export default function HomePage({ daftarToko, sales }) {
-    // Hitung data hari ini
-    const today = new Date().toLocaleDateString('id-ID');
-    const todaySales = sales.filter((sale) => new Date(sale.date).toLocaleDateString('id-ID') === today);
-    const totalKunjungan = todaySales.length;
-    const totalPendapatan = todaySales.reduce((sum, sale) => sum + sale.total, 0);
-    const totalBoxTerjual = todaySales.reduce((sum, sale) => sum + sale.items.reduce((qty, item) => qty + item.quantity, 0), 0);
+export default function HomePage({ daftarToko, kunjunganList = [], setActivePage }) {
+    // --- Hitung data hari ini dari 'kunjunganList' ---
+    const todayStart = new Date();
+    todayStart.setHours(0, 0, 0, 0);
 
-    // Ambil toko pertama sebagai default
-    const tokoAktif = daftarToko.length > 0 ? daftarToko[0] : null;
+    const todayEnd = new Date();
+    todayEnd.setHours(23, 59, 59, 999);
 
-    const openModal = () => {
-        alert('Fitur penambahan kunjungan akan dikembangkan segera!');
-    };
+    const kunjunganHariIni = kunjunganList.filter((kunjungan) => {
+        if (!kunjungan.createdAt?.seconds) return false;
+        const visitDate = new Date(kunjungan.createdAt.seconds * 1000);
+        return visitDate >= todayStart && visitDate <= todayEnd;
+    });
+
+    const totalKunjungan = kunjunganHariIni.length;
+    const totalPendapatan = kunjunganHariIni.reduce((sum, kunjungan) => sum + kunjungan.total, 0);
+    const totalBoxTerjual = kunjunganHariIni.reduce((sum, kunjungan) => sum + kunjungan.items.reduce((qty, item) => qty + item.qtyBox, 0), 0);
+
+    const salesPerson = { name: 'Sales App', initial: 'S' }; // Placeholder
 
     return (
-        <div
-            style={{
-                padding: '20px',
-                paddingBottom: '80px',
-                maxWidth: '500px',
-                margin: '0 auto',
-            }}
-        >
+        <div className="p-5 max-w-md mx-auto">
             {/* Header */}
-            <header
-                style={{
-                    display: 'flex',
-                    justifyContent: 'space-between',
-                    alignItems: 'center',
-                    marginBottom: '24px',
-                    paddingTop: '10px',
-                }}
-            >
+            <header className="flex justify-between items-center mb-6 pt-2">
                 <div>
-                    <h1 style={{ margin: 0, fontSize: '24px', fontWeight: '700', color: '#402566' }}>{tokoAktif ? tokoAktif.nama : 'SalesApp'}</h1>
-                    <p style={{ margin: '4px 0 0', color: '#6a4c93', fontSize: '14px' }}>{new Date().toLocaleDateString('id-ID', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}</p>
+                    <h1 className="text-2xl font-bold text-purple-800">{salesPerson.name}</h1>
+                    <p className="text-sm text-slate-500">{new Date().toLocaleDateString('id-ID', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}</p>
                 </div>
-                <div
-                    style={{
-                        width: '40px',
-                        height: '40px',
-                        borderRadius: '50%',
-                        backgroundColor: '#402566',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        color: 'white',
-                        fontWeight: 'bold',
-                    }}
-                >
-                    {tokoAktif ? tokoAktif.nama.charAt(0).toUpperCase() : 'SA'}
-                </div>
+                <div className="w-12 h-12 rounded-full bg-gradient-to-br from-purple-500 to-fuchsia-500 flex items-center justify-center text-white font-bold text-xl shadow-lg">{salesPerson.initial}</div>
             </header>
 
-            {/* Summary */}
-            <div
-                style={{
-                    backgroundColor: 'white',
-                    borderRadius: '20px',
-                    padding: '24px',
-                    marginBottom: '24px',
-                    textAlign: 'center',
-                    boxShadow: '0 4px 16px rgba(64, 37, 102, 0.15)',
-                    border: '1px solid #eee',
-                }}
-            >
-                <p style={{ margin: 0, color: '#6a4c93', fontSize: '16px', fontWeight: '600' }}>Total Box Terjual Hari Ini</p>
-                <p style={{ margin: '8px 0 0', fontSize: '36px', fontWeight: '800', color: '#402566' }}>{totalBoxTerjual}</p>
-            </div>
-
-            <div style={{ display: 'flex', gap: '12px', marginBottom: '24px' }}>
-                <div
-                    style={{
-                        backgroundColor: 'white',
-                        borderRadius: '16px',
-                        padding: '16px',
-                        flex: 1,
-                        boxShadow: '0 2px 10px rgba(64, 37, 102, 0.1)',
-                        border: '1px solid #f0e6f6',
-                    }}
-                >
-                    <p style={{ margin: 0, color: '#6a4c93', fontSize: '13px' }}>Total Kunjungan</p>
-                    <p style={{ margin: '6px 0 0', fontSize: '22px', fontWeight: '700', color: '#402566' }}>{totalKunjungan}</p>
-                </div>
-                <div
-                    style={{
-                        backgroundColor: 'white',
-                        borderRadius: '16px',
-                        padding: '16px',
-                        flex: 1,
-                        boxShadow: '0 2px 10px rgba(64, 37, 102, 0.1)',
-                        border: '1px solid #f0e6f6',
-                    }}
-                >
-                    <p style={{ margin: 0, color: '#6a4c93', fontSize: '13px' }}>Pendapatan</p>
-                    <p style={{ margin: '6px 0 0', fontSize: '22px', fontWeight: '700', color: '#27ae60' }}>Rp{totalPendapatan.toLocaleString('id-ID')}</p>
-                </div>
-            </div>
-
-            <button
-                onClick={openModal}
-                style={{
-                    width: '100%',
-                    padding: '16px',
-                    backgroundColor: '#402566',
-                    color: 'white',
-                    border: 'none',
-                    borderRadius: '16px',
-                    fontSize: '18px',
-                    fontWeight: '600',
-                    marginBottom: '24px',
-                    boxShadow: '0 4px 14px rgba(64, 37, 102, 0.3)',
-                    cursor: 'pointer',
-                }}
-            >
-                ➕ Tambah Kunjungan Baru
+            {/* Tombol Aksi Utama */}
+            <button onClick={() => setActivePage('visit')} className="w-full py-4 bg-purple-600 text-white rounded-2xl font-bold text-lg hover:bg-purple-700 transition flex items-center justify-center gap-2 shadow-lg hover:shadow-xl mb-6">
+                <Plus size={22} />
+                Tambah Kunjungan Baru
             </button>
 
-            {/* Riwayat */}
-            <div>
-                <h2 style={{ fontSize: '18px', fontWeight: '600', marginBottom: '12px', color: '#402566' }}>Kunjungan Terbaru</h2>
-                {sales.length === 0 ? (
-                    <div
-                        style={{
-                            backgroundColor: 'white',
-                            borderRadius: '16px',
-                            padding: '20px',
-                            textAlign: 'center',
-                            color: '#999',
-                            boxShadow: '0 2px 8px rgba(64, 37, 102, 0.05)',
-                            border: '1px solid #f0e6f6',
-                        }}
-                    >
-                        Belum ada kunjungan.
+            {/* Ringkasan Hari Ini */}
+            <div className="mb-6">
+                <h2 className="text-lg font-semibold text-slate-700 mb-3">Ringkasan Hari Ini</h2>
+                <div className="grid grid-cols-3 gap-3">
+                    {/* Total Kunjungan */}
+                    <div className="bg-white p-4 rounded-xl shadow-md border border-gray-100 text-center">
+                        <MapPin className="mx-auto text-purple-500 mb-2" size={24} />
+                        <p className="text-2xl font-bold text-slate-800">{totalKunjungan}</p>
+                        <p className="text-xs text-slate-500">Kunjungan</p>
                     </div>
+                    {/* Total Box */}
+                    <div className="bg-white p-4 rounded-xl shadow-md border border-gray-100 text-center">
+                        <Package className="mx-auto text-blue-500 mb-2" size={24} />
+                        <p className="text-2xl font-bold text-slate-800">{totalBoxTerjual}</p>
+                        <p className="text-xs text-slate-500">Box Terjual</p>
+                    </div>
+                    {/* Total Pendapatan */}
+                    <div className="bg-white p-4 rounded-xl shadow-md border border-gray-100 text-center">
+                        <Wallet className="mx-auto text-green-500 mb-2" size={24} />
+                        <p className="text-2xl font-bold text-slate-800">{(totalPendapatan / 1000).toFixed(1)}k</p>
+                        <p className="text-xs text-slate-500">Pendapatan</p>
+                    </div>
+                </div>
+            </div>
+
+            {/* Kunjungan Terbaru */}
+            <div>
+                <h2 className="text-lg font-semibold text-slate-700 mb-3">Kunjungan Terbaru</h2>
+                {kunjunganList.length === 0 ? (
+                    <div className="bg-white rounded-xl p-5 text-center text-slate-500 shadow-sm">Belum ada kunjungan.</div>
                 ) : (
-                    <div>
-                        {sales.slice(0, 3).map((sale) => (
-                            <div
-                                key={sale.id}
-                                style={{
-                                    backgroundColor: 'white',
-                                    borderRadius: '16px',
-                                    padding: '16px',
-                                    marginBottom: '12px',
-                                    boxShadow: '0 2px 8px rgba(64, 37, 102, 0.05)',
-                                    border: '1px solid #f0e6f6',
-                                    fontSize: '15px',
-                                }}
-                            >
-                                <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '6px' }}>
-                                    <strong>{sale.customer}</strong>
-                                    <span style={{ color: '#27ae60', fontWeight: '600' }}>Rp{sale.total.toLocaleString('id-ID')}</span>
+                    <div className="space-y-3">
+                        {kunjunganList.slice(0, 5).map((kunjungan) => (
+                            <div key={kunjungan.id} className="bg-white rounded-xl p-4 flex items-center gap-4 shadow-sm border border-gray-100">
+                                <div className="w-10 h-10 rounded-full bg-purple-100 flex items-center justify-center text-purple-600 font-bold">{kunjungan.tokoNama.charAt(0).toUpperCase()}</div>
+                                <div className="flex-grow">
+                                    <p className="font-bold text-slate-800">{kunjungan.tokoNama}</p>
+                                    <p className="text-xs text-slate-500">{new Date(kunjungan.createdAt.seconds * 1000).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' })}</p>
                                 </div>
-                                <div style={{ color: '#6a4c93', fontSize: '13px' }}>{sale.date}</div>
+                                <div className="text-right">
+                                    <p className={`font-bold ${kunjungan.total > 0 ? 'text-green-600' : 'text-slate-500'}`}>Rp{kunjungan.total.toLocaleString('id-ID')}</p>
+                                    <p className="text-xs text-slate-500">{kunjungan.items.reduce((sum, item) => sum + item.qtyBox, 0)} box</p>
+                                </div>
                             </div>
                         ))}
                     </div>

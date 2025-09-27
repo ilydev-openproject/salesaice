@@ -1,8 +1,11 @@
 // src/pages/VisitPage.jsx
 import { useState, useEffect } from 'react';
 import { collection, getDocs, addDoc, serverTimestamp, query, orderBy, doc, updateDoc, deleteDoc } from 'firebase/firestore';
+import { DayPicker } from 'react-day-picker';
+import 'react-day-picker/dist/style.css';
+import { format } from 'date-fns';
 import { db } from '../lib/firebase';
-import { Store, Package, Plus, Minus, CheckCircle2, XCircle, ChevronDown, MapPin, ArrowLeft, ShoppingCart, Calendar, Pencil, Trash2, Wallet, Search } from 'lucide-react';
+import { Store, Package, Plus, Minus, CheckCircle2, XCircle, ChevronDown, MapPin, ArrowLeft, ShoppingCart, Calendar, Pencil, Trash2, Wallet, Search, CalendarRange } from 'lucide-react';
 
 export default function VisitPage() {
     // State untuk daftar kunjungan
@@ -21,6 +24,10 @@ export default function VisitPage() {
     const [isTokoDropdownOpen, setIsTokoDropdownOpen] = useState(false);
     const [isDataLoaded, setIsDataLoaded] = useState(false); // Untuk load data form sekali saja
     const [searchTerm, setSearchTerm] = useState('');
+    // State untuk filter tanggal
+    const [filterType, setFilterType] = useState('today'); // 'today', 'custom'
+    const [customDate, setCustomDate] = useState(new Date());
+    const [showCalendar, setShowCalendar] = useState(false);
 
     // Load daftar kunjungan
     useEffect(() => {
@@ -94,6 +101,10 @@ export default function VisitPage() {
         return produkList.reduce((sum, produk) => {
             return sum + getTotalHarga(produk);
         }, 0);
+    };
+
+    const getTotalBoxes = () => {
+        return Object.values(cart).reduce((sum, qty) => sum + qty, 0);
     };
 
     const handleSubmit = async (e) => {
@@ -198,7 +209,29 @@ export default function VisitPage() {
         }
     };
 
-    const filteredKunjungan = kunjunganList.filter((kunjungan) => kunjungan.tokoNama.toLowerCase().includes(searchTerm.toLowerCase()) || (kunjungan.kodeToko && kunjungan.kodeToko.toLowerCase().includes(searchTerm.toLowerCase())));
+    const filteredKunjungan = kunjunganList
+        .filter((kunjungan) => {
+            if (!kunjungan.createdAt?.seconds) return false;
+            const visitDate = new Date(kunjungan.createdAt.seconds * 1000);
+
+            if (filterType === 'today') {
+                const today = new Date();
+                return visitDate.getDate() === today.getDate() && visitDate.getMonth() === today.getMonth() && visitDate.getFullYear() === today.getFullYear();
+            }
+            if (filterType === 'custom') {
+                return visitDate.getDate() === customDate.getDate() && visitDate.getMonth() === customDate.getMonth() && visitDate.getFullYear() === customDate.getFullYear();
+            }
+            return true; // Should not happen if filterType is always 'today' or 'custom'
+        })
+        .filter((kunjungan) => kunjungan.tokoNama.toLowerCase().includes(searchTerm.toLowerCase()) || (kunjungan.kodeToko && kunjungan.kodeToko.toLowerCase().includes(searchTerm.toLowerCase())));
+
+    const handleDateSelect = (date) => {
+        if (date) {
+            setCustomDate(date);
+            setFilterType('custom');
+        }
+        setShowCalendar(false);
+    };
 
     if (loading) {
         return <div className="p-5 text-center text-purple-700 min-h-[calc(100vh-120px)] flex items-center justify-center">Memuat data...</div>;
@@ -219,9 +252,40 @@ export default function VisitPage() {
                 </div>
 
                 {/* Search Bar */}
-                <div className="relative mb-6">
+                <div className="relative mb-4">
                     <input type="text" placeholder="Cari nama atau kode toko..." value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} className="w-full p-3 pl-10 text-slate-700 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500" />
                     <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={20} />
+                </div>
+
+                {/* Filter Tanggal */}
+                <div className="relative mb-6 flex items-center gap-2">
+                    <button onClick={() => setFilterType('today')} className={`flex-1 flex items-center justify-center gap-2 px-4 py-2 text-sm font-semibold rounded-lg transition-all ${filterType === 'today' ? 'bg-purple-600 text-white shadow-md' : 'bg-white text-slate-600 border border-slate-300'}`}>
+                        <Calendar size={16} />
+                        Hari Ini
+                    </button>
+                    <button onClick={() => setShowCalendar(!showCalendar)} className={`flex-1 flex items-center justify-center gap-2 px-4 py-2 text-sm font-semibold rounded-lg transition-all ${filterType === 'custom' ? 'bg-purple-600 text-white shadow-md' : 'bg-white text-slate-600 border border-slate-300'}`}>
+                        <CalendarRange size={16} />
+                        {filterType === 'custom' ? format(customDate, 'd MMM yyyy') : 'Pilih Tanggal'}
+                    </button>
+
+                    {showCalendar && (
+                        <div className="absolute top-full mt-2 z-20 bg-white rounded-2xl shadow-2xl border p-2" onMouseLeave={() => setShowCalendar(false)}>
+                            <DayPicker
+                                mode="single"
+                                selected={customDate}
+                                onSelect={handleDateSelect}
+                                captionLayout="dropdown-buttons"
+                                fromYear={2020}
+                                toYear={new Date().getFullYear() + 1}
+                                classNames={{
+                                    caption_label: 'text-lg font-bold',
+                                    head_cell: 'font-semibold',
+                                    day_selected: 'bg-purple-600 text-white rounded-full hover:bg-purple-700 focus:bg-purple-700',
+                                    day_today: 'font-bold text-purple-600',
+                                }}
+                            />
+                        </div>
+                    )}
                 </div>
 
                 {filteredKunjungan.length === 0 ? (
@@ -387,6 +451,10 @@ export default function VisitPage() {
                         {/* Total & Submit (Sticky di bawah form) */}
                         <div className="bg-white/80 backdrop-blur-sm py-4 px-5 border-t border-gray-200">
                             <div className="bg-purple-50 p-4 rounded-xl border border-purple-200 mb-4">
+                                <div className="flex justify-between items-center text-sm font-medium text-purple-700 mb-2">
+                                    <span>Total Box</span>
+                                    <span>{getTotalBoxes()} box</span>
+                                </div>
                                 <div className="flex justify-between items-center text-lg font-bold text-purple-800">
                                     <span>Total Belanja</span>
                                     <span>Rp{getGrandTotal().toLocaleString('id-ID')}</span>

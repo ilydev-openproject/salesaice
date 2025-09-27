@@ -1,6 +1,14 @@
 // src/App.jsx
 import { useState, useEffect } from 'react';
-import { collection, getDocs, addDoc, deleteDoc, doc } from 'firebase/firestore';
+import {
+    collection,
+    getDocs,
+    addDoc,
+    deleteDoc,
+    doc,
+    query, // 👈 tambahkan ini
+    orderBy, // 👈 tambahkan ini
+} from 'firebase/firestore';
 import { db } from './lib/firebase';
 import HomePage from './pages/HomePage';
 import TokoPage from './pages/TokoPage';
@@ -11,7 +19,7 @@ import { Home, Package, Store, MapPin } from 'lucide-react';
 export default function App() {
     const [activePage, setActivePage] = useState('home');
     const [daftarToko, setDaftarToko] = useState([]);
-    const [sales, setSales] = useState([]);
+    const [kunjunganList, setKunjunganList] = useState([]);
     const [loading, setLoading] = useState(true);
 
     // === Load data dari Firebase ===
@@ -23,10 +31,10 @@ export default function App() {
                 const tokoList = tokoSnapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
                 setDaftarToko(tokoList);
 
-                // Load sales
-                const salesSnapshot = await getDocs(collection(db, 'sales'));
-                const salesList = salesSnapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
-                setSales(salesList);
+                // Load kunjungan
+                const kunjunganSnapshot = await getDocs(query(collection(db, 'kunjungan'), orderBy('createdAt', 'desc')));
+                const listKunjungan = kunjunganSnapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
+                setKunjunganList(listKunjungan);
             } catch (error) {
                 console.error('Error loading data:', error);
                 alert('Gagal memuat data. Cek koneksi internet.');
@@ -91,7 +99,7 @@ export default function App() {
             }}
         >
             <div style={{ flex: 1, paddingBottom: '70px' }}>
-                {activePage === 'home' && <HomePage daftarToko={daftarToko} sales={sales} />}
+                {activePage === 'home' && <HomePage daftarToko={daftarToko} kunjunganList={kunjunganList} setActivePage={setActivePage} />}
                 {activePage === 'toko' && <TokoPage daftarToko={daftarToko} onTambahToko={tambahToko} onHapusToko={hapusToko} />}
                 {activePage === 'produk' && <ProdukPage />}
                 {activePage === 'visit' && <VisitPage />}
