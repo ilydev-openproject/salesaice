@@ -1,6 +1,6 @@
 // src/pages/ProdukPage.jsx
 import { useState, useEffect } from 'react';
-import { collection, getDocs, addDoc, deleteDoc, doc, updateDoc, query, orderBy } from 'firebase/firestore';
+import { collection, getDocs, addDoc, deleteDoc, doc, updateDoc, query, orderBy, serverTimestamp } from 'firebase/firestore';
 import { Package, Plus, Trash2, TrendingUp, Wallet, Tag, Box, CheckCircle2, XCircle, Eye, EyeOff, Pencil } from 'lucide-react';
 import { db } from '../lib/firebase';
 
@@ -85,8 +85,7 @@ export default function ProdukPage() {
                 // Create
                 await addDoc(collection(db, 'produk'), {
                     ...produkData,
-                    // Use server timestamp for better consistency
-                    createdAt: new Date(),
+                    createdAt: serverTimestamp(), // Use server timestamp for new documents
                 });
             }
 
@@ -136,70 +135,56 @@ export default function ProdukPage() {
         const isAvailable = produk.available;
 
         return (
-            <div key={produk.id} className={`bg-slate-300 rounded-2xl mb-4 shadow-sm border ${!isAvailable ? 'border-red-200 bg-red-50/50' : 'border-gray-100'} overflow-hidden`}>
+            <div key={produk.id} className={`bg-white rounded-xl border border-gray-200 mb-3 transition-all hover:shadow-md hover:border-purple-200 overflow-hidden ${!isAvailable ? 'opacity-60' : ''}`}>
                 <div className="flex-1">
                     {/* Header Card */}
-                    <div className="p-4 flex justify-between items-start gap-4">
-                        <div className="flex items-center gap-4">
+                    <div className="p-2.5 flex items-center gap-3">
+                        {/* Gambar */}
+                        <div className="flex-shrink-0">
                             <img
                                 src={produk.foto || 'https://via.placeholder.com/80?text=Produk'}
                                 alt={produk.nama}
-                                className={`w-16 h-16 object-cover rounded-lg border border-gray-200 ${!isAvailable ? 'grayscale' : ''}`}
+                                className={`w-14 h-14 object-cover rounded-lg border border-gray-200 ${!isAvailable ? 'grayscale' : ''}`}
                                 onError={(e) => {
-                                    e.target.src = 'https://via.placeholder.com/80?text=Produk';
+                                    e.target.src = 'https://via.placeholder.com/64?text=Produk';
                                 }}
                             />
-                            <div>
-                                <h3 className={`font-bold text-slate-800 text-base ${!isAvailable ? 'line-through text-slate-500' : ''}`}>{produk.nama}</h3>
-                                <span className={`mt-1 px-2 py-0.5 rounded-full text-xs font-semibold inline-flex items-center gap-1 ${isAvailable ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>
+                        </div>
+
+                        {/* Info Utama & Harga */}
+                        <div className="flex-grow">
+                            <h3 className={`font-bold text-slate-800 text-sm leading-tight ${!isAvailable ? 'line-through text-slate-500' : ''}`}>{produk.nama}</h3>
+                            <div className="flex items-center gap-3 text-xs mt-1 text-slate-600">
+                                <span>
+                                    Jual: <span className="font-semibold">Rp{hargaJualPerPcs.toLocaleString('id-ID')}</span>
+                                </span>
+                                <span>
+                                    Isi: <span className="font-semibold">{isiPerBox} pcs</span>
+                                </span>
+                            </div>
+                            <div className="flex items-center gap-1.5 mt-1.5">
+                                <span className={`px-2 py-0.5 rounded-full text-xs font-semibold inline-flex items-center gap-1 ${isAvailable ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>
                                     {isAvailable ? <CheckCircle2 size={12} /> : <XCircle size={12} />}
                                     {isAvailable ? 'Tersedia' : 'Stok Habis'}
                                 </span>
+                                <div className={`text-xs font-bold flex items-center gap-1 ${keuntunganToko >= 0 ? 'text-green-700' : 'text-red-700'}`}>
+                                    <TrendingUp size={12} />
+                                    <span>Rp{keuntunganToko.toLocaleString('id-ID')}</span>
+                                </div>
                             </div>
                         </div>
-                        <div className="flex gap-2">
-                            <button onClick={() => toggleAvailable(produk)} className="p-2 rounded-full hover:bg-slate-100 text-slate-500 transition-colors">
-                                {isAvailable ? <EyeOff size={16} /> : <Eye size={16} />}
-                            </button>
-                            <button onClick={() => bukaFormEdit(produk)} className="p-2 rounded-full hover:bg-blue-100 text-blue-500 transition-colors">
-                                <Pencil size={16} />
-                            </button>
-                            <button onClick={() => hapusProduk(produk.id)} className="p-2 rounded-full hover:bg-red-100 text-red-500 transition-colors">
-                                <Trash2 size={16} />
-                            </button>
-                        </div>
-                    </div>
 
-                    {/* Detail Harga */}
-                    <div className="px-4 pb-4 grid grid-cols-3 gap-2 text-xs">
-                        <div className="bg-slate-100 p-2 rounded-lg">
-                            <div className="flex items-center gap-1.5 text-slate-500 font-medium">
-                                <Wallet size={14} /> Modal
-                            </div>
-                            <div className="font-bold text-slate-800 mt-1">Rp{hargaPerBox.toLocaleString('id-ID')}</div>
-                        </div>
-                        <div className="bg-slate-100 p-2 rounded-lg">
-                            <div className="flex items-center gap-1.5 text-slate-500 font-medium">
-                                <Tag size={14} /> Jual
-                            </div>
-                            <div className="font-bold text-slate-800 mt-1">Rp{hargaJualPerPcs.toLocaleString('id-ID')}</div>
-                        </div>
-                        <div className="bg-slate-100 p-2 rounded-lg">
-                            <div className="flex items-center gap-1.5 text-slate-500 font-medium">
-                                <Box size={14} /> Isi
-                            </div>
-                            <div className="font-bold text-slate-800 mt-1">{isiPerBox} pcs</div>
-                        </div>
-                    </div>
-
-                    {/* Keuntungan */}
-                    <div className={`px-4 py-2 flex justify-between items-center ${keuntunganToko >= 0 ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>
-                        <div className="flex items-center gap-2 font-bold text-sm">
-                            <TrendingUp size={18} />
-                            <span>Keuntungan Toko</span>
-                        </div>
-                        <div className="text-right">
-                            <div className="font-extrabold text-base">Rp{keuntunganToko.toLocaleString('id-ID')} /box</div>
+                        {/* Tombol Aksi */}
+                        <div className="flex flex-col gap-1 self-start">
+                            <button onClick={() => toggleAvailable(produk)} className="p-1 rounded-full hover:bg-slate-100 text-slate-500 transition-colors">
+                                {isAvailable ? <EyeOff size={14} /> : <Eye size={14} />}
+                            </button>
+                            <button onClick={() => bukaFormEdit(produk)} className="p-1 rounded-full hover:bg-blue-100 text-blue-500 transition-colors">
+                                <Pencil size={14} />
+                            </button>
+                            <button onClick={() => hapusProduk(produk.id)} className="p-1 rounded-full hover:bg-red-100 text-red-500 transition-colors">
+                                <Trash2 size={14} />
+                            </button>
                         </div>
                     </div>
                 </div>
@@ -259,7 +244,11 @@ export default function ProdukPage() {
 
             {/* Daftar Produk */}
             {loading ? (
-                <div className="text-center text-purple-700 py-10">Memuat katalog...</div>
+                <div className="text-center py-10 text-purple-700">Memuat katalog...</div>
+            ) : produkList.length === 0 ? (
+                <div className="text-center py-10 text-gray-500 bg-slate-50 rounded-xl">
+                    Belum ada produk. <br /> <span className="text-sm">Klik "Tambah" untuk membuat produk baru.</span>
+                </div>
             ) : filteredProduk.length === 0 ? (
                 <div className="text-center text-gray-500 py-10">Belum ada produk.</div>
             ) : (
@@ -273,6 +262,17 @@ export default function ProdukPage() {
                         }
                         return safeRender(produk);
                     })}
+                </div>
+            )}
+            {produkList.length > 0 && (
+                <div className="mt-8 text-center text-xs text-slate-500">
+                    <div className="flex items-center justify-center gap-1 mb-1">
+                        <CheckCircle2 size={14} className="text-green-500" />
+                        <span>Data disimpan di cloud</span>
+                    </div>
+                    <p>
+                        Total: {filteredProduk.length} produk {searchTerm && `(dari ${produkList.length} total)`}
+                    </p>
                 </div>
             )}
         </div>

@@ -1,14 +1,6 @@
 // src/App.jsx
 import { useState, useEffect } from 'react';
-import {
-    collection,
-    getDocs,
-    addDoc,
-    deleteDoc,
-    doc,
-    query, // 👈 tambahkan ini
-    orderBy, // 👈 tambahkan ini
-} from 'firebase/firestore';
+import { collection, getDocs, query, orderBy } from 'firebase/firestore';
 import { db } from './lib/firebase';
 import HomePage from './pages/HomePage';
 import TokoPage from './pages/TokoPage';
@@ -46,32 +38,6 @@ export default function App() {
         loadData();
     }, []);
 
-    // === Tambah Toko ===
-    const tambahToko = async (tokoBaru) => {
-        try {
-            await addDoc(collection(db, 'toko'), tokoBaru);
-            // Reload data
-            const snapshot = await getDocs(collection(db, 'toko'));
-            const list = snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
-            setDaftarToko(list);
-        } catch (error) {
-            console.error('Error tambah toko:', error);
-            alert('Gagal menyimpan toko.');
-        }
-    };
-
-    // === Hapus Toko ===
-    const hapusToko = async (id) => {
-        if (!confirm('Hapus toko ini?')) return;
-        try {
-            await deleteDoc(doc(db, 'toko', id));
-            setDaftarToko(daftarToko.filter((t) => t.id !== id));
-        } catch (error) {
-            console.error('Error hapus toko:', error);
-            alert('Gagal menghapus toko.');
-        }
-    };
-
     if (loading) {
         return (
             <div
@@ -100,7 +66,7 @@ export default function App() {
         >
             <div style={{ flex: 1, paddingBottom: '70px' }}>
                 {activePage === 'home' && <HomePage daftarToko={daftarToko} kunjunganList={kunjunganList} setActivePage={setActivePage} />}
-                {activePage === 'toko' && <TokoPage daftarToko={daftarToko} onTambahToko={tambahToko} onHapusToko={hapusToko} />}
+                {activePage === 'toko' && <TokoPage />}
                 {activePage === 'produk' && <ProdukPage />}
                 {activePage === 'visit' && <VisitPage />}
             </div>
