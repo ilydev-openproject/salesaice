@@ -1,7 +1,7 @@
 // src/pages/ProdukPage.jsx
 import { useState, useEffect } from 'react';
 import { collection, getDocs, addDoc, deleteDoc, doc, updateDoc, query, orderBy, serverTimestamp } from 'firebase/firestore';
-import { Package, Plus, Trash2, TrendingUp, Wallet, Tag, Box, CheckCircle2, XCircle, Eye, EyeOff, Pencil } from 'lucide-react';
+import { Package, Plus, Trash2, TrendingUp, Wallet, Tag, Box, CheckCircle2, XCircle, Eye, EyeOff, Pencil, ArrowDownUp, Filter } from 'lucide-react';
 import { db } from '../lib/firebase';
 
 export default function ProdukPage() {
@@ -17,6 +17,14 @@ export default function ProdukPage() {
     const [available, setAvailable] = useState(true);
     const [foto, setFoto] = useState('');
     const [searchTerm, setSearchTerm] = useState('');
+    const [sortBy, setSortBy] = useState('nama'); // 'nama', 'hargaPcs', 'hargaBox', 'keuntungan'
+
+    const SORT_OPTIONS = {
+        nama: 'Nama A-Z',
+        keuntungan: 'Untung Tertinggi',
+        hargaPcs: 'Jual Tertinggi',
+        hargaBox: 'Modal Tertinggi',
+    };
 
     useEffect(() => {
         const loadProduk = async () => {
@@ -120,7 +128,24 @@ export default function ProdukPage() {
         }
     };
 
-    const filteredProduk = produkList.filter((produk) => produk.nama.toLowerCase().includes(searchTerm.toLowerCase())).sort((a, b) => (a.hargaJualPerPcs ?? 0) - (b.hargaJualPerPcs ?? 0));
+    const filteredProduk = produkList
+        .filter((produk) => produk.nama.toLowerCase().includes(searchTerm.toLowerCase()))
+        .sort((a, b) => {
+            switch (sortBy) {
+                case 'hargaPcs':
+                    return (b.hargaJualPerPcs ?? 0) - (a.hargaJualPerPcs ?? 0); // Tertinggi ke terendah
+                case 'hargaBox':
+                    return (b.hargaPerBox ?? 0) - (a.hargaPerBox ?? 0); // Tertinggi ke terendah
+                case 'keuntungan': {
+                    const keuntunganA = (a.hargaJualPerPcs ?? 0) * (a.isiPerBox ?? 1) - (a.hargaPerBox ?? 0);
+                    const keuntunganB = (b.hargaJualPerPcs ?? 0) * (b.isiPerBox ?? 1) - (b.hargaPerBox ?? 0);
+                    return keuntunganB - keuntunganA; // Tertinggi ke terendah
+                }
+                case 'nama':
+                default:
+                    return a.nama.localeCompare(b.nama); // A-Z
+            }
+        });
 
     // ✅ Fallback untuk data yang mungkin undefined
     const safeRender = (produk) => {
@@ -154,21 +179,24 @@ export default function ProdukPage() {
                         {/* Info Utama & Harga */}
                         <div className="flex-grow">
                             <h3 className={`font-bold text-slate-800 text-sm leading-tight ${!isAvailable ? 'line-through text-slate-500' : ''}`}>{produk.nama}</h3>
-                            <div className="flex items-center gap-3 text-xs mt-1 text-slate-600">
+                            <div className="grid grid-cols-2 gap-x-3 gap-y-0.5 text-xs mt-1 text-slate-600">
+                                <span>
+                                    Modal: <span className="font-semibold">Rp{hargaPerBox.toLocaleString('id-ID')}</span>
+                                </span>
                                 <span>
                                     Jual: <span className="font-semibold">Rp{hargaJualPerPcs.toLocaleString('id-ID')}</span>
                                 </span>
                                 <span>
-                                    Isi: <span className="font-semibold">{isiPerBox} pcs</span>
+                                    Isi: <span className="font-semibold">{isiPerBox}</span>
                                 </span>
                             </div>
                             <div className="flex items-center gap-1.5 mt-1.5">
                                 <span className={`px-2 py-0.5 rounded-full text-xs font-semibold inline-flex items-center gap-1 ${isAvailable ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>
                                     {isAvailable ? <CheckCircle2 size={12} /> : <XCircle size={12} />}
-                                    {isAvailable ? 'Tersedia' : 'Stok Habis'}
+                                    {isAvailable ? 'Tersedia' : 'Habis'}
                                 </span>
                                 <div className={`text-xs font-bold flex items-center gap-1 ${keuntunganToko >= 0 ? 'text-green-700' : 'text-red-700'}`}>
-                                    <TrendingUp size={12} />
+                                    <TrendingUp size={12} /> Untung:
                                     <span>Rp{keuntunganToko.toLocaleString('id-ID')}</span>
                                 </div>
                             </div>
@@ -209,8 +237,21 @@ export default function ProdukPage() {
             </div>
 
             {/* Search and Filter */}
-            <div className="mb-6 flex flex-col sm:flex-row gap-3">
+            <div className="mb-4">
                 <input type="text" placeholder="Cari produk..." value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} className="w-full p-3 text-slate-700 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500" />
+            </div>
+
+            <div className="mb-6">
+                <h3 className="text-xs font-semibold text-slate-600 mb-2 flex items-center gap-1.5">
+                    <Filter size={12} /> Urutkan Berdasarkan
+                </h3>
+                <div className="flex items-center gap-2 overflow-x-auto pb-2 -mx-5 px-5" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
+                    {Object.entries(SORT_OPTIONS).map(([key, label]) => (
+                        <button key={key} onClick={() => setSortBy(key)} className={`px-4 py-1.5 rounded-full text-sm font-medium transition-colors whitespace-nowrap ${sortBy === key ? 'bg-purple-600 text-white shadow' : 'bg-white text-slate-700 border border-slate-300 hover:bg-slate-50'}`}>
+                            {label}
+                        </button>
+                    ))}
+                </div>
             </div>
             {/* Form Tambah Produk */}
             <div className={`fixed inset-0 z-50 transition-colors duration-300 ${showForm ? 'bg-black/40' : 'bg-transparent pointer-events-none'}`}>

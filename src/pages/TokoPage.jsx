@@ -2,9 +2,10 @@
 import { useState, useEffect } from 'react';
 import { collection, getDocs, addDoc, updateDoc, deleteDoc, doc, serverTimestamp } from 'firebase/firestore';
 import { db } from '../lib/firebase';
-import { Store, Plus, Trash2, Pencil, CheckCircle2, Calendar, Filter, ArrowLeft } from 'lucide-react';
+import { Store, Plus, Trash2, Pencil, CheckCircle2, Calendar, Filter, ArrowLeft, Package, MapPin } from 'lucide-react';
 import { MessageSquare } from 'lucide-react'; // Import MessageSquare
 const HARI = ['senin', 'selasa', 'rabu', 'kamis', 'jumat', 'sabtu'];
+
 const HARI_LABEL = {
     senin: 'Senin',
     selasa: 'Selasa',
@@ -16,6 +17,7 @@ const HARI_LABEL = {
 
 export default function TokoPage() {
     const [tokoList, setTokoList] = useState([]);
+    const [kunjunganList, setKunjunganList] = useState([]);
     const [loading, setLoading] = useState(true);
     const [showForm, setShowForm] = useState(false);
     const [editingId, setEditingId] = useState(null);
@@ -29,10 +31,12 @@ export default function TokoPage() {
 
     // Load data
     useEffect(() => {
-        const loadToko = async () => {
+        const loadData = async () => {
             try {
-                const snapshot = await getDocs(collection(db, 'toko'));
-                const list = snapshot.docs.map((doc) => {
+                setLoading(true);
+                const [tokoSnapshot, kunjunganSnapshot] = await Promise.all([getDocs(collection(db, 'toko')), getDocs(collection(db, 'kunjungan'))]);
+
+                const tokoData = tokoSnapshot.docs.map((doc) => {
                     const data = doc.data();
                     // Ambil jadwalKunjungan, pastikan array
                     const jadwal = Array.isArray(data.jadwalKunjungan) ? data.jadwalKunjungan.filter((h) => HARI.includes(h)) : [];
@@ -42,15 +46,19 @@ export default function TokoPage() {
                         jadwalKunjungan: jadwal,
                     };
                 });
-                setTokoList(list);
+
+                const kunjunganData = kunjunganSnapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
+
+                setTokoList(tokoData);
+                setKunjunganList(kunjunganData);
             } catch (error) {
-                console.error('Error load toko:', error);
+                console.error('Error load data:', error);
                 alert('Gagal memuat data toko.');
             } finally {
                 setLoading(false);
             }
         };
-        loadToko();
+        loadData();
     }, []);
 
     const resetForm = () => {
@@ -153,6 +161,13 @@ export default function TokoPage() {
         return hariList.map((h) => HARI_LABEL[h]).join(', ');
     };
 
+    // Fungsi untuk menghitung statistik per toko
+    const getTokoStats = (tokoId) => {
+        const kunjunganToko = kunjunganList.filter((k) => k.tokoId === tokoId);
+        const totalKunjungan = kunjunganToko.length;
+        const totalBox = kunjunganToko.reduce((sum, kunjungan) => sum + (kunjungan.items?.reduce((itemSum, item) => itemSum + item.qtyBox, 0) || 0), 0);
+        return { totalKunjungan, totalBox };
+    };
     // Filtered list of stores based on search term
     const filteredToko = tokoList
         .filter((toko) => {
@@ -266,31 +281,47 @@ export default function TokoPage() {
             ) : (
                 <div className="space-y-4">
                     {filteredToko.map((toko) => (
-                        <div key={toko.id} className="bg-white rounded-xl p-4 border border-gray-200">
-                            <div className="flex justify-between">
-                                <div>
-                                    <h3 className="font-bold text-base text-slate-800">{toko.nama}</h3>
+                        <div key={toko.id} className="bg-white rounded-xl p-4 border border-gray-200 shadow-sm">
+                            <div className="flex justify-between items-start">
+                                <div className="flex-grow">
+                                    <h3 className="font-bold text-base text-slate-800 pr-4">{toko.nama}</h3>
                                     <p className="text-xs text-slate-600 mt-1">
-                                        Kode: <span className="font-mono bg-slate-100 px-1.5 py-0.5 rounded text-xs">{toko.kode}</span>
+                                        Kode: <span className="font-mono bg-slate-100 px-1.5 py-0.5 rounded">{toko.kode}</span>
                                     </p>
-                                    {toko.nomorWa && (
-                                        <a href={`https://wa.me/${toko.nomorWa}`} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1.5 text-xs text-green-700 mt-2 hover:underline">
-                                            <MessageSquare size={12} /> {toko.nomorWa}
-                                        </a>
-                                    )}
-                                    <div className="mt-2 flex bg-purple-100 w-fit px-1.5 py-0.5 rounded-lg items-center gap-1 text-xs text-purple-700">
-                                        <Calendar size={12} className="text-purple-600" />
-                                        <span>{formatHari(toko.jadwalKunjungan)}</span>
+                                    <div className="mt-3 space-y-2">
+                                        {toko.nomorWa && (
+                                            <a href={`https://wa.me/${toko.nomorWa}`} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1.5 text-xs text-green-700 hover:underline">
+                                                <MessageSquare size={12} /> {toko.nomorWa}
+                                            </a>
+                                        )}
+                                        <div className="flex items-center gap-1 text-xs text-purple-700">
+                                            <Calendar size={12} className="text-purple-600" />
+                                            <span>{formatHari(toko.jadwalKunjungan)}</span>
+                                        </div>
                                     </div>
-                                    <p className="text-xs text-slate-500 mt-2">Dibuat: {toko.createdAt && toko.createdAt.seconds ? new Date(toko.createdAt.seconds * 1000).toLocaleString('id-ID', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' }) : 'N/A'}</p>
                                 </div>
-                                <div className="flex gap-2">
+                                <div className="flex flex-col items-end gap-2">
                                     <button onClick={() => openEditForm(toko)} className="p-1 rounded-full hover:bg-blue-100 text-blue-500 transition-colors">
                                         <Pencil size={14} />
                                     </button>
                                     <button onClick={() => hapusToko(toko.id)} className="p-1 rounded-full hover:bg-red-100 text-red-500 transition-colors">
                                         <Trash2 size={14} />
                                     </button>
+                                </div>
+                            </div>
+                            {/* Statistik Toko */}
+                            <div className="mt-4 pt-3 border-t border-slate-100 grid grid-cols-2 gap-3 text-center">
+                                <div>
+                                    <p className="text-lg font-bold text-slate-700">{getTokoStats(toko.id).totalKunjungan}</p>
+                                    <p className="text-xs text-slate-500 flex items-center justify-center gap-1">
+                                        <MapPin size={12} /> Kunjungan
+                                    </p>
+                                </div>
+                                <div>
+                                    <p className="text-lg font-bold text-slate-700">{getTokoStats(toko.id).totalBox}</p>
+                                    <p className="text-xs text-slate-500 flex items-center justify-center gap-1">
+                                        <Package size={12} /> Box Order
+                                    </p>
                                 </div>
                             </div>
                         </div>

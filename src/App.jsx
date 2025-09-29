@@ -1,6 +1,6 @@
 // src/App.jsx
 import { useState, useEffect } from 'react';
-import { collection, getDocs, query, orderBy } from 'firebase/firestore';
+import { collection, getDocs, query, orderBy } from 'firebase/firestore'; // Removed unused 'where' import
 import { db } from './lib/firebase';
 import HomePage from './pages/HomePage';
 import TokoPage from './pages/TokoPage';
@@ -12,6 +12,7 @@ export default function App() {
     const [activePage, setActivePage] = useState('home');
     const [daftarToko, setDaftarToko] = useState([]);
     const [kunjunganList, setKunjunganList] = useState([]);
+    const [produkList, setProdukList] = useState([]); // New state for produkList
     const [loading, setLoading] = useState(true);
 
     // === Load data dari Firebase ===
@@ -27,6 +28,11 @@ export default function App() {
                 const kunjunganSnapshot = await getDocs(query(collection(db, 'kunjungan'), orderBy('createdAt', 'desc')));
                 const listKunjungan = kunjunganSnapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
                 setKunjunganList(listKunjungan);
+
+                // Load produk
+                const produkSnapshot = await getDocs(query(collection(db, 'produk'), orderBy('nama', 'asc')));
+                const listProduk = produkSnapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
+                setProdukList(listProduk);
             } catch (error) {
                 console.error('Error loading data:', error);
                 alert('Gagal memuat data. Cek koneksi internet.');
@@ -65,7 +71,7 @@ export default function App() {
             }}
         >
             <div style={{ flex: 1, paddingBottom: '70px' }}>
-                {activePage === 'home' && <HomePage daftarToko={daftarToko} kunjunganList={kunjunganList} setActivePage={setActivePage} />}
+                {activePage === 'home' && <HomePage daftarToko={daftarToko} kunjunganList={kunjunganList} produkList={produkList} setActivePage={setActivePage} />}
                 {activePage === 'toko' && <TokoPage />}
                 {activePage === 'produk' && <ProdukPage />}
                 {activePage === 'visit' && <VisitPage />}
