@@ -677,7 +677,7 @@ ${padRight('No HP', 15)}: ${toko.nomorWa || '-'}
                                                                     )}
                                                                 </div>
                                                                 <div className="flex-grow">
-                                                                    <h4 className={`font-bold text-sm text-slate-800 ${!isAvailable ? 'line-through text-slate-500' : ''}`}>{produk.nama}</h4>
+                                                                    <h4 className={`font-bold text-xs text-slate-800 ${!isAvailable ? 'line-through text-slate-500' : ''}`}>{produk.nama}</h4>
                                                                     <p className="text-xs text-slate-600 mt-1">Rp{(produk.hargaPerBox || 0).toLocaleString('id-ID')} / box</p>
                                                                 </div>
                                                                 <div className="flex items-center gap-1 flex-shrink-0">
