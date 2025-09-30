@@ -7,6 +7,7 @@ import TokoPage from './pages/TokoPage';
 import ProdukPage from './pages/ProdukPage';
 import VisitPage from './pages/VisitPage';
 import { Home, Package, Store, MapPin } from 'lucide-react';
+import Loader from './components/Loader'; // Impor Loader
 
 export default function App() {
     // Baca halaman aktif dari localStorage saat pertama kali load, default ke 'home' jika tidak ada.
@@ -52,16 +53,8 @@ export default function App() {
 
     if (loading) {
         return (
-            <div
-                style={{
-                    height: '100vh',
-                    display: 'flex',
-                    justifyContent: 'center',
-                    alignItems: 'center',
-                    backgroundColor: '#f8f6fc',
-                }}
-            >
-                <div style={{ color: '#402566', fontSize: '18px' }}>Loading...</div>
+            <div className="h-screen flex flex-col items-center justify-center bg-[#f8f6fc]">
+                <Loader text="Menyiapkan aplikasi..." />
             </div>
         );
     }

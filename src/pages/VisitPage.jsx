@@ -5,8 +5,9 @@ import { DayPicker } from 'react-day-picker';
 import 'react-day-picker/dist/style.css';
 import { format, isSameDay, isSameMonth, startOfMonth, endOfMonth } from 'date-fns'; // Added isSameDay, isSameMonth, startOfMonth, endOfMonth
 import { toPng } from 'html-to-image';
-import { db } from '../lib/firebase';
-import { Store, Package, Plus, Minus, CheckCircle2, XCircle, ChevronDown, MapPin, ArrowLeft, ShoppingCart, Calendar, Pencil, Trash2, Wallet, Search, CalendarRange, Download, MoreVertical, Eye, X, MessageSquare, AlertTriangle, Camera, CircleDot, Trash } from 'lucide-react';
+import { db } from '../lib/firebase'; //
+import { Store, Package, Plus, Minus, CheckCircle2, XCircle, ChevronDown, MapPin, ArrowLeft, ShoppingCart, Calendar, Pencil, Trash2, Wallet, Search, CalendarRange, Download, MoreVertical, Eye, X, MessageSquare, AlertTriangle } from 'lucide-react';
+import Loader from '../components/Loader';
 import VisitReceipt from '../components/VisitReceipt';
 
 export default function VisitPage({ setActivePage }) {
@@ -37,16 +38,14 @@ export default function VisitPage({ setActivePage }) {
     // State untuk modal preview resi
     const [showReceiptPreview, setShowReceiptPreview] = useState(false);
     const [previewImageUrl, setPreviewImageUrl] = useState('');
-    // State untuk kamera
-    const [showCameraView, setShowCameraView] = useState(false);
-    const [capturedImage, setCapturedImage] = useState(null); // Akan menyimpan data URL gambar
-    const videoRef = useRef(null);
-    const canvasRef = useRef(null);
-    const streamRef = useRef(null);
     const [previewImageFilename, setPreviewImageFilename] = useState('');
 
     // State untuk notifikasi modern
     const [notification, setNotification] = useState({ show: false, message: '', type: 'success' });
+
+    // State untuk modal konfirmasi hapus
+    const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+    const [itemToDelete, setItemToDelete] = useState(null);
 
     const showNotification = (message, type = 'success') => {
         setNotification({ show: true, message, type });
@@ -170,7 +169,6 @@ export default function VisitPage({ setActivePage }) {
             tokoNama: selectedToko?.nama || 'Toko Tidak Diketahui',
             kodeToko: selectedToko?.kode || '',
             items,
-            fotoKunjungan: capturedImage, // Simpan gambar sebagai data URL
             catatan: catatan.trim(),
             total: getGrandTotal(),
             // createdAt tidak diupdate saat edit
@@ -215,7 +213,6 @@ export default function VisitPage({ setActivePage }) {
         setCart({});
         setCatatan('');
         setSelectedTokoId(tokoList.length > 0 ? tokoList[0].id : '');
-        setCapturedImage(null);
         setProductSearchTerm(''); // Reset filter produk saat form ditutup
     };
 
@@ -225,7 +222,6 @@ export default function VisitPage({ setActivePage }) {
         setEditingVisitId(kunjungan.id);
         setSelectedTokoId(kunjungan.tokoId);
         setCatatan(kunjungan.catatan || '');
-        setCapturedImage(kunjungan.fotoKunjungan || null);
 
         // Buat ulang cart dari data kunjungan
         const initialCart = kunjungan.items.reduce((acc, item) => {
@@ -237,77 +233,27 @@ export default function VisitPage({ setActivePage }) {
         setShowForm(true);
     };
 
-    const handleDelete = async (visitId) => {
-        if (!confirm('Apakah Anda yakin ingin menghapus kunjungan ini?')) {
-            return;
-        }
+    const openDeleteConfirm = (kunjungan) => {
+        setItemToDelete(kunjungan);
+        setShowDeleteConfirm(true);
+        closeMenu();
+    };
+
+    const handleConfirmDelete = async () => {
+        if (!itemToDelete) return;
+
         try {
-            await deleteDoc(doc(db, 'kunjungan', visitId));
+            await deleteDoc(doc(db, 'kunjungan', itemToDelete.id));
             showNotification('Kunjungan berhasil dihapus.');
             fetchKunjungan(); // Muat ulang daftar
+            setShowDeleteConfirm(false);
+            setItemToDelete(null);
         } catch (error) {
-            console.error('Error deleting visit:', error);
+            console.error('Error deleting visit:', error); //
             showNotification('Gagal menghapus kunjungan.', 'error');
         }
     };
 
-    // --- LOGIKA KAMERA ---
-    const startCamera = async () => {
-        setShowCameraView(true);
-        try {
-            const stream = await navigator.mediaDevices.getUserMedia({
-                video: { facingMode: 'environment' }, // Prioritaskan kamera belakang
-                audio: false,
-            });
-            if (videoRef.current) {
-                videoRef.current.srcObject = stream;
-                streamRef.current = stream; // Simpan stream untuk bisa dihentikan nanti
-            }
-        } catch (err) {
-            console.error('Error accessing camera:', err);
-            showNotification('Gagal mengakses kamera. Pastikan izin telah diberikan.', 'error');
-            setShowCameraView(false);
-        }
-    };
-
-    const stopCamera = () => {
-        if (streamRef.current) {
-            streamRef.current.getTracks().forEach((track) => track.stop());
-        }
-        setShowCameraView(false);
-    };
-
-    const takePicture = () => {
-        if (videoRef.current && canvasRef.current) {
-            const video = videoRef.current;
-            const canvas = canvasRef.current;
-            const context = canvas.getContext('2d');
-
-            // Set ukuran canvas sesuai dengan video
-            canvas.width = video.videoWidth;
-            canvas.height = video.videoHeight;
-
-            // Gambar frame video ke canvas
-            context.drawImage(video, 0, 0, canvas.width, canvas.height);
-
-            // Tambahkan timestamp
-            const timestamp = new Date().toLocaleString('id-ID', { dateStyle: 'medium', timeStyle: 'short' });
-            context.font = 'bold 24px Arial';
-            context.fillStyle = 'white';
-            context.strokeStyle = 'black';
-            context.lineWidth = 4;
-            const textWidth = context.measureText(timestamp).width;
-            context.strokeText(timestamp, canvas.width - textWidth - 20, canvas.height - 20);
-            context.fillText(timestamp, canvas.width - textWidth - 20, canvas.height - 20);
-
-            // Dapatkan data URL dan simpan
-            const dataUrl = canvas.toDataURL('image/jpeg', 0.9);
-            setCapturedImage(dataUrl);
-
-            // Hentikan kamera dan tutup view
-            stopCamera();
-        }
-    };
     const filteredKunjungan = kunjunganList
         .filter((kunjungan) => {
             if (!kunjungan.createdAt?.seconds) return false;
@@ -366,7 +312,7 @@ export default function VisitPage({ setActivePage }) {
     const closeMenu = () => setOpenMenuId(null);
 
     const handleDownloadFromPreview = () => {
-        const link = document.createElement('a'); //
+        const link = document.createElement('a');
         link.download = previewImageFilename;
         link.href = previewImageUrl;
         link.click();
@@ -458,44 +404,13 @@ ${padRight('No HP', 15)}: ${toko.nomorWa || '-'}
         window.open(whatsappUrl, '_blank');
         closeMenu();
     };
-    const handleShareWithImage = async (kunjungan) => {
-        if (!navigator.share) {
-            showNotification('Browser Anda tidak mendukung fitur berbagi.', 'error');
-            return;
-        }
-
-        // Ambil teks laporan dari fungsi yang sudah ada
-        const reportText = getWhatsAppMessageText(kunjungan);
-
-        try {
-            // Konversi data URL gambar ke Blob, lalu ke File
-            const response = await fetch(kunjungan.fotoKunjungan);
-            const blob = await response.blob();
-            const file = new File([blob], `kunjungan-${kunjungan.tokoNama}.jpg`, { type: 'image/jpeg' });
-
-            // Gunakan Web Share API
-            await navigator.share({
-                title: `Laporan Kunjungan ${kunjungan.tokoNama}`,
-                text: reportText,
-                files: [file],
-            });
-            closeMenu();
-        } catch (error) {
-            // Jika pengguna membatalkan share, error akan muncul. Kita bisa abaikan.
-            if (error.name !== 'AbortError') {
-                console.error('Error sharing:', error);
-                // Jika gagal (misal karena file terlalu besar), coba share teks saja
-                try {
-                    await navigator.share({ title: `Laporan Kunjungan ${kunjungan.tokoNama}`, text: reportText });
-                } catch (shareError) {
-                    console.error('Error sharing text only:', shareError);
-                }
-            }
-        }
-    };
 
     if (loading) {
-        return <div className="p-5 text-center text-purple-700 min-h-[calc(100vh-120px)] flex items-center justify-center">Memuat data...</div>;
+        return (
+            <div className="min-h-[calc(100vh-120px)] flex items-center justify-center">
+                <Loader text="Memuat data kunjungan..." />
+            </div>
+        );
     }
 
     return (
@@ -614,19 +529,13 @@ ${padRight('No HP', 15)}: ${toko.nomorWa || '-'}
                                                     >
                                                         <Eye size={16} /> Lihat Resi
                                                     </button>
-                                                    <button
-                                                        onClick={() => {
-                                                            kunjungan.fotoKunjungan ? handleShareWithImage(kunjungan) : handleWhatsAppShare(kunjungan);
-                                                        }}
-                                                        className="w-full text-left px-4 py-2 text-sm text-slate-700 hover:bg-slate-100 flex items-center gap-3"
-                                                    >
+                                                    <button onClick={() => handleWhatsAppShare(kunjungan)} className="w-full text-left px-4 py-2 text-sm text-slate-700 hover:bg-slate-100 flex items-center gap-3">
                                                         <MessageSquare size={16} /> Kirim via WA
                                                     </button>
                                                     <div className="my-1 h-px bg-slate-100"></div>
                                                     <button
                                                         onClick={() => {
-                                                            handleDelete(kunjungan.id);
-                                                            closeMenu();
+                                                            openDeleteConfirm(kunjungan);
                                                         }}
                                                         className="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50 flex items-center gap-3"
                                                     >
@@ -703,29 +612,6 @@ ${padRight('No HP', 15)}: ${toko.nomorWa || '-'}
                                     <textarea value={catatan} onChange={(e) => setCatatan(e.target.value)} placeholder="Catatan hasil kunjungan..." className="w-full p-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500" rows="3" />
                                 </div>
 
-                                {/* Foto Kunjungan */}
-                                <div>
-                                    <label className="block text-sm font-medium text-slate-700 mb-2">Foto Kunjungan</label>
-                                    {capturedImage ? (
-                                        <div className="relative group">
-                                            <img src={capturedImage} alt="Foto Kunjungan" className="w-full h-auto rounded-lg border-2 border-purple-300" />
-                                            <div className="absolute inset-0 bg-black/50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity rounded-lg">
-                                                <button type="button" onClick={() => setCapturedImage(null)} className="flex items-center gap-2 text-white bg-red-600/80 px-4 py-2 rounded-full font-semibold hover:bg-red-600">
-                                                    <Trash size={16} /> Hapus Foto
-                                                </button>
-                                            </div>
-                                        </div>
-                                    ) : (
-                                        <button type="button" onClick={startCamera} className="w-full flex flex-col items-center justify-center gap-2 p-6 border-2 border-dashed border-slate-300 rounded-lg text-slate-500 hover:bg-slate-100 hover:border-purple-400 transition">
-                                            <Camera size={32} />
-                                            <span className="font-semibold">Ambil Foto</span>
-                                        </button>
-                                    )}
-                                </div>
-
-                                {/* Canvas (tersembunyi) untuk menggambar timestamp */}
-                                <canvas ref={canvasRef} style={{ display: 'none' }}></canvas>
-
                                 {/* Daftar Produk */}
                                 <div>
                                     <div className="flex items-center gap-2 mb-3">
@@ -773,7 +659,7 @@ ${padRight('No HP', 15)}: ${toko.nomorWa || '-'}
                                                     const qty = cart[produk.id] || 0;
                                                     const isAvailable = produk.available;
                                                     return (
-                                                        <div key={produk.id} className={`rounded-xl p-2.5 border transition-all duration-300 ${qty > 0 ? 'bg-green-50 border-green-300' : 'bg-white border-gray-200'} ${!isAvailable ? 'bg-slate-100 border-slate-200' : ''}`}>
+                                                        <div key={produk.id} className={`rounded-xl p-2.5 border transition-all duration-300 ${qty > 0 ? 'bg-lime-400 border-lime-400' : 'bg-white border-gray-200'} ${!isAvailable ? 'bg-slate-100 border-slate-200' : ''}`}>
                                                             <div className="flex items-center gap-3">
                                                                 <div className="relative w-14 h-14 flex-shrink-0">
                                                                     <img
@@ -848,6 +734,31 @@ ${padRight('No HP', 15)}: ${toko.nomorWa || '-'}
                             <button onClick={handleDownloadFromPreview} className="w-full py-3 bg-purple-600 text-white rounded-lg font-bold text-base hover:bg-purple-700 transition flex items-center justify-center gap-2 shadow-md hover:shadow-lg">
                                 <Download size={20} />
                                 Download Gambar
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {/* Modal Konfirmasi Hapus */}
+            {showDeleteConfirm && (
+                <div className="fixed inset-0 z-[100] bg-black/60 flex items-center justify-center p-4 animate-in fade-in">
+                    <div className="bg-white rounded-2xl shadow-2xl p-6 w-full max-w-sm animate-in zoom-in-95 slide-in-from-bottom-5">
+                        <div className="text-center">
+                            <div className="w-16 h-16 mx-auto flex items-center justify-center bg-red-100 rounded-full">
+                                <Trash2 size={32} className="text-red-600" />
+                            </div>
+                            <h3 className="mt-4 text-xl font-bold text-slate-800">Hapus Kunjungan?</h3>
+                            <p className="mt-2 text-sm text-slate-500">
+                                Anda akan menghapus kunjungan ke <strong className="text-slate-700">{itemToDelete?.tokoNama}</strong>. Tindakan ini tidak dapat dibatalkan.
+                            </p>
+                        </div>
+                        <div className="mt-6 grid grid-cols-2 gap-3">
+                            <button onClick={() => setShowDeleteConfirm(false)} className="w-full py-3 bg-slate-100 text-slate-700 rounded-lg font-semibold hover:bg-slate-200 transition">
+                                Batal
+                            </button>
+                            <button onClick={handleConfirmDelete} className="w-full py-3 bg-red-600 text-white rounded-lg font-semibold hover:bg-red-700 transition">
+                                Ya, Hapus
                             </button>
                         </div>
                     </div>

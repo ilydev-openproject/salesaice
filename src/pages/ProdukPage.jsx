@@ -1,7 +1,8 @@
 // src/pages/ProdukPage.jsx
 import { useState, useEffect } from 'react';
 import { collection, getDocs, addDoc, deleteDoc, doc, updateDoc, query, orderBy, serverTimestamp } from 'firebase/firestore';
-import { Package, Plus, Trash2, TrendingUp, Wallet, Tag, Box, CheckCircle2, XCircle, Eye, EyeOff, Pencil, ArrowDownUp } from 'lucide-react';
+import { Package, Plus, Trash2, TrendingUp, Wallet, Tag, Box, CheckCircle2, XCircle, Eye, EyeOff, Pencil, ArrowDownUp, AlertTriangle } from 'lucide-react';
+import Loader from '../components/Loader';
 import { db } from '../lib/firebase';
 
 export default function ProdukPage({ setActivePage }) {
@@ -18,6 +19,10 @@ export default function ProdukPage({ setActivePage }) {
     const [foto, setFoto] = useState('');
     const [searchTerm, setSearchTerm] = useState('');
     const [sortBy, setSortBy] = useState('nama'); // 'nama', 'hargaPcs', 'hargaBox', 'keuntungan'
+
+    // State untuk modal konfirmasi hapus
+    const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+    const [itemToDelete, setItemToDelete] = useState(null);
 
     useEffect(() => {
         const loadProduk = async () => {
@@ -110,14 +115,22 @@ export default function ProdukPage({ setActivePage }) {
         }
     };
 
-    const hapusProduk = async (id) => {
-        if (!confirm('Hapus produk ini?')) return;
+    const openDeleteConfirm = (produk) => {
+        setItemToDelete(produk);
+        setShowDeleteConfirm(true);
+    };
+
+    const handleConfirmDelete = async () => {
+        if (!itemToDelete) return;
+
         try {
-            await deleteDoc(doc(db, 'produk', id));
-            setProdukList(produkList.filter((p) => p.id !== id));
+            await deleteDoc(doc(db, 'produk', itemToDelete.id));
+            setProdukList(produkList.filter((p) => p.id !== itemToDelete.id));
+            setShowDeleteConfirm(false);
+            setItemToDelete(null);
         } catch (error) {
             console.error('Error hapus produk:', error);
-            alert('Gagal menghapus produk.');
+            alert('Gagal menghapus produk.'); //
         }
     };
 
@@ -203,7 +216,7 @@ export default function ProdukPage({ setActivePage }) {
                             <button onClick={() => bukaFormEdit(produk)} className="p-1 rounded-full hover:bg-blue-100 text-blue-500 transition-colors">
                                 <Pencil size={14} />
                             </button>
-                            <button onClick={() => hapusProduk(produk.id)} className="p-1 rounded-full hover:bg-red-100 text-red-500 transition-colors">
+                            <button onClick={() => openDeleteConfirm(produk)} className="p-1 rounded-full hover:bg-red-100 text-red-500 transition-colors">
                                 <Trash2 size={14} />
                             </button>
                         </div>
@@ -214,7 +227,11 @@ export default function ProdukPage({ setActivePage }) {
     };
 
     if (loading) {
-        return <div className="p-5 text-center text-purple-700 min-h-[calc(100vh-120px)] flex items-center justify-center">Memuat katalog...</div>;
+        return (
+            <div className="min-h-[calc(100vh-120px)] flex items-center justify-center">
+                <Loader text="Memuat katalog..." />
+            </div>
+        );
     }
 
     return (
@@ -303,6 +320,31 @@ export default function ProdukPage({ setActivePage }) {
                     <p>
                         Total: {filteredProduk.length} produk {searchTerm && `(dari ${produkList.length} total)`}
                     </p>
+                </div>
+            )}
+
+            {/* Modal Konfirmasi Hapus */}
+            {showDeleteConfirm && (
+                <div className="fixed inset-0 z-[100] bg-black/60 flex items-center justify-center p-4 animate-in fade-in">
+                    <div className="bg-white rounded-2xl shadow-2xl p-6 w-full max-w-sm animate-in zoom-in-95 slide-in-from-bottom-5">
+                        <div className="text-center">
+                            <div className="w-16 h-16 mx-auto flex items-center justify-center bg-red-100 rounded-full">
+                                <Trash2 size={32} className="text-red-600" />
+                            </div>
+                            <h3 className="mt-4 text-xl font-bold text-slate-800">Hapus Produk?</h3>
+                            <p className="mt-2 text-sm text-slate-500">
+                                Anda akan menghapus <strong className="text-slate-700">{itemToDelete?.nama}</strong>. Tindakan ini tidak dapat dibatalkan.
+                            </p>
+                        </div>
+                        <div className="mt-6 grid grid-cols-2 gap-3">
+                            <button onClick={() => setShowDeleteConfirm(false)} className="w-full py-3 bg-slate-100 text-slate-700 rounded-lg font-semibold hover:bg-slate-200 transition">
+                                Batal
+                            </button>
+                            <button onClick={handleConfirmDelete} className="w-full py-3 bg-red-600 text-white rounded-lg font-semibold hover:bg-red-700 transition">
+                                Ya, Hapus
+                            </button>
+                        </div>
+                    </div>
                 </div>
             )}
         </div>

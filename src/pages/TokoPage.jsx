@@ -2,7 +2,8 @@
 import { useState, useEffect } from 'react';
 import { collection, getDocs, addDoc, updateDoc, deleteDoc, doc, serverTimestamp } from 'firebase/firestore';
 import { db } from '../lib/firebase';
-import { Store, Plus, Trash2, Pencil, CheckCircle2, Calendar, Filter, ArrowLeft, Package, MapPin } from 'lucide-react';
+import Loader from '../components/Loader';
+import { Store, Plus, Trash2, Pencil, CheckCircle2, Calendar, Filter, ArrowLeft, Package, MapPin, AlertTriangle } from 'lucide-react';
 import { MessageSquare } from 'lucide-react'; // Import MessageSquare
 const HARI = ['senin', 'selasa', 'rabu', 'kamis', 'jumat', 'sabtu'];
 
@@ -28,6 +29,10 @@ export default function TokoPage() {
     const [searchTerm, setSearchTerm] = useState(''); // New state for search term
     const [nomorWa, setNomorWa] = useState('');
     const [filterHari, setFilterHari] = useState('semua');
+
+    // State untuk modal konfirmasi hapus
+    const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+    const [itemToDelete, setItemToDelete] = useState(null);
 
     // Load data
     useEffect(() => {
@@ -145,14 +150,22 @@ export default function TokoPage() {
         }
     };
 
-    const hapusToko = async (id) => {
-        if (!confirm('Hapus toko ini?')) return;
+    const openDeleteConfirm = (toko) => {
+        setItemToDelete(toko);
+        setShowDeleteConfirm(true);
+    };
+
+    const handleConfirmDelete = async () => {
+        if (!itemToDelete) return;
+
         try {
-            await deleteDoc(doc(db, 'toko', id));
-            setTokoList(tokoList.filter((t) => t.id !== id));
+            await deleteDoc(doc(db, 'toko', itemToDelete.id));
+            setTokoList(tokoList.filter((t) => t.id !== itemToDelete.id));
+            setShowDeleteConfirm(false);
+            setItemToDelete(null);
         } catch (error) {
             console.error('Error hapus toko:', error);
-            alert('Gagal menghapus toko.');
+            alert('Gagal menghapus toko.'); //
         }
     };
 
@@ -269,7 +282,11 @@ export default function TokoPage() {
 
             {/* Daftar Toko */}
             {loading ? (
-                <div className="text-center py-10 text-purple-700">Memuat toko...</div>
+                <div className="py-10">
+                    <div className="flex items-center justify-center">
+                        <Loader text="Memuat daftar toko..." />
+                    </div>
+                </div>
             ) : tokoList.length === 0 ? (
                 <div className="text-center py-10 text-gray-500 bg-slate-50 rounded-xl">
                     Belum ada toko.
@@ -304,7 +321,7 @@ export default function TokoPage() {
                                     <button onClick={() => openEditForm(toko)} className="p-1 rounded-full hover:bg-blue-100 text-blue-500 transition-colors">
                                         <Pencil size={14} />
                                     </button>
-                                    <button onClick={() => hapusToko(toko.id)} className="p-1 rounded-full hover:bg-red-100 text-red-500 transition-colors">
+                                    <button onClick={() => openDeleteConfirm(toko)} className="p-1 rounded-full hover:bg-red-100 text-red-500 transition-colors">
                                         <Trash2 size={14} />
                                     </button>
                                 </div>
@@ -338,6 +355,31 @@ export default function TokoPage() {
                     Total: {filteredToko.length} toko {(searchTerm || filterHari !== 'semua') && `(dari ${tokoList.length} total)`}
                 </p>
             </div>
+
+            {/* Modal Konfirmasi Hapus */}
+            {showDeleteConfirm && (
+                <div className="fixed inset-0 z-[100] bg-black/60 flex items-center justify-center p-4 animate-in fade-in">
+                    <div className="bg-white rounded-2xl shadow-2xl p-6 w-full max-w-sm animate-in zoom-in-95 slide-in-from-bottom-5">
+                        <div className="text-center">
+                            <div className="w-16 h-16 mx-auto flex items-center justify-center bg-red-100 rounded-full">
+                                <Trash2 size={32} className="text-red-600" />
+                            </div>
+                            <h3 className="mt-4 text-xl font-bold text-slate-800">Hapus Toko?</h3>
+                            <p className="mt-2 text-sm text-slate-500">
+                                Anda akan menghapus <strong className="text-slate-700">{itemToDelete?.nama}</strong>. Tindakan ini tidak dapat dibatalkan.
+                            </p>
+                        </div>
+                        <div className="mt-6 grid grid-cols-2 gap-3">
+                            <button onClick={() => setShowDeleteConfirm(false)} className="w-full py-3 bg-slate-100 text-slate-700 rounded-lg font-semibold hover:bg-slate-200 transition">
+                                Batal
+                            </button>
+                            <button onClick={handleConfirmDelete} className="w-full py-3 bg-red-600 text-white rounded-lg font-semibold hover:bg-red-700 transition">
+                                Ya, Hapus
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 }
