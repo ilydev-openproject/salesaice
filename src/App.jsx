@@ -9,7 +9,8 @@ import VisitPage from './pages/VisitPage';
 import { Home, Package, Store, MapPin } from 'lucide-react';
 
 export default function App() {
-    const [activePage, setActivePage] = useState('home');
+    // Baca halaman aktif dari localStorage saat pertama kali load, default ke 'home' jika tidak ada.
+    const [activePage, setActivePage] = useState(() => localStorage.getItem('activePage') || 'home');
     const [daftarToko, setDaftarToko] = useState([]);
     const [kunjunganList, setKunjunganList] = useState([]);
     const [produkList, setProdukList] = useState([]); // New state for produkList
@@ -44,6 +45,11 @@ export default function App() {
         loadData();
     }, []);
 
+    // === Simpan activePage ke localStorage setiap kali berubah ===
+    useEffect(() => {
+        localStorage.setItem('activePage', activePage);
+    }, [activePage]);
+
     if (loading) {
         return (
             <div
@@ -72,9 +78,9 @@ export default function App() {
         >
             <div style={{ flex: 1, paddingBottom: '70px' }}>
                 {activePage === 'home' && <HomePage daftarToko={daftarToko} kunjunganList={kunjunganList} produkList={produkList} setActivePage={setActivePage} />}
-                {activePage === 'toko' && <TokoPage />}
-                {activePage === 'produk' && <ProdukPage />}
-                {activePage === 'visit' && <VisitPage />}
+                {activePage === 'toko' && <TokoPage setActivePage={setActivePage} />}
+                {activePage === 'produk' && <ProdukPage setActivePage={setActivePage} />}
+                {activePage === 'visit' && <VisitPage setActivePage={setActivePage} />}
             </div>
 
             {/* Bottom Navigation */}

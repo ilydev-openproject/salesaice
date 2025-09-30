@@ -3,13 +3,13 @@ import { useState, useEffect, useRef, useCallback } from 'react';
 import { collection, getDocs, addDoc, serverTimestamp, query, orderBy, doc, updateDoc, deleteDoc } from 'firebase/firestore';
 import { DayPicker } from 'react-day-picker';
 import 'react-day-picker/dist/style.css';
-import { format } from 'date-fns';
+import { format, isSameDay, isSameMonth, startOfMonth, endOfMonth } from 'date-fns'; // Added isSameDay, isSameMonth, startOfMonth, endOfMonth
 import { toPng } from 'html-to-image';
 import { db } from '../lib/firebase';
-import { Store, Package, Plus, Minus, CheckCircle2, XCircle, ChevronDown, MapPin, ArrowLeft, ShoppingCart, Calendar, Pencil, Trash2, Wallet, Search, CalendarRange, Download, MoreVertical, Eye, X } from 'lucide-react';
+import { Store, Package, Plus, Minus, CheckCircle2, XCircle, ChevronDown, MapPin, ArrowLeft, ShoppingCart, Calendar, Pencil, Trash2, Wallet, Search, CalendarRange, Download, MoreVertical, Eye, X, MessageSquare, AlertTriangle, Camera, CircleDot, Trash } from 'lucide-react';
 import VisitReceipt from '../components/VisitReceipt';
 
-export default function VisitPage() {
+export default function VisitPage({ setActivePage }) {
     // State untuk daftar kunjungan
     const [kunjunganList, setKunjunganList] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -26,6 +26,7 @@ export default function VisitPage() {
     const [isTokoDropdownOpen, setIsTokoDropdownOpen] = useState(false);
     const [isDataLoaded, setIsDataLoaded] = useState(false); // Untuk load data form sekali saja
     const [searchTerm, setSearchTerm] = useState('');
+    const [productSearchTerm, setProductSearchTerm] = useState(''); // State untuk filter produk di form
     // State untuk filter tanggal
     const [filterType, setFilterType] = useState('today'); // 'today', 'custom'
     const [customDate, setCustomDate] = useState(new Date());
@@ -36,18 +37,40 @@ export default function VisitPage() {
     // State untuk modal preview resi
     const [showReceiptPreview, setShowReceiptPreview] = useState(false);
     const [previewImageUrl, setPreviewImageUrl] = useState('');
+    // State untuk kamera
+    const [showCameraView, setShowCameraView] = useState(false);
+    const [capturedImage, setCapturedImage] = useState(null); // Akan menyimpan data URL gambar
+    const videoRef = useRef(null);
+    const canvasRef = useRef(null);
+    const streamRef = useRef(null);
     const [previewImageFilename, setPreviewImageFilename] = useState('');
+
+    // State untuk notifikasi modern
+    const [notification, setNotification] = useState({ show: false, message: '', type: 'success' });
+
+    const showNotification = (message, type = 'success') => {
+        setNotification({ show: true, message, type });
+        setTimeout(() => {
+            setNotification({ show: false, message: '', type: 'success' });
+        }, 3000); // Sembunyikan setelah 3 detik
+    };
 
     const [openMenuId, setOpenMenuId] = useState(null); // State untuk menu titik tiga
 
     // Load daftar kunjungan
     useEffect(() => {
-        fetchKunjungan();
+        const loadInitialData = async () => {
+            setLoading(true);
+            await Promise.all([fetchKunjungan(), loadTokoData()]);
+            setLoading(false);
+        };
+        loadInitialData();
     }, []);
 
     const loadFormData = async () => {
         if (isDataLoaded) return; // Jangan load ulang jika sudah ada
         try {
+            // Ini hanya akan memuat data produk sekarang
             const [tokoSnap, produkSnap] = await Promise.all([getDocs(collection(db, 'toko')), getDocs(collection(db, 'produk'))]);
             const tokoData = tokoSnap.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
             const produkData = produkSnap.docs
@@ -57,13 +80,10 @@ export default function VisitPage() {
 
             setTokoList(tokoData);
             setProdukList(produkData);
-            if (tokoData.length > 0 && !selectedTokoId) {
-                setSelectedTokoId(tokoData[0].id);
-            }
             setIsDataLoaded(true);
         } catch (error) {
             console.error('Error load data:', error);
-            alert('Gagal memuat data toko/produk.');
+            showNotification('Gagal memuat data toko/produk.', 'error');
         }
     };
 
@@ -75,7 +95,6 @@ export default function VisitPage() {
     }, [showForm, isDataLoaded]);
 
     const fetchKunjungan = async () => {
-        setLoading(true);
         try {
             const q = query(collection(db, 'kunjungan'), orderBy('createdAt', 'desc'));
             const snapshot = await getDocs(q);
@@ -83,8 +102,16 @@ export default function VisitPage() {
             setKunjunganList(list);
         } catch (error) {
             console.error('Error fetching kunjungan:', error);
-        } finally {
-            setLoading(false);
+        }
+    };
+
+    const loadTokoData = async () => {
+        try {
+            const tokoSnap = await getDocs(collection(db, 'toko'));
+            const tokoData = tokoSnap.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
+            setTokoList(tokoData);
+        } catch (error) {
+            console.error('Error loading toko data:', error);
         }
     };
 
@@ -121,7 +148,7 @@ export default function VisitPage() {
     const handleSubmit = async (e) => {
         e.preventDefault();
         if (!selectedTokoId) {
-            alert('Pilih toko terlebih dahulu!');
+            showNotification('Pilih toko terlebih dahulu!', 'error');
             return;
         }
 
@@ -143,6 +170,7 @@ export default function VisitPage() {
             tokoNama: selectedToko?.nama || 'Toko Tidak Diketahui',
             kodeToko: selectedToko?.kode || '',
             items,
+            fotoKunjungan: capturedImage, // Simpan gambar sebagai data URL
             catatan: catatan.trim(),
             total: getGrandTotal(),
             // createdAt tidak diupdate saat edit
@@ -154,14 +182,14 @@ export default function VisitPage() {
                 // Update
                 const visitRef = doc(db, 'kunjungan', editingVisitId);
                 await updateDoc(visitRef, kunjunganData);
-                alert('Kunjungan berhasil diperbarui!');
+                showNotification('Kunjungan berhasil diperbarui.');
             } else {
                 // Create
                 await addDoc(collection(db, 'kunjungan'), {
                     ...kunjunganData,
                     createdAt: serverTimestamp(),
                 });
-                alert('Kunjungan berhasil disimpan!');
+                showNotification('Kunjungan berhasil disimpan.');
             }
 
             // Reset
@@ -169,7 +197,7 @@ export default function VisitPage() {
             fetchKunjungan(); // Muat ulang daftar kunjungan
         } catch (error) {
             console.error('Error saving visit:', error);
-            alert('Gagal menyimpan kunjungan.');
+            showNotification('Gagal menyimpan kunjungan.', 'error');
         } finally {
             setSubmitting(false);
         }
@@ -187,6 +215,8 @@ export default function VisitPage() {
         setCart({});
         setCatatan('');
         setSelectedTokoId(tokoList.length > 0 ? tokoList[0].id : '');
+        setCapturedImage(null);
+        setProductSearchTerm(''); // Reset filter produk saat form ditutup
     };
 
     const handleEdit = async (kunjungan) => {
@@ -195,6 +225,7 @@ export default function VisitPage() {
         setEditingVisitId(kunjungan.id);
         setSelectedTokoId(kunjungan.tokoId);
         setCatatan(kunjungan.catatan || '');
+        setCapturedImage(kunjungan.fotoKunjungan || null);
 
         // Buat ulang cart dari data kunjungan
         const initialCart = kunjungan.items.reduce((acc, item) => {
@@ -212,14 +243,71 @@ export default function VisitPage() {
         }
         try {
             await deleteDoc(doc(db, 'kunjungan', visitId));
-            alert('Kunjungan berhasil dihapus.');
+            showNotification('Kunjungan berhasil dihapus.');
             fetchKunjungan(); // Muat ulang daftar
         } catch (error) {
             console.error('Error deleting visit:', error);
-            alert('Gagal menghapus kunjungan.');
+            showNotification('Gagal menghapus kunjungan.', 'error');
         }
     };
 
+    // --- LOGIKA KAMERA ---
+    const startCamera = async () => {
+        setShowCameraView(true);
+        try {
+            const stream = await navigator.mediaDevices.getUserMedia({
+                video: { facingMode: 'environment' }, // Prioritaskan kamera belakang
+                audio: false,
+            });
+            if (videoRef.current) {
+                videoRef.current.srcObject = stream;
+                streamRef.current = stream; // Simpan stream untuk bisa dihentikan nanti
+            }
+        } catch (err) {
+            console.error('Error accessing camera:', err);
+            showNotification('Gagal mengakses kamera. Pastikan izin telah diberikan.', 'error');
+            setShowCameraView(false);
+        }
+    };
+
+    const stopCamera = () => {
+        if (streamRef.current) {
+            streamRef.current.getTracks().forEach((track) => track.stop());
+        }
+        setShowCameraView(false);
+    };
+
+    const takePicture = () => {
+        if (videoRef.current && canvasRef.current) {
+            const video = videoRef.current;
+            const canvas = canvasRef.current;
+            const context = canvas.getContext('2d');
+
+            // Set ukuran canvas sesuai dengan video
+            canvas.width = video.videoWidth;
+            canvas.height = video.videoHeight;
+
+            // Gambar frame video ke canvas
+            context.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+            // Tambahkan timestamp
+            const timestamp = new Date().toLocaleString('id-ID', { dateStyle: 'medium', timeStyle: 'short' });
+            context.font = 'bold 24px Arial';
+            context.fillStyle = 'white';
+            context.strokeStyle = 'black';
+            context.lineWidth = 4;
+            const textWidth = context.measureText(timestamp).width;
+            context.strokeText(timestamp, canvas.width - textWidth - 20, canvas.height - 20);
+            context.fillText(timestamp, canvas.width - textWidth - 20, canvas.height - 20);
+
+            // Dapatkan data URL dan simpan
+            const dataUrl = canvas.toDataURL('image/jpeg', 0.9);
+            setCapturedImage(dataUrl);
+
+            // Hentikan kamera dan tutup view
+            stopCamera();
+        }
+    };
     const filteredKunjungan = kunjunganList
         .filter((kunjungan) => {
             if (!kunjungan.createdAt?.seconds) return false;
@@ -251,7 +339,7 @@ export default function VisitPage() {
         setTimeout(async () => {
             const node = document.getElementById(`receipt-${kunjungan.id}`);
             if (!node) {
-                alert('Gagal menemukan elemen resi.');
+                showNotification('Gagal menemukan elemen resi.', 'error');
                 setReceiptKunjungan(null);
                 return;
             }
@@ -263,7 +351,7 @@ export default function VisitPage() {
                 setShowReceiptPreview(true);
             } catch (err) {
                 console.error('oops, something went wrong!', err);
-                alert('Gagal membuat pratinjau resi.');
+                showNotification('Gagal membuat pratinjau resi.', 'error');
             } finally {
                 setReceiptKunjungan(null); // Sembunyikan lagi setelah selesai
             }
@@ -278,10 +366,132 @@ export default function VisitPage() {
     const closeMenu = () => setOpenMenuId(null);
 
     const handleDownloadFromPreview = () => {
-        const link = document.createElement('a');
+        const link = document.createElement('a'); //
         link.download = previewImageFilename;
         link.href = previewImageUrl;
         link.click();
+    };
+
+    const handleWhatsAppShare = (kunjungan) => {
+        console.log('--- handleWhatsAppShare called ---');
+        console.log('Kunjungan being shared:', kunjungan);
+
+        const toko = tokoList.find((t) => t.id === kunjungan.tokoId);
+        if (!toko) {
+            showNotification('Data toko tidak ditemukan untuk membuat laporan.', 'error');
+            console.error('Toko not found for tokoId:', kunjungan.tokoId);
+            return;
+        }
+        console.log('Found Toko:', toko);
+
+        const visitDate = new Date(kunjungan.createdAt.seconds * 1000);
+        console.log('Visit Date (from kunjungan.createdAt):', visitDate);
+
+        // 1. No Urut Kunjungan Hari Ini
+        const visitsToday = kunjunganList
+            .filter((v) => {
+                if (!v.createdAt?.seconds || typeof v.createdAt.seconds !== 'number') {
+                    console.warn('Skipping visit due to invalid createdAt for daily stats:', v.id, v.createdAt);
+                    return false;
+                }
+                const d = new Date(v.createdAt.seconds * 1000);
+                return isSameDay(d, visitDate); // Use isSameDay from date-fns
+            })
+            .sort((a, b) => a.createdAt.seconds - b.createdAt.seconds);
+        const visitOrderToday = visitsToday.findIndex((v) => v.id === kunjungan.id) + 1;
+        console.log(
+            'Visits Today (for ordering):',
+            visitsToday.map((v) => ({ id: v.id, tokoNama: v.tokoNama, createdAt: new Date(v.createdAt.seconds * 1000) })),
+        );
+        console.log('Visit Order Today:', visitOrderToday);
+
+        // 2. Statistik Bulan Ini
+        const currentMonthStart = startOfMonth(visitDate);
+        const currentMonthEnd = endOfMonth(visitDate);
+        console.log('Start of Month:', currentMonthStart);
+        console.log('End of Month:', currentMonthEnd);
+
+        const visitsThisMonthForToko = kunjunganList.filter((v) => {
+            if (!v.createdAt?.seconds || typeof v.createdAt.seconds !== 'number') {
+                console.warn('Skipping visit for month stats due to invalid createdAt:', v.id, v.createdAt);
+                return false;
+            }
+            const d = new Date(v.createdAt.seconds * 1000);
+            const isSameToko = v.tokoId === kunjungan.tokoId;
+            const isInMonth = isSameMonth(d, visitDate); // Use isSameMonth from date-fns
+            // console.log(`Visit ${v.id} (${v.tokoNama}): tokoId match=${isSameToko}, in month=${isInMonth}, date=${d}`);
+            return isSameToko && isInMonth;
+        });
+        const totalVisitsThisMonth = visitsThisMonthForToko.length;
+        const totalBoxesThisMonth = visitsThisMonthForToko.reduce((sum, v) => sum + (v.items?.reduce((itemSum, item) => itemSum + item.qtyBox, 0) || 0), 0);
+        console.log(
+            'Visits This Month For Toko:',
+            visitsThisMonthForToko.map((v) => ({ id: v.id, tokoNama: v.tokoNama, createdAt: new Date(v.createdAt.seconds * 1000), total: v.total })),
+        );
+        console.log('Total Visits This Month (for this toko):', totalVisitsThisMonth);
+        console.log('Total Boxes This Month (for this toko):', totalBoxesThisMonth);
+
+        const totalOrderBox = kunjungan.items.reduce((sum, item) => sum + item.qtyBox, 0);
+        console.log('Total Order Box (current visit):', totalOrderBox);
+
+        const padRight = (str, len) => str.padEnd(len, ' ');
+
+        const message = `LAPORAN KUNJUNGAN K2 
+
+${padRight('No Urut', 15)}: ${visitOrderToday}
+${padRight('Nama Toko', 15)}: ${kunjungan.tokoNama}
+${padRight('Kode Toko', 15)}: ${kunjungan.kodeToko || '-'}
+
+${padRight('Kunjungan ke', 15)}: ${totalVisitsThisMonth} (bln ini)
+${padRight('Total order', 15)}: ${totalOrderBox} box
+${padRight('Total bln ini', 15)}: ${totalBoxesThisMonth} box
+
+${padRight('No HP', 15)}: ${toko.nomorWa || '-'}
+
+`
+            .trim() // Trim leading/trailing whitespace from the whole string
+            .split('\n') // Split into lines
+            .map((line) => line.trimEnd()) // Trim trailing spaces from each line
+            .join('\n');
+
+        const whatsappUrl = `https://wa.me/?text=${encodeURIComponent(message)}`;
+        window.open(whatsappUrl, '_blank');
+        closeMenu();
+    };
+    const handleShareWithImage = async (kunjungan) => {
+        if (!navigator.share) {
+            showNotification('Browser Anda tidak mendukung fitur berbagi.', 'error');
+            return;
+        }
+
+        // Ambil teks laporan dari fungsi yang sudah ada
+        const reportText = getWhatsAppMessageText(kunjungan);
+
+        try {
+            // Konversi data URL gambar ke Blob, lalu ke File
+            const response = await fetch(kunjungan.fotoKunjungan);
+            const blob = await response.blob();
+            const file = new File([blob], `kunjungan-${kunjungan.tokoNama}.jpg`, { type: 'image/jpeg' });
+
+            // Gunakan Web Share API
+            await navigator.share({
+                title: `Laporan Kunjungan ${kunjungan.tokoNama}`,
+                text: reportText,
+                files: [file],
+            });
+            closeMenu();
+        } catch (error) {
+            // Jika pengguna membatalkan share, error akan muncul. Kita bisa abaikan.
+            if (error.name !== 'AbortError') {
+                console.error('Error sharing:', error);
+                // Jika gagal (misal karena file terlalu besar), coba share teks saja
+                try {
+                    await navigator.share({ title: `Laporan Kunjungan ${kunjungan.tokoNama}`, text: reportText });
+                } catch (shareError) {
+                    console.error('Error sharing text only:', shareError);
+                }
+            }
+        }
     };
 
     if (loading) {
@@ -290,13 +500,26 @@ export default function VisitPage() {
 
     return (
         <>
+            {/* Komponen Notifikasi Modern (Hanya render jika 'show' true) */}
+            {notification.show && (
+                <div className="fixed top-4 left-1/2 -translate-x-1/2 z-[100] w-full max-w-sm px-4 transition-all duration-300 animate-in slide-in-from-top-5 fade-in">
+                    <div className={`flex items-center gap-3 w-full p-3 rounded-xl shadow-2xl border ${notification.type === 'success' ? 'bg-green-500 border-green-600 text-white' : 'bg-red-500 border-red-600 text-white'}`}>
+                        {notification.type === 'success' ? <CheckCircle2 size={20} /> : <AlertTriangle size={20} />}
+                        <p className="font-semibold text-sm flex-1">{notification.message}</p>
+                        <button onClick={() => setNotification({ ...notification, show: false })} className="opacity-70 hover:opacity-100">
+                            <X size={18} />
+                        </button>
+                    </div>
+                </div>
+            )}
+
             {/* Halaman Utama: Daftar Kunjungan */}
-            <div className="p-5 pb-20 max-w-md mx-auto" onClick={closeMenu}>
+            <div className=" pb-20 max-w-md mx-auto" onClick={closeMenu}>
                 <div className="p-5 pb-20 max-w-md mx-auto">
                     <div className="flex justify-between items-center mb-6">
                         <h2 className="text-2xl font-bold text-slate-800 flex items-center gap-2">
                             <MapPin className="text-purple-600" />
-                            Riwayat Kunjungan
+                            Kunjungan
                         </h2>
                         <button onClick={openForm} className="bg-purple-600 text-white px-4 py-2 rounded-full font-semibold flex items-center gap-2 hover:bg-purple-700 transition shadow-md hover:shadow-lg">
                             <Plus size={18} /> Tambah
@@ -391,6 +614,14 @@ export default function VisitPage() {
                                                     >
                                                         <Eye size={16} /> Lihat Resi
                                                     </button>
+                                                    <button
+                                                        onClick={() => {
+                                                            kunjungan.fotoKunjungan ? handleShareWithImage(kunjungan) : handleWhatsAppShare(kunjungan);
+                                                        }}
+                                                        className="w-full text-left px-4 py-2 text-sm text-slate-700 hover:bg-slate-100 flex items-center gap-3"
+                                                    >
+                                                        <MessageSquare size={16} /> Kirim via WA
+                                                    </button>
                                                     <div className="my-1 h-px bg-slate-100"></div>
                                                     <button
                                                         onClick={() => {
@@ -419,19 +650,19 @@ export default function VisitPage() {
                     <div className={`absolute inset-y-0 left-0 w-full max-w-md bg-slate-50 shadow-2xl transition-transform duration-300 ease-in-out transform ${showForm ? 'translate-x-0' : '-translate-x-full'}`}>
                         <div className="h-full flex flex-col">
                             <div className="flex items-center justify-between p-4 bg-white">
-                                <button type="button" onClick={resetForm} className="p-2 rounded-full hover:bg-slate-100">
+                                <button type="button" onClick={resetForm} className="p-2 rounded-full hover:bg-slate-100" aria-label="Kembali">
                                     <ArrowLeft size={20} />
                                 </button>
                                 <h2 className="text-lg font-bold text-slate-800">{editingVisitId ? 'Edit Kunjungan' : 'Tambah Kunjungan'}</h2>
                                 <div className="w-10"></div> {/* Spacer */}
                             </div>
 
-                            <form id="visit-form" onSubmit={handleSubmit} className="flex-1 overflow-y-auto p-5 space-y-6">
+                            <form id="visit-form" onSubmit={handleSubmit} className="flex-1 overflow-y-auto p-4 space-y-4">
                                 {/* Pilih Toko */}
                                 <div>
                                     <label className="block text-sm font-medium text-slate-700 mb-2">Toko yang Dikunjungi</label>
                                     <div className="relative" style={{ pointerEvents: editingVisitId ? 'none' : 'auto', opacity: editingVisitId ? 0.7 : 1 }}>
-                                        <button type="button" onClick={() => setIsTokoDropdownOpen(!isTokoDropdownOpen)} className="w-full p-3 text-left bg-white border border-gray-300 rounded-lg flex justify-between items-center focus:outline-none focus:ring-2 focus:ring-purple-500">
+                                        <button type="button" onClick={() => setIsTokoDropdownOpen(!isTokoDropdownOpen)} className="w-full p-2.5 text-left bg-white border border-gray-300 rounded-lg flex justify-between items-center focus:outline-none focus:ring-2 focus:ring-purple-500">
                                             <span className="flex items-center gap-2">
                                                 <Store size={18} className="text-slate-500" />
                                                 {tokoList.find((t) => t.id === selectedTokoId)?.nama || 'Pilih Toko'}
@@ -448,15 +679,19 @@ export default function VisitPage() {
                                                         if (b.id === selectedTokoId) return 1; // b (selected) comes first
                                                         return a.nama.localeCompare(b.nama); // Urutkan sisanya berdasarkan abjad
                                                     })
-                                                    .map((toko) => (
-                                                        <div key={toko.id} onClick={() => handleSelectToko(toko.id)} className={`p-3 cursor-pointer hover:bg-purple-50 flex justify-between items-center ${selectedTokoId === toko.id ? 'bg-purple-100 font-semibold' : ''}`}>
-                                                            <span>
-                                                                {toko.nama}
-                                                                {toko.kode && <span className="text-xs text-slate-500 ml-2">({toko.kode})</span>}
-                                                            </span>
-                                                            {selectedTokoId === toko.id && <CheckCircle2 size={16} className="text-purple-600" />}
-                                                        </div>
-                                                    ))}
+                                                    .map(
+                                                        (
+                                                            toko, // Perkecil padding item dropdown
+                                                        ) => (
+                                                            <div key={toko.id} onClick={() => handleSelectToko(toko.id)} className={`p-2.5 cursor-pointer hover:bg-purple-50 flex justify-between items-center ${selectedTokoId === toko.id ? 'bg-purple-100 font-semibold' : ''}`}>
+                                                                <span>
+                                                                    {toko.nama}
+                                                                    {toko.kode && <span className="text-xs text-slate-500 ml-2">({toko.kode})</span>}
+                                                                </span>
+                                                                {selectedTokoId === toko.id && <CheckCircle2 size={16} className="text-purple-600" />}
+                                                            </div>
+                                                        ),
+                                                    )}
                                             </div>
                                         )}
                                     </div>
@@ -465,58 +700,113 @@ export default function VisitPage() {
                                 {/* Catatan */}
                                 <div>
                                     <label className="block text-sm font-medium text-slate-700 mb-2">Catatan (Opsional)</label>
-                                    <textarea value={catatan} onChange={(e) => setCatatan(e.target.value)} placeholder="Catatan hasil kunjungan..." className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500" rows="3" />
+                                    <textarea value={catatan} onChange={(e) => setCatatan(e.target.value)} placeholder="Catatan hasil kunjungan..." className="w-full p-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500" rows="3" />
                                 </div>
+
+                                {/* Foto Kunjungan */}
+                                <div>
+                                    <label className="block text-sm font-medium text-slate-700 mb-2">Foto Kunjungan</label>
+                                    {capturedImage ? (
+                                        <div className="relative group">
+                                            <img src={capturedImage} alt="Foto Kunjungan" className="w-full h-auto rounded-lg border-2 border-purple-300" />
+                                            <div className="absolute inset-0 bg-black/50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity rounded-lg">
+                                                <button type="button" onClick={() => setCapturedImage(null)} className="flex items-center gap-2 text-white bg-red-600/80 px-4 py-2 rounded-full font-semibold hover:bg-red-600">
+                                                    <Trash size={16} /> Hapus Foto
+                                                </button>
+                                            </div>
+                                        </div>
+                                    ) : (
+                                        <button type="button" onClick={startCamera} className="w-full flex flex-col items-center justify-center gap-2 p-6 border-2 border-dashed border-slate-300 rounded-lg text-slate-500 hover:bg-slate-100 hover:border-purple-400 transition">
+                                            <Camera size={32} />
+                                            <span className="font-semibold">Ambil Foto</span>
+                                        </button>
+                                    )}
+                                </div>
+
+                                {/* Canvas (tersembunyi) untuk menggambar timestamp */}
+                                <canvas ref={canvasRef} style={{ display: 'none' }}></canvas>
 
                                 {/* Daftar Produk */}
                                 <div>
                                     <div className="flex items-center gap-2 mb-3">
                                         <Package className="text-purple-600" size={18} />
-                                        <h3 className="text-lg font-semibold text-slate-800">Pilih Produk</h3>
+                                        <h3 className="text-base font-semibold text-slate-800">Pilih Produk</h3>
                                     </div>
 
+                                    <div className="relative mb-3">
+                                        <input type="text" placeholder="Cari produk..." value={productSearchTerm} onChange={(e) => setProductSearchTerm(e.target.value)} className="w-full p-2.5 pl-10 text-slate-700 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500" />
+                                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={20} />
+                                    </div>
                                     {produkList.length === 0 ? (
-                                        <div className="text-center py-4 text-gray-500 bg-slate-100 rounded-lg">Memuat produk...</div>
-                                    ) : (
-                                        <div className="space-y-3">
-                                            {produkList.map((produk) => {
-                                                const qty = cart[produk.id] || 0;
-                                                const isAvailable = produk.available;
-                                                return (
-                                                    <div key={produk.id} className={`rounded-xl p-3 border transition-all duration-300 ${qty > 0 ? 'bg-green-500 border-green-300' : 'bg-white border-gray-200'} ${!isAvailable ? 'bg-slate-100 border-slate-200' : ''}`}>
-                                                        <div className="flex items-center gap-4">
-                                                            <div className="relative w-16 h-16 flex-shrink-0">
-                                                                <img
-                                                                    src={produk.foto || 'https://via.placeholder.com/100?text=Produk'}
-                                                                    alt={produk.nama}
-                                                                    className={`w-full h-full object-contain rounded-lg ${!isAvailable ? 'grayscale' : ''}`}
-                                                                    onError={(e) => {
-                                                                        e.target.src = 'https://via.placeholder.com/100?text=Produk';
-                                                                    }}
-                                                                />
-                                                                {!isAvailable && (
-                                                                    <div className="absolute inset-0 bg-white/70 flex items-center justify-center rounded-lg text-center">
-                                                                        <span className="text-xs font-bold text-red-600">Habis</span>
-                                                                    </div>
-                                                                )}
+                                        <div className="space-y-2">
+                                            {[...Array(3)].map(
+                                                (
+                                                    _,
+                                                    index, // Render 3 skeleton items
+                                                ) => (
+                                                    <div key={index} className="rounded-xl p-2.5 border border-gray-200 bg-white animate-pulse">
+                                                        <div className="flex items-center gap-3">
+                                                            {/* Image Placeholder */}
+                                                            <div className="w-14 h-14 flex-shrink-0 bg-gray-200 rounded-lg"></div>
+                                                            {/* Text Placeholders */}
+                                                            <div className="flex-grow space-y-1">
+                                                                <div className="h-3 bg-gray-200 rounded w-3/4"></div>
+                                                                <div className="h-2.5 bg-gray-200 rounded w-1/2"></div>
                                                             </div>
-                                                            <div className="flex-grow">
-                                                                <h4 className={`font-bold text-slate-800 ${!isAvailable ? 'line-through text-slate-500' : ''}`}>{produk.nama}</h4>
-                                                                <p className="text-sm text-slate-600 mt-1">Rp{(produk.hargaPerBox || 0).toLocaleString('id-ID')} / box</p>
-                                                            </div>
+                                                            {/* Quantity Control Placeholders */}
                                                             <div className="flex items-center gap-1 flex-shrink-0">
-                                                                <button type="button" onClick={() => updateQty(produk.id, -1)} className="w-8 h-8 rounded-full bg-slate-200 flex items-center justify-center text-slate-700 hover:bg-slate-300 disabled:opacity-50" disabled={qty === 0 || !isAvailable}>
-                                                                    <Minus size={16} />
-                                                                </button>
-                                                                <span className="w-8 text-center font-bold text-lg text-purple-700">{qty}</span>
-                                                                <button type="button" onClick={() => updateQty(produk.id, 1)} className="w-8 h-8 rounded-full bg-purple-600 flex items-center justify-center text-white hover:bg-purple-700 disabled:opacity-50 disabled:bg-slate-300" disabled={!isAvailable}>
-                                                                    <Plus size={16} />
-                                                                </button>
+                                                                <div className="w-7 h-7 rounded-full bg-gray-200"></div>
+                                                                <div className="w-7 h-7 bg-gray-200 rounded"></div>
+                                                                <div className="w-7 h-7 rounded-full bg-gray-200"></div>
                                                             </div>
                                                         </div>
                                                     </div>
-                                                );
-                                            })}
+                                                ),
+                                            )}
+                                            <div className="text-center py-2 text-gray-500 text-sm">Memuat produk...</div>
+                                        </div>
+                                    ) : (
+                                        <div className="space-y-3">
+                                            {produkList // Reduce product list item padding, image size, and font sizes
+                                                .filter((p) => p.nama.toLowerCase().includes(productSearchTerm.toLowerCase()))
+                                                .map((produk) => {
+                                                    const qty = cart[produk.id] || 0;
+                                                    const isAvailable = produk.available;
+                                                    return (
+                                                        <div key={produk.id} className={`rounded-xl p-2.5 border transition-all duration-300 ${qty > 0 ? 'bg-green-50 border-green-300' : 'bg-white border-gray-200'} ${!isAvailable ? 'bg-slate-100 border-slate-200' : ''}`}>
+                                                            <div className="flex items-center gap-3">
+                                                                <div className="relative w-14 h-14 flex-shrink-0">
+                                                                    <img
+                                                                        src={produk.foto || 'https://via.placeholder.com/100?text=Produk'}
+                                                                        alt={produk.nama}
+                                                                        className={`w-full h-full object-cover rounded-lg ${!isAvailable ? 'grayscale' : ''}`}
+                                                                        onError={(e) => {
+                                                                            e.target.src = 'https://via.placeholder.com/100?text=Produk';
+                                                                        }}
+                                                                    />
+                                                                    {!isAvailable && (
+                                                                        <div className="absolute inset-0 bg-white/70 flex items-center justify-center rounded-lg text-center">
+                                                                            <span className="text-xs font-bold text-red-600">Habis</span>
+                                                                        </div>
+                                                                    )}
+                                                                </div>
+                                                                <div className="flex-grow">
+                                                                    <h4 className={`font-bold text-sm text-slate-800 ${!isAvailable ? 'line-through text-slate-500' : ''}`}>{produk.nama}</h4>
+                                                                    <p className="text-xs text-slate-600 mt-1">Rp{(produk.hargaPerBox || 0).toLocaleString('id-ID')} / box</p>
+                                                                </div>
+                                                                <div className="flex items-center gap-1 flex-shrink-0">
+                                                                    <button type="button" onClick={() => updateQty(produk.id, -1)} className="w-7 h-7 rounded-full bg-slate-200 flex items-center justify-center text-slate-700 hover:bg-slate-300 disabled:opacity-50" disabled={qty === 0 || !isAvailable}>
+                                                                        <Minus size={16} />
+                                                                    </button>
+                                                                    <span className="w-7 text-center font-bold text-base text-purple-700">{qty}</span>
+                                                                    <button type="button" onClick={() => updateQty(produk.id, 1)} className="w-7 h-7 rounded-full bg-purple-600 flex items-center justify-center text-white hover:bg-purple-700 disabled:opacity-50 disabled:bg-slate-300" disabled={!isAvailable}>
+                                                                        <Plus size={16} />
+                                                                    </button>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    );
+                                                })}
                                         </div>
                                     )}
                                 </div>
@@ -546,9 +836,9 @@ export default function VisitPage() {
 
             {/* Modal Preview Resi */}
             {showReceiptPreview && (
-                <div className="fixed inset-0 z-[60] bg-black/70 flex flex-col items-center justify-center p-4" onClick={() => setShowReceiptPreview(false)}>
-                    <div className="relative w-full max-w-sm bg-slate-100 rounded-2xl shadow-2xl p-4" onClick={(e) => e.stopPropagation()}>
-                        <button onClick={() => setShowReceiptPreview(false)} className="absolute -top-3 -right-3 w-8 h-8 bg-white rounded-full flex items-center justify-center shadow-lg text-slate-600 hover:bg-slate-200 transition">
+                <div className="fixed inset-0 z-[60] bg-black/70 flex flex-col items-center justify-end p-4 transition-opacity duration-300" onClick={() => setShowReceiptPreview(false)}>
+                    <div className="relative w-full max-w-sm bg-slate-100 rounded-2xl shadow-2xl p-4 transition-transform duration-300 transform translate-y-0" onClick={(e) => e.stopPropagation()}>
+                        <button onClick={() => setShowReceiptPreview(false)} className="absolute -top-3 -right-3 w-8 h-8 bg-white rounded-full flex items-center justify-center shadow-lg text-slate-600 hover:bg-slate-200 transition" aria-label="Tutup">
                             <X size={20} />
                         </button>
                         <div className="bg-white rounded-lg overflow-hidden shadow-inner">

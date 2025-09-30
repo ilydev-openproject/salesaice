@@ -1,10 +1,10 @@
 // src/pages/ProdukPage.jsx
 import { useState, useEffect } from 'react';
 import { collection, getDocs, addDoc, deleteDoc, doc, updateDoc, query, orderBy, serverTimestamp } from 'firebase/firestore';
-import { Package, Plus, Trash2, TrendingUp, Wallet, Tag, Box, CheckCircle2, XCircle, Eye, EyeOff, Pencil, ArrowDownUp, Filter } from 'lucide-react';
+import { Package, Plus, Trash2, TrendingUp, Wallet, Tag, Box, CheckCircle2, XCircle, Eye, EyeOff, Pencil, ArrowDownUp } from 'lucide-react';
 import { db } from '../lib/firebase';
 
-export default function ProdukPage() {
+export default function ProdukPage({ setActivePage }) {
     const [produkList, setProdukList] = useState([]);
     const [loading, setLoading] = useState(true);
     const [showForm, setShowForm] = useState(false);
@@ -18,13 +18,6 @@ export default function ProdukPage() {
     const [foto, setFoto] = useState('');
     const [searchTerm, setSearchTerm] = useState('');
     const [sortBy, setSortBy] = useState('nama'); // 'nama', 'hargaPcs', 'hargaBox', 'keuntungan'
-
-    const SORT_OPTIONS = {
-        nama: 'Nama A-Z',
-        keuntungan: 'Untung Tertinggi',
-        hargaPcs: 'Jual Tertinggi',
-        hargaBox: 'Modal Tertinggi',
-    };
 
     useEffect(() => {
         const loadProduk = async () => {
@@ -237,20 +230,16 @@ export default function ProdukPage() {
             </div>
 
             {/* Search and Filter */}
-            <div className="mb-4">
-                <input type="text" placeholder="Cari produk..." value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} className="w-full p-3 text-slate-700 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500" />
-            </div>
-
-            <div className="mb-6">
-                <h3 className="text-xs font-semibold text-slate-600 mb-2 flex items-center gap-1.5">
-                    <Filter size={12} /> Urutkan Berdasarkan
-                </h3>
-                <div className="flex items-center gap-2 overflow-x-auto pb-2 -mx-5 px-5" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
-                    {Object.entries(SORT_OPTIONS).map(([key, label]) => (
-                        <button key={key} onClick={() => setSortBy(key)} className={`px-4 py-1.5 rounded-full text-sm font-medium transition-colors whitespace-nowrap ${sortBy === key ? 'bg-purple-600 text-white shadow' : 'bg-white text-slate-700 border border-slate-300 hover:bg-slate-50'}`}>
-                            {label}
-                        </button>
-                    ))}
+            <div className="mb-6 flex items-center gap-2">
+                <input type="text" placeholder="Cari produk..." value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} className="flex-grow p-3 text-slate-700 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500" />
+                <div className="relative">
+                    <select value={sortBy} onChange={(e) => setSortBy(e.target.value)} className="appearance-none w-full bg-white border border-gray-300 rounded-lg p-3 pr-10 focus:outline-none focus:ring-2 focus:ring-purple-500 text-sm">
+                        <option value="nama">Nama A-Z</option>
+                        <option value="keuntungan">Untung Tertinggi</option>
+                        <option value="hargaPcs">Jual Tertinggi</option>
+                        <option value="hargaBox">Modal Tertinggi</option>
+                    </select>
+                    <ArrowDownUp size={16} className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" />
                 </div>
             </div>
             {/* Form Tambah Produk */}
