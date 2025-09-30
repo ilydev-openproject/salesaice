@@ -26,6 +26,7 @@ export default function VisitPage({ setActivePage }) {
     const [cart, setCart] = useState({}); // { productId: jumlahBox }
     const [isTokoDropdownOpen, setIsTokoDropdownOpen] = useState(false);
     const [isDataLoaded, setIsDataLoaded] = useState(false); // Untuk load data form sekali saja
+    const [tokoSearchTerm, setTokoSearchTerm] = useState(''); // State untuk pencarian di dropdown toko
     const [searchTerm, setSearchTerm] = useState('');
     const [productSearchTerm, setProductSearchTerm] = useState(''); // State untuk filter produk di form
     // State untuk filter tanggal
@@ -117,6 +118,7 @@ export default function VisitPage({ setActivePage }) {
     const handleSelectToko = (tokoId) => {
         setSelectedTokoId(tokoId);
         setIsTokoDropdownOpen(false);
+        setTokoSearchTerm(''); // Reset pencarian saat toko dipilih
     };
 
     const updateQty = (productId, delta) => {
@@ -213,6 +215,7 @@ export default function VisitPage({ setActivePage }) {
         setCart({});
         setCatatan('');
         setSelectedTokoId(tokoList.length > 0 ? tokoList[0].id : '');
+        setTokoSearchTerm('');
         setProductSearchTerm(''); // Reset filter produk saat form ditutup
     };
 
@@ -580,27 +583,33 @@ ${padRight('No HP', 15)}: ${toko.nomorWa || '-'}
                                         </button>
 
                                         {isTokoDropdownOpen && (
-                                            <div className="absolute z-10 mt-1 w-full bg-white border border-gray-200 rounded-lg shadow-lg max-h-60 overflow-y-auto">
-                                                {tokoList
-                                                    .slice() // Buat salinan agar tidak mengubah state asli
-                                                    .sort((a, b) => {
-                                                        if (a.id === selectedTokoId) return -1; // a (selected) comes first
-                                                        if (b.id === selectedTokoId) return 1; // b (selected) comes first
-                                                        return a.nama.localeCompare(b.nama); // Urutkan sisanya berdasarkan abjad
-                                                    })
-                                                    .map(
-                                                        (
-                                                            toko, // Perkecil padding item dropdown
-                                                        ) => (
-                                                            <div key={toko.id} onClick={() => handleSelectToko(toko.id)} className={`p-2.5 cursor-pointer hover:bg-purple-50 flex justify-between items-center ${selectedTokoId === toko.id ? 'bg-purple-100 font-semibold' : ''}`}>
-                                                                <span>
-                                                                    {toko.nama}
-                                                                    {toko.kode && <span className="text-xs text-slate-500 ml-2">({toko.kode})</span>}
-                                                                </span>
-                                                                {selectedTokoId === toko.id && <CheckCircle2 size={16} className="text-purple-600" />}
-                                                            </div>
-                                                        ),
-                                                    )}
+                                            <div className="absolute z-10 mt-1 w-full bg-white border border-gray-200 rounded-lg shadow-lg flex flex-col">
+                                                <div className="p-2 border-b border-gray-200">
+                                                    <input type="text" placeholder="Cari toko..." value={tokoSearchTerm} onChange={(e) => setTokoSearchTerm(e.target.value)} onClick={(e) => e.stopPropagation()} className="w-full p-2 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-purple-500" />
+                                                </div>
+                                                <div className="max-h-48 overflow-y-auto">
+                                                    {tokoList
+                                                        .filter((t) => t.nama.toLowerCase().includes(tokoSearchTerm.toLowerCase()) || (t.kode && t.kode.toLowerCase().includes(tokoSearchTerm.toLowerCase())))
+                                                        .slice() // Buat salinan agar tidak mengubah state asli
+                                                        .sort((a, b) => {
+                                                            if (a.id === selectedTokoId) return -1; // a (selected) comes first
+                                                            if (b.id === selectedTokoId) return 1; // b (selected) comes first
+                                                            return a.nama.localeCompare(b.nama); // Urutkan sisanya berdasarkan abjad
+                                                        })
+                                                        .map(
+                                                            (
+                                                                toko, // Perkecil padding item dropdown
+                                                            ) => (
+                                                                <div key={toko.id} onClick={() => handleSelectToko(toko.id)} className={`p-2.5 cursor-pointer hover:bg-purple-50 flex justify-between items-center ${selectedTokoId === toko.id ? 'bg-purple-100 font-semibold' : ''}`}>
+                                                                    <span>
+                                                                        {toko.nama}
+                                                                        {toko.kode && <span className="text-xs text-slate-500 ml-2">({toko.kode})</span>}
+                                                                    </span>
+                                                                    {selectedTokoId === toko.id && <CheckCircle2 size={16} className="text-purple-600" />}
+                                                                </div>
+                                                            ),
+                                                        )}
+                                                </div>
                                             </div>
                                         )}
                                     </div>
