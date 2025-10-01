@@ -2,6 +2,7 @@
 import React from 'react';
 import { format } from 'date-fns';
 import { id } from 'date-fns/locale';
+import logoImg from '/logo.png'; // 1. Impor gambar logo di sini
 
 const VisitReceipt = React.forwardRef(({ kunjungan }, ref) => {
     if (!kunjungan) return null;
@@ -15,7 +16,7 @@ const VisitReceipt = React.forwardRef(({ kunjungan }, ref) => {
         <div ref={ref} id={`receipt-${kunjungan.id}`} className="w-[380px] bg-white p-6 font-sans text-slate-800 shadow-lg">
             {/* Header */}
             <div className="text-center mb-5">
-                <img src="/logo.png" alt="Logo" className="h-14 w-auto mx-auto mb-3" />
+                <img src={logoImg} alt="Logo" className="h-14 w-auto mx-auto mb-3" /> {/* 2. Gunakan logo yang sudah diimpor */}
                 <h1 className="text-2xl font-bold text-purple-800 tracking-tight">BUKTI PEMESANAN</h1>
                 <p className="text-sm text-slate-500 mt-1">{format(visitDate, "d MMMM yyyy, HH:mm 'WIB'", { locale: id })}</p>
             </div>

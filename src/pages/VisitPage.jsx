@@ -385,7 +385,7 @@ export default function VisitPage({ setActivePage }) {
 
         const padRight = (str, len) => str.padEnd(len, ' ');
 
-        const message = `LAPORAN KUNJUNGAN K2 
+        const message = `LAPORAN KUNJUNGAN 
 
 ${padRight('No Urut', 15)}: ${visitOrderToday}
 ${padRight('Nama Toko', 15)}: ${kunjungan.tokoNama}
