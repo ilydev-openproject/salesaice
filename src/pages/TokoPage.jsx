@@ -26,6 +26,7 @@ export default function TokoPage() {
     const [nama, setNama] = useState('');
     const [kode, setKode] = useState('');
     const [jadwalKunjungan, setJadwalKunjungan] = useState([]);
+    const [kodeFreezer, setKodeFreezer] = useState(''); // New state for kodeFreezer
     const [searchTerm, setSearchTerm] = useState(''); // New state for search term
     const [nomorWa, setNomorWa] = useState('');
     const [filterHari, setFilterHari] = useState('semua');
@@ -48,6 +49,7 @@ export default function TokoPage() {
                     return {
                         id: doc.id,
                         ...data,
+                        kodeFreezer: data.kodeFreezer || '', // Ensure kodeFreezer exists
                         jadwalKunjungan: jadwal,
                     };
                 });
@@ -70,6 +72,7 @@ export default function TokoPage() {
         setNama('');
         setKode('');
         setJadwalKunjungan([]);
+        setKodeFreezer(''); // Reset kodeFreezer
         setNomorWa('');
         setEditingId(null);
         setShowForm(false);
@@ -84,6 +87,7 @@ export default function TokoPage() {
         setEditingId(toko.id);
         setNama(toko.nama || '');
         setKode(toko.kode || '');
+        setKodeFreezer(toko.kodeFreezer || ''); // Set kodeFreezer for editing
         setJadwalKunjungan(Array.isArray(toko.jadwalKunjungan) ? toko.jadwalKunjungan : []);
         setNomorWa(toko.nomorWa || '');
         setShowForm(true);
@@ -119,10 +123,22 @@ export default function TokoPage() {
             return;
         }
 
+        // Validasi: Cek duplikasi kode freezer (jika diisi)
+        const trimmedKodeFreezer = kodeFreezer.trim();
+        if (trimmedKodeFreezer) {
+            const isFreezerDuplicate = tokoList.some((toko) => toko.kodeFreezer && toko.kodeFreezer.toLowerCase() === trimmedKodeFreezer.toLowerCase() && toko.id !== editingId);
+
+            if (isFreezerDuplicate) {
+                alert(`Kode freezer "${trimmedKodeFreezer}" sudah digunakan oleh toko lain. Mohon gunakan kode yang unik.`);
+                return;
+            }
+        }
+
         const tokoData = {
             nama: nama.trim(),
             kode: kode.trim() || '-',
             jadwalKunjungan: jadwalKunjungan, // Ensure this is an array of strings
+            kodeFreezer: kodeFreezer.trim(), // Include kodeFreezer
             nomorWa: nomorWa.trim(),
         };
 
@@ -148,6 +164,19 @@ export default function TokoPage() {
             console.error('Error simpan toko:', error);
             alert('Gagal menyimpan toko.');
         }
+    };
+
+    const handleCopy = (textToCopy, fieldName) => {
+        if (!textToCopy || textToCopy === '-') return;
+        navigator.clipboard
+            .writeText(textToCopy)
+            .then(() => {
+                alert(`${fieldName} "${textToCopy}" berhasil disalin.`);
+            })
+            .catch((err) => {
+                console.error('Gagal menyalin teks: ', err);
+                alert('Gagal menyalin teks.');
+            });
     };
 
     const openDeleteConfirm = (toko) => {
@@ -250,6 +279,10 @@ export default function TokoPage() {
                                 <input type="text" value={kode} onChange={(e) => setKode(e.target.value)} placeholder="Contoh: TJ001" className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500" />
                             </div>
                             <div>
+                                <label className="block text-sm font-medium text-slate-700 mb-1">Kode Freezer (Opsional)</label>
+                                <input type="text" value={kodeFreezer} onChange={(e) => setKodeFreezer(e.target.value)} placeholder="Contoh: FZ001" className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500" />
+                            </div>
+                            <div>
                                 <label className="block text-sm font-medium text-slate-700 mb-1">Nomor WhatsApp (Opsional)</label>
                                 <input type="tel" value={nomorWa} onChange={handleNomorWaChange} placeholder="Contoh: 628123456789" className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500" />
                             </div>
@@ -303,7 +336,16 @@ export default function TokoPage() {
                                 <div className="flex-grow">
                                     <h3 className="font-bold text-base text-slate-800 pr-4">{toko.nama}</h3>
                                     <p className="text-xs text-slate-600 mt-1">
-                                        Kode: <span className="font-mono bg-slate-100 px-1.5 py-0.5 rounded">{toko.kode}</span>
+                                        Kode:{' '}
+                                        <span onClick={() => handleCopy(toko.kode, 'Kode Toko')} title="Klik untuk salin" className="font-mono bg-slate-100 px-1.5 py-0.5 rounded cursor-pointer hover:bg-slate-200 active:bg-slate-300 transition-colors">
+                                            {toko.kode}
+                                        </span>
+                                    </p>
+                                    <p className="text-xs text-slate-600 mt-1">
+                                        Freezer:{' '}
+                                        <span onClick={() => handleCopy(toko.kodeFreezer, 'Kode Freezer')} title="Klik untuk salin" className="font-mono bg-slate-100 px-1.5 py-0.5 rounded cursor-pointer hover:bg-slate-200 active:bg-slate-300 transition-colors">
+                                            {toko.kodeFreezer || '-'}
+                                        </span>
                                     </p>
                                     <div className="mt-3 space-y-2">
                                         {toko.nomorWa && (

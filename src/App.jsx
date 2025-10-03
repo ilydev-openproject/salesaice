@@ -5,14 +5,16 @@ import { db } from './lib/firebase';
 import HomePage from './pages/HomePage';
 import TokoPage from './pages/TokoPage';
 import ProdukPage from './pages/ProdukPage';
+import OrderPage from './pages/OrderPage'; // Import OrderPage
 import VisitPage from './pages/VisitPage';
-import { Home, Package, Store, MapPin } from 'lucide-react';
+import { Home, Package, Store, MapPin, ShoppingBag } from 'lucide-react';
 import Loader from './components/Loader'; // Impor Loader
 
 export default function App() {
     // Baca halaman aktif dari localStorage saat pertama kali load, default ke 'home' jika tidak ada.
     const [activePage, setActivePage] = useState(() => localStorage.getItem('activePage') || 'home');
     const [daftarToko, setDaftarToko] = useState([]);
+    const [orderList, setOrderList] = useState([]);
     const [kunjunganList, setKunjunganList] = useState([]);
     const [produkList, setProdukList] = useState([]); // New state for produkList
     const [loading, setLoading] = useState(true);
@@ -21,20 +23,17 @@ export default function App() {
     useEffect(() => {
         const loadData = async () => {
             try {
-                // Load toko
-                const tokoSnapshot = await getDocs(collection(db, 'toko'));
-                const tokoList = tokoSnapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
-                setDaftarToko(tokoList);
+                const [tokoSnapshot, kunjunganSnapshot, produkSnapshot, orderSnapshot] = await Promise.all([
+                    getDocs(collection(db, 'toko')),
+                    getDocs(query(collection(db, 'kunjungan'), orderBy('createdAt', 'desc'))),
+                    getDocs(query(collection(db, 'produk'), orderBy('nama', 'asc'))),
+                    getDocs(query(collection(db, 'orders'), orderBy('createdAt', 'desc'))), // Load orders
+                ]);
 
-                // Load kunjungan
-                const kunjunganSnapshot = await getDocs(query(collection(db, 'kunjungan'), orderBy('createdAt', 'desc')));
-                const listKunjungan = kunjunganSnapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
-                setKunjunganList(listKunjungan);
-
-                // Load produk
-                const produkSnapshot = await getDocs(query(collection(db, 'produk'), orderBy('nama', 'asc')));
-                const listProduk = produkSnapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
-                setProdukList(listProduk);
+                setDaftarToko(tokoSnapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() })));
+                setKunjunganList(kunjunganSnapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() })));
+                setProdukList(produkSnapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() })));
+                setOrderList(orderSnapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }))); // Set orders
             } catch (error) {
                 console.error('Error loading data:', error);
                 alert('Gagal memuat data. Cek koneksi internet.');
@@ -42,7 +41,6 @@ export default function App() {
                 setLoading(false);
             }
         };
-
         loadData();
     }, []);
 
@@ -70,9 +68,10 @@ export default function App() {
             }}
         >
             <div style={{ flex: 1, paddingBottom: '70px' }}>
-                {activePage === 'home' && <HomePage daftarToko={daftarToko} kunjunganList={kunjunganList} produkList={produkList} setActivePage={setActivePage} />}
+                {activePage === 'home' && <HomePage daftarToko={daftarToko} kunjunganList={kunjunganList} produkList={produkList} orderList={orderList} setActivePage={setActivePage} />}
                 {activePage === 'toko' && <TokoPage setActivePage={setActivePage} />}
                 {activePage === 'produk' && <ProdukPage setActivePage={setActivePage} />}
+                {activePage === 'order' && <OrderPage setActivePage={setActivePage} />}
                 {activePage === 'visit' && <VisitPage setActivePage={setActivePage} />}
             </div>
 
@@ -125,6 +124,22 @@ export default function App() {
                 >
                     <MapPin size={18} color={activePage === 'visit' ? '#402566' : '#999'} />
                     <span style={{ marginTop: '2px', color: activePage === 'visit' ? '#402566' : '#999' }}>Kunjungan</span>
+                </button>
+                <button
+                    onClick={() => setActivePage('order')}
+                    style={{
+                        display: 'flex',
+                        flexDirection: 'column',
+                        alignItems: 'center',
+                        background: 'none',
+                        border: 'none',
+                        fontSize: '10px',
+                        outline: 'none',
+                        cursor: 'pointer',
+                    }}
+                >
+                    <ShoppingBag size={18} color={activePage === 'order' ? '#402566' : '#999'} />
+                    <span style={{ marginTop: '2px', color: activePage === 'order' ? '#402566' : '#999' }}>Order</span>
                 </button>
                 <button onClick={() => setActivePage('produk')} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', background: 'none', border: 'none', outline: 'none', fontSize: '10px', cursor: 'pointer' }}>
                     <Package size={18} color={activePage === 'produk' ? '#402566' : '#999'} />

@@ -1,8 +1,8 @@
 // src/pages/HomePage.jsx
 import { MapPin, Package, Wallet, Plus, CalendarDays, ShoppingBag } from 'lucide-react';
 
-export default function HomePage({ daftarToko, kunjunganList = [], produkList = [], setActivePage }) {
-    // --- Hitung data HARI INI dari 'kunjunganList' ---
+export default function HomePage({ daftarToko, kunjunganList = [], produkList = [], orderList = [], setActivePage }) {
+    // --- Hitung data HARI INI dari 'kunjunganList' & 'orderList' ---
     const todayStart = new Date();
     todayStart.setHours(0, 0, 0, 0);
     const now = new Date();
@@ -10,30 +10,45 @@ export default function HomePage({ daftarToko, kunjunganList = [], produkList = 
     const todayEnd = new Date();
     todayEnd.setHours(23, 59, 59, 999);
 
-    const kunjunganHariIni = kunjunganList.filter((kunjungan) => {
-        if (!kunjungan.createdAt?.seconds) return false;
-        const visitDate = new Date(kunjungan.createdAt.seconds * 1000);
-        return visitDate >= todayStart && visitDate <= todayEnd;
-    });
+    const filterToday = (item) => {
+        if (!item.createdAt?.seconds) return false;
+        const itemDate = new Date(item.createdAt.seconds * 1000);
+        return itemDate >= todayStart && itemDate <= todayEnd;
+    };
+
+    const kunjunganHariIni = kunjunganList.filter(filterToday);
+    const orderHariIni = orderList.filter(filterToday);
 
     const totalKunjungan = kunjunganHariIni.length;
-    const totalPendapatan = kunjunganHariIni.reduce((sum, kunjungan) => sum + kunjungan.total, 0);
-    const totalBoxTerjual = kunjunganHariIni.reduce((sum, kunjungan) => sum + kunjungan.items.reduce((qty, item) => qty + item.qtyBox, 0), 0);
+    const totalPendapatan = [...kunjunganHariIni, ...orderHariIni].reduce((sum, item) => sum + item.total, 0);
+    const totalBoxTerjual = [...kunjunganHariIni, ...orderHariIni].reduce((sum, item) => sum + (item.items?.reduce((qty, subItem) => qty + subItem.qtyBox, 0) || 0), 0);
 
-    // --- Hitung data BULAN INI dari 'kunjunganList' ---
+    // --- Hitung data BULAN INI dari 'kunjunganList' & 'orderList' ---
     const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
     monthStart.setHours(0, 0, 0, 0);
 
     const monthEnd = new Date(now.getFullYear(), now.getMonth() + 1, 0);
     monthEnd.setHours(23, 59, 59, 999);
 
+    const filterThisMonth = (item) => {
+        if (!item.createdAt?.seconds) return false;
+        const itemDate = new aDate(item.createdAt.seconds * 1000);
+        return itemDate >= monthStart && itemDate <= monthEnd;
+    };
+
     const kunjunganBulanIni = kunjunganList.filter((kunjungan) => {
         if (!kunjungan.createdAt?.seconds) return false;
         const visitDate = new Date(kunjungan.createdAt.seconds * 1000);
         return visitDate >= monthStart && visitDate <= monthEnd;
     });
+    const orderBulanIni = orderList.filter((order) => {
+        if (!order.createdAt?.seconds) return false;
+        const orderDate = new Date(order.createdAt.seconds * 1000);
+        return orderDate >= monthStart && orderDate <= monthEnd;
+    });
+
     const totalKunjunganBulanIni = kunjunganBulanIni.length;
-    const totalBoxTerjualBulanIni = kunjunganBulanIni.reduce((sum, kunjungan) => sum + kunjungan.items.reduce((qty, item) => qty + item.qtyBox, 0), 0);
+    const totalBoxTerjualBulanIni = [...kunjunganBulanIni, ...orderBulanIni].reduce((sum, item) => sum + (item.items?.reduce((qty, subItem) => qty + subItem.qtyBox, 0) || 0), 0);
 
     // --- Hitung Produk Terlaris Bulan Ini (Top 5) ---
     const productSalesMap = new Map(); // Map: productId -> totalQtyBox
@@ -41,6 +56,15 @@ export default function HomePage({ daftarToko, kunjunganList = [], produkList = 
     kunjunganBulanIni.forEach((kunjungan) => {
         if (kunjungan.items) {
             kunjungan.items.forEach((item) => {
+                const currentQty = productSalesMap.get(item.productId) || 0;
+                productSalesMap.set(item.productId, currentQty + item.qtyBox);
+            });
+        }
+    });
+
+    orderBulanIni.forEach((order) => {
+        if (order.items) {
+            order.items.forEach((item) => {
                 const currentQty = productSalesMap.get(item.productId) || 0;
                 productSalesMap.set(item.productId, currentQty + item.qtyBox);
             });
