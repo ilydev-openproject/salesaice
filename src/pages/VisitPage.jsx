@@ -10,7 +10,7 @@ import { Store, Package, Plus, Minus, CheckCircle2, XCircle, ChevronDown, MapPin
 import Loader from '../components/Loader';
 import VisitReceipt from '../components/VisitReceipt';
 
-export default function VisitPage({ setActivePage }) {
+export default function VisitPage({ setActivePage, orderList = [] }) {
     // State untuk daftar kunjungan
     const [kunjunganList, setKunjunganList] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -177,20 +177,50 @@ export default function VisitPage({ setActivePage }) {
             // createdAt tidak diupdate saat edit
         };
 
+        const hasOrder = items.length > 0;
+
         setSubmitting(true);
         try {
             if (editingVisitId) {
                 // Update
                 const visitRef = doc(db, 'kunjungan', editingVisitId);
-                await updateDoc(visitRef, kunjunganData);
+                // Saat edit, kita hanya update data kunjungan.
+                // Asumsi: Order yang terkait diedit terpisah di halaman Order.
+                // Untuk menyederhanakan, kita hanya update catatan dan data non-item.
+                await updateDoc(visitRef, {
+                    tokoId: kunjunganData.tokoId,
+                    tokoNama: kunjunganData.tokoNama,
+                    kodeToko: kunjunganData.kodeToko,
+                    catatan: kunjunganData.catatan,
+                    // items dan total tidak diubah dari sini untuk menghindari duplikasi/konflik
+                });
                 showNotification('Kunjungan berhasil diperbarui.');
             } else {
-                // Create
+                // Create Kunjungan (tanpa item dan total)
                 await addDoc(collection(db, 'kunjungan'), {
-                    ...kunjunganData,
+                    tokoId: kunjunganData.tokoId,
+                    tokoNama: kunjunganData.tokoNama,
+                    kodeToko: kunjunganData.kodeToko,
+                    catatan: kunjunganData.catatan,
+                    items: [], // Selalu kosong di kunjungan
+                    total: 0, // Selalu nol di kunjungan
                     createdAt: serverTimestamp(),
                 });
-                showNotification('Kunjungan berhasil disimpan.');
+                showNotification('Kunjungan berhasil dicatat.');
+
+                // Jika ada order, buat entri terpisah di koleksi 'orders'
+                if (hasOrder) {
+                    await addDoc(collection(db, 'orders'), {
+                        tokoId: kunjunganData.tokoId,
+                        tokoNama: kunjunganData.tokoNama,
+                        kodeToko: kunjunganData.kodeToko,
+                        items: kunjunganData.items,
+                        catatan: `Order dari kunjungan: ${kunjunganData.catatan}`,
+                        total: kunjunganData.total,
+                        createdAt: serverTimestamp(),
+                    });
+                    showNotification('Order dari kunjungan berhasil disimpan.', 'success');
+                }
             }
 
             // Reset
@@ -282,34 +312,50 @@ export default function VisitPage({ setActivePage }) {
         setShowCalendar(false);
     };
 
-    const handlePreview = useCallback(async (kunjungan) => {
-        setReceiptKunjungan(kunjungan);
-        setReceiptLoading(true); // Start loading
-        setShowReceiptPreview(true); // Show modal with loader
+    const handlePreview = useCallback(
+        async (kunjungan) => {
+            // Cari order yang terkait dengan kunjungan ini
+            const visitTimestamp = kunjungan.createdAt?.seconds;
+            const relatedOrder = orderList.find((order) => order.tokoId === kunjungan.tokoId && visitTimestamp && Math.abs(order.createdAt?.seconds - visitTimestamp) < 5);
 
-        // Tunggu DOM update dan render komponen resi
-        setTimeout(async () => {
-            const node = document.getElementById(`receipt-${kunjungan.id}`);
-            if (!node) {
-                showNotification('Gagal menemukan elemen resi.', 'error');
-                setReceiptLoading(false);
-                setReceiptKunjungan(null);
-                return;
-            }
+            // Gabungkan data kunjungan dengan data order untuk resi
+            const receiptData = {
+                ...kunjungan, // Ambil id, tokoNama, kodeToko, createdAt dari kunjungan
+                items: relatedOrder ? relatedOrder.items : [], // Ambil items dari order
+                total: relatedOrder ? relatedOrder.total : 0, // Ambil total dari order
+            };
 
-            try {
-                const dataUrl = await toPng(node, { cacheBust: true, pixelRatio: 2 });
-                setPreviewImageUrl(dataUrl);
-                setPreviewImageFilename(`resi-${kunjungan.tokoNama.replace(/\s/g, '_')}-${format(new Date(), 'yyyyMMdd')}.png`);
-            } catch (err) {
-                console.error('oops, something went wrong!', err);
-                showNotification('Gagal membuat pratinjau resi.', 'error');
-            } finally {
-                setReceiptLoading(false); // Stop loading
-                // Keep receiptKunjungan to show the component until modal is closed
-            }
-        }, 100); // Timeout untuk memastikan DOM siap
-    }, []);
+            setReceiptKunjungan(receiptData);
+
+            // Lanjutkan proses seperti biasa
+            setReceiptLoading(true); // Start loading
+            setShowReceiptPreview(true); // Show modal with loader
+
+            // Tunggu DOM update dan render komponen resi
+            setTimeout(async () => {
+                const node = document.getElementById(`receipt-${kunjungan.id}`);
+                if (!node) {
+                    showNotification('Gagal menemukan elemen resi.', 'error');
+                    setReceiptLoading(false);
+                    setReceiptKunjungan(null);
+                    return;
+                }
+
+                try {
+                    const dataUrl = await toPng(node, { cacheBust: true, pixelRatio: 2 });
+                    setPreviewImageUrl(dataUrl);
+                    setPreviewImageFilename(`resi-${kunjungan.tokoNama.replace(/\s/g, '_')}-${format(new Date(), 'yyyyMMdd')}.png`);
+                } catch (err) {
+                    console.error('oops, something went wrong!', err);
+                    showNotification('Gagal membuat pratinjau resi.', 'error');
+                } finally {
+                    setReceiptLoading(false); // Stop loading
+                    // Keep receiptKunjungan to show the component until modal is closed
+                }
+            }, 100); // Timeout untuk memastikan DOM siap
+        },
+        [orderList],
+    ); // Tambahkan orderList sebagai dependensi
 
     const closePreview = () => {
         setShowReceiptPreview(false);
@@ -499,7 +545,15 @@ ${padRight('No HP', 15)}: ${toko.nomorWa || '-'}
                     ) : (
                         <div className="space-y-4">
                             {filteredKunjungan.map((kunjungan) => {
-                                const totalBoxes = kunjungan.items.reduce((sum, item) => sum + item.qtyBox, 0);
+                                // Cari order yang cocok berdasarkan tokoId dan waktu pembuatan yang sangat berdekatan
+                                const visitTimestamp = kunjungan.createdAt?.seconds;
+                                const relatedOrder = orderList.find(
+                                    (order) => order.tokoId === kunjungan.tokoId && visitTimestamp && Math.abs(order.createdAt?.seconds - visitTimestamp) < 5, // Toleransi 5 detik
+                                );
+
+                                const displayTotal = relatedOrder ? relatedOrder.total : 0;
+                                const totalBoxes = relatedOrder ? relatedOrder.items.reduce((sum, item) => sum + item.qtyBox, 0) : 0;
+
                                 return (
                                     <div key={kunjungan.id} onClick={() => handleEdit(kunjungan)} className="bg-white rounded-xl shadow-sm border border-gray-100 transition-all duration-300 hover:shadow-md hover:border-purple-200 cursor-pointer relative">
                                         <div className="p-3 flex items-center gap-3">
@@ -509,7 +563,7 @@ ${padRight('No HP', 15)}: ${toko.nomorWa || '-'}
                                                 <p className="text-xs text-gray-500">{kunjungan.createdAt ? new Date(kunjungan.createdAt.seconds * 1000).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' }) : 'Baru saja'}</p>
                                             </div>
                                             <div className="text-right pr-5">
-                                                <p className={`font-bold text-sm ${kunjungan.total > 0 ? 'text-green-600' : 'text-slate-500'}`}>Rp{kunjungan.total.toLocaleString('id-ID')}</p>
+                                                <p className={`font-bold text-sm ${displayTotal > 0 ? 'text-green-600' : 'text-slate-500'}`}>Rp{displayTotal.toLocaleString('id-ID')}</p>
                                                 <p className="text-xs text-slate-500">{totalBoxes} box</p>
                                             </div>
                                         </div>

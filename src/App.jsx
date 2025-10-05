@@ -6,9 +6,10 @@ import HomePage from './pages/HomePage';
 import TokoPage from './pages/TokoPage';
 import ProdukPage from './pages/ProdukPage';
 import OrderPage from './pages/OrderPage'; // Import OrderPage
+import ProdukTerlarisPage from './pages/ProdukTerlarisPage'; // Import ProdukTerlarisPage
 import VisitPage from './pages/VisitPage';
-import { Home, Package, Store, MapPin, ShoppingBag } from 'lucide-react';
-import Loader from './components/Loader'; // Impor Loader
+import { Home, Package, Store, MapPin, ShoppingBag, TrendingUp } from 'lucide-react';
+import Loader from './components/Loader';
 
 export default function App() {
     // Baca halaman aktif dari localStorage saat pertama kali load, default ke 'home' jika tidak ada.
@@ -72,7 +73,8 @@ export default function App() {
                 {activePage === 'toko' && <TokoPage setActivePage={setActivePage} />}
                 {activePage === 'produk' && <ProdukPage setActivePage={setActivePage} />}
                 {activePage === 'order' && <OrderPage setActivePage={setActivePage} />}
-                {activePage === 'visit' && <VisitPage setActivePage={setActivePage} />}
+                {activePage === 'produk-terlaris' && <ProdukTerlarisPage produkList={produkList} kunjunganList={kunjunganList} orderList={orderList} setActivePage={setActivePage} />}
+                {activePage === 'visit' && <VisitPage setActivePage={setActivePage} orderList={orderList} />}
             </div>
 
             {/* Bottom Navigation */}

@@ -1,5 +1,5 @@
 // src/pages/HomePage.jsx
-import { MapPin, Package, Wallet, Plus, CalendarDays, ShoppingBag } from 'lucide-react';
+import { MapPin, Package, Wallet, Plus, TrendingUp, ChevronRight } from 'lucide-react';
 
 export default function HomePage({ daftarToko, kunjunganList = [], produkList = [], orderList = [], setActivePage }) {
     // --- Hitung data HARI INI dari 'kunjunganList' & 'orderList' ---
@@ -136,44 +136,28 @@ export default function HomePage({ daftarToko, kunjunganList = [], produkList = 
                     </div>
                 </div>
             </div>
+
+            {/* Menu Laporan */}
+            <div className="mb-4">
+                <h2 className="text-base font-semibold text-slate-700 mb-2">Menu Laporan</h2>
+                <div className="bg-white p-2 rounded-lg shadow-sm border border-gray-100">
+                    <button onClick={() => setActivePage('produk-terlaris')} className="w-full flex items-center justify-between p-2 rounded-md hover:bg-slate-50 transition-colors">
+                        <div className="flex items-center gap-3">
+                            <div className="w-8 h-8 flex items-center justify-center bg-purple-100 text-purple-600 rounded-lg">
+                                <TrendingUp size={18} />
+                            </div>
+                            <span className="font-semibold text-sm text-slate-700">Produk Terlaris</span>
+                        </div>
+                        <ChevronRight size={20} className="text-slate-400" />
+                    </button>
+                </div>
+            </div>
+
             {/* Tombol Aksi Utama */}
             <button onClick={() => setActivePage('visit')} className="w-full py-3 bg-purple-600 text-white rounded-xl font-bold text-base hover:bg-purple-700 transition flex items-center justify-center gap-2 shadow-md hover:shadow-lg mb-4">
                 <Plus size={20} />
                 Tambah Kunjungan Baru
             </button>
-
-            {/* Produk Terlaris */}
-            <div className="mb-4">
-                <h2 className="text-base font-semibold text-slate-700 mb-2">Produk Terlaris Bulan Ini (Top 5)</h2>
-                {sortedProductSales.length === 0 ? (
-                    <div className="bg-white rounded-lg p-4 text-center text-slate-500 shadow-sm">Belum ada penjualan produk.</div>
-                ) : (
-                    <div className="space-y-2">
-                        {sortedProductSales.map((produk) => (
-                            <div key={produk.id} className="bg-white rounded-lg p-3 flex items-center gap-3 shadow-sm border border-gray-100">
-                                <div className="flex-shrink-0">
-                                    <img
-                                        src={produk.foto || 'https://via.placeholder.com/64?text=Produk'}
-                                        alt={produk.nama}
-                                        className="w-10 h-10 object-cover rounded-md border border-gray-200"
-                                        onError={(e) => {
-                                            e.target.src = 'https://via.placeholder.com/64?text=Produk';
-                                        }}
-                                    />
-                                </div>
-                                <div className="flex-grow">
-                                    <p className="font-semibold text-slate-800 text-sm">{produk.nama}</p>
-                                    <p className="text-xs text-slate-500">Rp{(produk.hargaJualPerPcs || 0).toLocaleString('id-ID')} / pcs</p>
-                                </div>
-                                <div className="text-right">
-                                    <p className="font-bold text-purple-600">{produk.totalQtyBox} box</p>
-                                    <p className="text-xs text-slate-500">terjual</p>
-                                </div>
-                            </div>
-                        ))}
-                    </div>
-                )}
-            </div>
 
             {/* Kunjungan Terbaru */}
             <div>
@@ -182,19 +166,28 @@ export default function HomePage({ daftarToko, kunjunganList = [], produkList = 
                     <div className="bg-white rounded-lg p-4 text-center text-slate-500 shadow-sm">Belum ada kunjungan.</div>
                 ) : (
                     <div className="space-y-2">
-                        {kunjunganList.slice(0, 5).map((kunjungan) => (
-                            <div key={kunjungan.id} className="bg-white rounded-lg p-3 flex items-center gap-3 shadow-sm border border-gray-100">
-                                <div className="w-8 h-8 rounded-full bg-purple-100 flex items-center justify-center text-purple-600 font-bold text-sm">{kunjungan.tokoNama.charAt(0).toUpperCase()}</div>
-                                <div className="flex-grow">
-                                    <p className="font-semibold text-slate-800 text-sm">{kunjungan.tokoNama}</p>
-                                    <p className="text-xs text-slate-500">{new Date(kunjungan.createdAt.seconds * 1000).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' })}</p>
+                        {kunjunganList.slice(0, 5).map((kunjungan) => {
+                            // Cari order yang cocok berdasarkan tokoId dan waktu pembuatan yang sangat berdekatan
+                            const visitTimestamp = kunjungan.createdAt?.seconds;
+                            const relatedOrder = orderList.find((order) => order.tokoId === kunjungan.tokoId && visitTimestamp && Math.abs(order.createdAt?.seconds - visitTimestamp) < 5);
+
+                            const displayTotal = relatedOrder ? relatedOrder.total : 0;
+                            const totalBoxes = relatedOrder ? relatedOrder.items.reduce((sum, item) => sum + item.qtyBox, 0) : 0;
+
+                            return (
+                                <div key={kunjungan.id} className="bg-white rounded-lg p-3 flex items-center gap-3 shadow-sm border border-gray-100">
+                                    <div className="w-8 h-8 rounded-full bg-purple-100 flex items-center justify-center text-purple-600 font-bold text-sm">{kunjungan.tokoNama.charAt(0).toUpperCase()}</div>
+                                    <div className="flex-grow">
+                                        <p className="font-semibold text-slate-800 text-sm">{kunjungan.tokoNama}</p>
+                                        <p className="text-xs text-slate-500">{new Date(kunjungan.createdAt.seconds * 1000).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' })}</p>
+                                    </div>
+                                    <div className="text-right">
+                                        <p className={`font-bold text-sm ${displayTotal > 0 ? 'text-green-600' : 'text-slate-500'}`}>Rp{displayTotal.toLocaleString('id-ID')}</p>
+                                        <p className="text-xs text-slate-500">{totalBoxes} box</p>
+                                    </div>
                                 </div>
-                                <div className="text-right">
-                                    <p className={`font-bold ${kunjungan.total > 0 ? 'text-green-600' : 'text-slate-500'}`}>Rp{kunjungan.total.toLocaleString('id-ID')}</p>
-                                    <p className="text-xs text-slate-500">{kunjungan.items.reduce((sum, item) => sum + item.qtyBox, 0)} box</p>
-                                </div>
-                            </div>
-                        ))}
+                            );
+                        })}
                     </div>
                 )}
             </div>
