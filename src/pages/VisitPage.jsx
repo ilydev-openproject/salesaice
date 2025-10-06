@@ -314,15 +314,19 @@ export default function VisitPage({ setActivePage, orderList = [] }) {
 
     const handlePreview = useCallback(
         async (kunjungan) => {
-            // Cari order yang terkait dengan kunjungan ini
-            const visitTimestamp = kunjungan.createdAt?.seconds;
-            const relatedOrder = orderList.find((order) => order.tokoId === kunjungan.tokoId && visitTimestamp && Math.abs(order.createdAt?.seconds - visitTimestamp) < 5);
+            // Cari SEMUA order yang terkait dengan kunjungan pada hari yang sama
+            const visitDate = new Date(kunjungan.createdAt.seconds * 1000);
+            const relatedOrders = orderList.filter((order) => {
+                if (!order.createdAt?.seconds) return false;
+                const orderDate = new Date(order.createdAt.seconds * 1000);
+                return order.tokoId === kunjungan.tokoId && isSameDay(orderDate, visitDate);
+            });
 
             // Gabungkan data kunjungan dengan data order untuk resi
             const receiptData = {
                 ...kunjungan, // Ambil id, tokoNama, kodeToko, createdAt dari kunjungan
-                items: relatedOrder ? relatedOrder.items : [], // Ambil items dari order
-                total: relatedOrder ? relatedOrder.total : 0, // Ambil total dari order
+                items: relatedOrders.flatMap((order) => order.items || []), // Gabungkan semua item dari order terkait
+                total: relatedOrders.reduce((sum, order) => sum + (order.total || 0), 0), // Jumlahkan semua total dari order terkait
             };
 
             setReceiptKunjungan(receiptData);
@@ -416,27 +420,32 @@ export default function VisitPage({ setActivePage, orderList = [] }) {
         console.log('Start of Month:', currentMonthStart);
         console.log('End of Month:', currentMonthEnd);
 
-        const visitsThisMonthForToko = kunjunganList.filter((v) => {
-            if (!v.createdAt?.seconds || typeof v.createdAt.seconds !== 'number') {
-                console.warn('Skipping visit for month stats due to invalid createdAt:', v.id, v.createdAt);
+        // Gunakan orderList untuk statistik bulanan yang lebih akurat
+        const ordersThisMonthForToko = orderList.filter((o) => {
+            if (!o.createdAt?.seconds || typeof o.createdAt.seconds !== 'number') {
+                console.warn('Skipping order for month stats due to invalid createdAt:', o.id, o.createdAt);
                 return false;
             }
-            const d = new Date(v.createdAt.seconds * 1000);
-            const isSameToko = v.tokoId === kunjungan.tokoId;
-            const isInMonth = isSameMonth(d, visitDate); // Use isSameMonth from date-fns
-            // console.log(`Visit ${v.id} (${v.tokoNama}): tokoId match=${isSameToko}, in month=${isInMonth}, date=${d}`);
+            const d = new Date(o.createdAt.seconds * 1000);
+            const isSameToko = o.tokoId === kunjungan.tokoId;
+            const isInMonth = isSameMonth(d, visitDate);
             return isSameToko && isInMonth;
         });
-        const totalVisitsThisMonth = visitsThisMonthForToko.length;
-        const totalBoxesThisMonth = visitsThisMonthForToko.reduce((sum, v) => sum + (v.items?.reduce((itemSum, item) => itemSum + item.qtyBox, 0) || 0), 0);
-        console.log(
-            'Visits This Month For Toko:',
-            visitsThisMonthForToko.map((v) => ({ id: v.id, tokoNama: v.tokoNama, createdAt: new Date(v.createdAt.seconds * 1000), total: v.total })),
-        );
-        console.log('Total Visits This Month (for this toko):', totalVisitsThisMonth);
+
+        // Hitung total kunjungan unik pada bulan ini
+        const uniqueVisitDaysThisMonth = new Set(kunjunganList.filter((v) => v.tokoId === kunjungan.tokoId && isSameMonth(new Date(v.createdAt.seconds * 1000), visitDate)).map((v) => format(new Date(v.createdAt.seconds * 1000), 'yyyy-MM-dd')));
+        const totalVisitsThisMonth = uniqueVisitDaysThisMonth.size;
+        const totalBoxesThisMonth = ordersThisMonthForToko.reduce((sum, o) => sum + (o.items?.reduce((itemSum, item) => itemSum + item.qtyBox, 0) || 0), 0);
         console.log('Total Boxes This Month (for this toko):', totalBoxesThisMonth);
 
-        const totalOrderBox = kunjungan.items.reduce((sum, item) => sum + item.qtyBox, 0);
+        // Hitung total box dari semua order pada hari kunjungan
+        const relatedOrdersToday = orderList.filter((order) => {
+            if (!order.createdAt?.seconds) return false;
+            const orderDate = new Date(order.createdAt.seconds * 1000);
+            return order.tokoId === kunjungan.tokoId && isSameDay(orderDate, visitDate);
+        });
+        const totalOrderBox = relatedOrdersToday.reduce((sum, order) => sum + (order.items?.reduce((itemSum, item) => itemSum + item.qtyBox, 0) || 0), 0);
+
         console.log('Total Order Box (current visit):', totalOrderBox);
 
         const padRight = (str, len) => str.padEnd(len, ' ');
@@ -545,14 +554,17 @@ ${padRight('No HP', 15)}: ${toko.nomorWa || '-'}
                     ) : (
                         <div className="space-y-4">
                             {filteredKunjungan.map((kunjungan) => {
-                                // Cari order yang cocok berdasarkan tokoId dan waktu pembuatan yang sangat berdekatan
-                                const visitTimestamp = kunjungan.createdAt?.seconds;
-                                const relatedOrder = orderList.find(
-                                    (order) => order.tokoId === kunjungan.tokoId && visitTimestamp && Math.abs(order.createdAt?.seconds - visitTimestamp) < 5, // Toleransi 5 detik
-                                );
+                                // Cari SEMUA order yang cocok berdasarkan tokoId dan tanggal yang sama
+                                const visitDate = new Date(kunjungan.createdAt.seconds * 1000);
+                                const relatedOrders = orderList.filter((order) => {
+                                    if (!order.createdAt?.seconds) return false;
+                                    const orderDate = new Date(order.createdAt.seconds * 1000);
+                                    return order.tokoId === kunjungan.tokoId && isSameDay(orderDate, visitDate);
+                                });
 
-                                const displayTotal = relatedOrder ? relatedOrder.total : 0;
-                                const totalBoxes = relatedOrder ? relatedOrder.items.reduce((sum, item) => sum + item.qtyBox, 0) : 0;
+                                // Akumulasi total dari semua order terkait
+                                const displayTotal = relatedOrders.reduce((sum, order) => sum + (order.total || 0), 0);
+                                const totalBoxes = relatedOrders.reduce((sum, order) => sum + (order.items?.reduce((itemSum, item) => itemSum + item.qtyBox, 0) || 0), 0);
 
                                 return (
                                     <div key={kunjungan.id} onClick={() => handleEdit(kunjungan)} className="bg-white rounded-xl shadow-sm border border-gray-100 transition-all duration-300 hover:shadow-md hover:border-purple-200 cursor-pointer relative">

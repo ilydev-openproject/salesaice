@@ -1,10 +1,14 @@
 // src/pages/TokoPage.jsx
-import { useState, useEffect } from 'react';
-import { collection, getDocs, addDoc, updateDoc, deleteDoc, doc, serverTimestamp } from 'firebase/firestore';
+import { useState, useEffect, useRef } from 'react';
+import { collection, getDocs, addDoc, updateDoc, deleteDoc, doc, serverTimestamp, writeBatch } from 'firebase/firestore';
 import { db } from '../lib/firebase';
 import Loader from '../components/Loader';
-import { Store, Plus, Trash2, Pencil, CheckCircle2, Calendar, Filter, ArrowLeft, Package, MapPin, AlertTriangle } from 'lucide-react';
+import { Store, Plus, Trash2, Pencil, CheckCircle2, Calendar, Filter, ArrowLeft, Package, MapPin, AlertTriangle, ArrowDownUp, FileUp, FileDown } from 'lucide-react';
 import { MessageSquare } from 'lucide-react'; // Import MessageSquare
+import * as XLSX from 'xlsx'; // Import xlsx library
+
+import VisitDetailPage from './VisitDetailPage'; // Import halaman detail kunjungan
+import OrderDetailPage from './OrderDetailPage'; // Import halaman detail order
 const HARI = ['senin', 'selasa', 'rabu', 'kamis', 'jumat', 'sabtu'];
 
 const HARI_LABEL = {
@@ -16,11 +20,11 @@ const HARI_LABEL = {
     sabtu: 'Sabtu',
 };
 
-export default function TokoPage() {
+export default function TokoPage({ orderList = [], kunjunganList = [] }) {
     const [tokoList, setTokoList] = useState([]);
-    const [kunjunganList, setKunjunganList] = useState([]);
     const [loading, setLoading] = useState(true);
     const [showForm, setShowForm] = useState(false);
+    const [isImporting, setIsImporting] = useState(false); // State untuk proses impor
     const [editingId, setEditingId] = useState(null);
 
     const [nama, setNama] = useState('');
@@ -30,18 +34,29 @@ export default function TokoPage() {
     const [searchTerm, setSearchTerm] = useState(''); // New state for search term
     const [nomorWa, setNomorWa] = useState('');
     const [filterHari, setFilterHari] = useState('semua');
+    const [sortBy, setSortBy] = useState('nama-asc'); // State untuk sorting
 
     // State untuk modal konfirmasi hapus
     const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
     const [itemToDelete, setItemToDelete] = useState(null);
+
+    // State untuk modal konfirmasi update dari import
+    const [showUpdateConfirm, setShowUpdateConfirm] = useState(false);
+    const [storesToUpdate, setStoresToUpdate] = useState([]);
+    const [storesToAdd, setStoresToAdd] = useState([]);
+
+    // State untuk menampilkan halaman detail
+    const [viewingDetail, setViewingDetail] = useState({ type: null, toko: null });
+
+    // Ref untuk file input
+    const fileInputRef = useRef(null);
 
     // Load data
     useEffect(() => {
         const loadData = async () => {
             try {
                 setLoading(true);
-                const [tokoSnapshot, kunjunganSnapshot] = await Promise.all([getDocs(collection(db, 'toko')), getDocs(collection(db, 'kunjungan'))]);
-
+                const tokoSnapshot = await getDocs(collection(db, 'toko'));
                 const tokoData = tokoSnapshot.docs.map((doc) => {
                     const data = doc.data();
                     // Ambil jadwalKunjungan, pastikan array
@@ -54,10 +69,7 @@ export default function TokoPage() {
                     };
                 });
 
-                const kunjunganData = kunjunganSnapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
-
                 setTokoList(tokoData);
-                setKunjunganList(kunjunganData);
             } catch (error) {
                 console.error('Error load data:', error);
                 alert('Gagal memuat data toko.');
@@ -166,6 +178,136 @@ export default function TokoPage() {
         }
     };
 
+    const handleConfirmUpdate = async () => {
+        const batch = writeBatch(db);
+        let updatedCount = 0;
+        let addedCount = 0;
+
+        // Proses update data yang sudah ada
+        storesToUpdate.forEach((toko) => {
+            const { id, ...tokoData } = toko;
+            const tokoRef = doc(db, 'toko', id);
+            batch.update(tokoRef, tokoData);
+            updatedCount++;
+        });
+
+        // Proses tambah data baru
+        storesToAdd.forEach((tokoData) => {
+            const newTokoRef = doc(collection(db, 'toko'));
+            batch.set(newTokoRef, tokoData);
+            addedCount++;
+        });
+
+        try {
+            await batch.commit();
+            alert(`Proses selesai: ${updatedCount} toko diperbarui, ${addedCount} toko baru ditambahkan.`);
+            window.location.reload(); // Reload untuk sinkronisasi data
+        } catch (error) {
+            console.error('Error updating/adding stores:', error);
+            alert('Gagal memproses data.');
+        } finally {
+            setShowUpdateConfirm(false);
+            setStoresToUpdate([]);
+            setStoresToAdd([]);
+        }
+    };
+    const handleFileImport = async (event) => {
+        // Fungsi untuk membersihkan dan menormalkan string (nama atau kode)
+        const normalizeString = (str) =>
+            str
+                .toLowerCase()
+                .replace(/kh/g, 'h')
+                .replace(/[\s().,-]/g, '');
+
+        const file = event.target.files[0];
+        if (!file) return;
+
+        setIsImporting(true);
+        try {
+            const data = await file.arrayBuffer();
+            const workbook = XLSX.read(data);
+            const worksheet = workbook.Sheets[workbook.SheetNames[0]];
+            const jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1 });
+
+            if (jsonData.length <= 1) {
+                alert('File Excel kosong.');
+                return;
+            }
+
+            const newStores = []; // Untuk data yang benar-benar baru
+            const updatedStores = []; // Untuk data yang sudah ada dan akan diupdate
+            const processedIdentifiers = new Set(); // Untuk cek duplikasi dalam file Excel
+
+            // Mulai dari baris kedua jika ada header, atau baris pertama jika tidak
+            const startRow = typeof jsonData[0][0] === 'string' && jsonData[0][0].toLowerCase() === 'nama' ? 1 : 0;
+
+            for (let i = startRow; i < jsonData.length; i++) {
+                const row = jsonData[i];
+                const namaToko = row[0]?.trim();
+
+                if (!namaToko) continue; // Lewati baris jika nama toko kosong
+
+                const kodeToko = row[1]?.toString().trim() || '-';
+                const kodeFreezerToko = row[2]?.toString().trim() || '';
+                const nomorWaToko = row[3]?.toString().trim() || '';
+                const jadwalStr = row[4]?.toString().toLowerCase().trim() || '';
+
+                // Proses jadwal
+                const jadwalToko = jadwalStr
+                    .split(',')
+                    .map((h) => h.trim())
+                    .filter((h) => HARI.includes(h));
+
+                // Identifier unik untuk setiap toko (nama + kode)
+                const identifier = `${normalizeString(namaToko)}|${normalizeString(kodeToko)}`;
+                if (processedIdentifiers.has(identifier)) continue; // Lewati jika duplikat di dalam file
+                processedIdentifiers.add(identifier);
+
+                const existingToko = tokoList.find((t) => normalizeString(t.nama) === normalizeString(namaToko) && normalizeString(t.kode || '-') === normalizeString(kodeToko));
+
+                const tokoData = {
+                    nama: namaToko,
+                    kode: kodeToko,
+                    kodeFreezer: kodeFreezerToko,
+                    nomorWa: nomorWaToko,
+                    jadwalKunjungan: jadwalToko,
+                };
+
+                if (existingToko) {
+                    // Toko sudah ada, siapkan untuk update
+                    updatedStores.push({ id: existingToko.id, ...tokoData });
+                } else {
+                    // Toko baru, siapkan untuk ditambah
+                    newStores.push({ ...tokoData, createdAt: serverTimestamp() });
+                }
+            }
+
+            if (updatedStores.length > 0) {
+                // Jika ada data yang sama, tampilkan modal konfirmasi
+                setStoresToUpdate(updatedStores);
+                setStoresToAdd(newStores); // Simpan juga data baru untuk diproses bersamaan
+                setShowUpdateConfirm(true);
+            } else if (newStores.length > 0) {
+                // Jika hanya ada data baru, langsung proses
+                const batch = writeBatch(db);
+                newStores.forEach((tokoData) => {
+                    const newTokoRef = doc(collection(db, 'toko'));
+                    batch.set(newTokoRef, tokoData);
+                });
+                await batch.commit();
+                alert(`${newStores.length} toko baru berhasil diimpor!`);
+                window.location.reload();
+            } else {
+                alert('Tidak ada data baru atau data untuk diperbarui. Semua data mungkin sudah ada dan identik.');
+            }
+        } catch (error) {
+            console.error('Error importing from Excel:', error);
+            alert('Gagal mengimpor file. Pastikan format file dan data sudah benar.');
+        } finally {
+            setIsImporting(false);
+            event.target.value = null; // Reset file input
+        }
+    };
     const handleCopy = (textToCopy, fieldName) => {
         if (!textToCopy || textToCopy === '-') return;
         navigator.clipboard
@@ -206,12 +348,19 @@ export default function TokoPage() {
     // Fungsi untuk menghitung statistik per toko
     const getTokoStats = (tokoId) => {
         const kunjunganToko = kunjunganList.filter((k) => k.tokoId === tokoId);
+        const orderToko = orderList.filter((o) => o.tokoId === tokoId);
+
         const totalKunjungan = kunjunganToko.length;
-        const totalBox = kunjunganToko.reduce((sum, kunjungan) => sum + (kunjungan.items?.reduce((itemSum, item) => itemSum + item.qtyBox, 0) || 0), 0);
+        const totalBox = orderToko.reduce((sum, order) => sum + (order.items?.reduce((itemSum, item) => itemSum + item.qtyBox, 0) || 0), 0);
+
         return { totalKunjungan, totalBox };
     };
-    // Filtered list of stores based on search term
-    const filteredToko = tokoList
+    // Filtered and sorted list of stores
+    const filteredAndSortedToko = tokoList
+        .map((toko) => ({
+            ...toko,
+            stats: getTokoStats(toko.id), // Pre-calculate stats for sorting
+        }))
         .filter((toko) => {
             // Filter by day
             if (filterHari === 'semua') {
@@ -224,204 +373,279 @@ export default function TokoPage() {
             // Filter by search term
             const term = searchTerm.toLowerCase();
             return toko.nama.toLowerCase().includes(term) || (toko.kode && toko.kode.toLowerCase().includes(term));
+        })
+        .sort((a, b) => {
+            switch (sortBy) {
+                case 'nama-desc':
+                    return b.nama.localeCompare(a.nama);
+                case 'terbaru':
+                    return (b.createdAt?.seconds || 0) - (a.createdAt?.seconds || 0);
+                case 'terlama':
+                    return (a.createdAt?.seconds || 0) - (b.createdAt?.seconds || 0);
+                case 'kunjungan-terbanyak':
+                    return b.stats.totalKunjungan - a.stats.totalKunjungan;
+                case 'box-terbanyak':
+                    return b.stats.totalBox - a.stats.totalBox;
+                case 'nama-asc':
+                default:
+                    return a.nama.localeCompare(b.nama);
+            }
         });
 
+    if (viewingDetail.type) {
+        if (viewingDetail.type === 'kunjungan') {
+            return <VisitDetailPage toko={viewingDetail.toko} kunjunganList={kunjunganList} orderList={orderList} onBack={() => setViewingDetail({ type: null, toko: null })} />;
+        }
+        if (viewingDetail.type === 'order') {
+            return <OrderDetailPage toko={viewingDetail.toko} orderList={orderList} onBack={() => setViewingDetail({ type: null, toko: null })} />;
+        }
+    }
+
     return (
-        <div className="p-5 pb-20 max-w-md mx-auto">
-            <div className="flex items-center justify-between mb-6">
-                <div className="flex items-center gap-2">
-                    <Store className="text-purple-600" size={20} />
-                    <h1 className="text-2xl font-bold text-slate-800">Daftar Toko</h1>
-                </div>
-                <button onClick={toggleForm} className="bg-purple-600 text-white px-4 py-2 rounded-full font-semibold flex items-center gap-2 hover:bg-purple-700 transition shadow-md">
-                    <Plus size={18} /> {showForm ? 'Batal' : 'Tambah'}
-                </button>
-            </div>
-
-            {/* Search Bar */}
-            <div className="mb-4">
-                <input type="text" placeholder="Cari nama atau kode toko..." value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500" />
-            </div>
-
-            {/* Filter Hari (Listbox style) */}
-            <div className="mb-6">
-                <h3 className="text-xs font-semibold text-slate-600 mb-2 flex items-center gap-1.5">
-                    <Filter size={12} /> Filter Jadwal
-                </h3>
-                <div className="flex items-center gap-2 overflow-x-auto pb-2 -mx-5 px-5" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
-                    {['semua', ...HARI].map((hari) => (
-                        <button key={hari} onClick={() => setFilterHari(hari)} className={`px-4 py-1.5 rounded-full text-sm font-medium transition-colors whitespace-nowrap ${filterHari === hari ? 'bg-purple-600 text-white shadow' : 'bg-white text-slate-700 border border-slate-300 hover:bg-slate-50'}`}>
-                            {hari === 'semua' ? 'Semua Hari' : HARI_LABEL[hari]}
+        <div className="animate-in fade-in duration-300">
+            <div className="p-5 pb-20 max-w-md mx-auto">
+                <div className="flex items-center justify-between mb-6">
+                    <div className="flex items-center gap-2">
+                        <Store className="text-purple-600" size={20} />
+                        <h1 className="text-2xl font-bold text-slate-800">Daftar Toko</h1>
+                    </div>
+                    <div className="flex items-center gap-2">
+                        <input type="file" ref={fileInputRef} onChange={handleFileImport} accept=".xlsx, .xls" className="hidden" />
+                        <button onClick={() => fileInputRef.current.click()} disabled={isImporting} className="bg-green-600 text-white px-3 py-2 rounded-full font-semibold flex items-center gap-2 hover:bg-green-700 transition shadow-md disabled:opacity-50">
+                            <FileUp size={16} />
+                            {isImporting ? 'Mengimpor...' : ''}
                         </button>
-                    ))}
+                        <button onClick={toggleForm} className="bg-purple-600 text-white px-4 py-2 rounded-full font-semibold flex items-center gap-2 hover:bg-purple-700 transition shadow-md">
+                            <Plus size={18} /> {showForm ? 'Batal' : 'Tambah'}
+                        </button>
+                    </div>
                 </div>
-            </div>
+                <p className="text-xs text-slate-500 -mt-4 mb-4">Format Excel: Kolom A (Nama), B (Kode), C (Kode Freezer), D (WA), E (Hari, pisahkan dengan koma)</p>
 
-            {/* Form */}
-            <div className={`fixed inset-0 z-50 transition-colors duration-300 ${showForm ? 'bg-black/40' : 'bg-transparent pointer-events-none'}`}>
-                <div className={`absolute inset-y-0 left-0 w-full max-w-md bg-slate-50 shadow-2xl transition-transform duration-300 ease-in-out transform ${showForm ? 'translate-x-0' : '-translate-x-full'}`}>
-                    <div className="h-full flex flex-col">
-                        <div className="flex items-center justify-between p-4 bg-white">
-                            <button type="button" onClick={toggleForm} className="p-2 rounded-full hover:bg-slate-100">
-                                <ArrowLeft size={20} />
-                            </button>
-                            <h2 className="text-lg font-bold text-slate-800">{editingId ? 'Edit Toko' : 'Tambah Toko Baru'}</h2>
-                            <div className="w-10"></div> {/* Spacer */}
+                {/* Search Bar */}
+                <div className="mb-4 flex items-center gap-2">
+                    <input type="text" placeholder="Cari nama atau kode toko..." value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} className="flex-grow p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500" />
+                    <div className="relative">
+                        <select value={sortBy} onChange={(e) => setSortBy(e.target.value)} className="appearance-none w-full bg-white border border-gray-300 rounded-lg p-3 pr-10 focus:outline-none focus:ring-2 focus:ring-purple-500 text-sm">
+                            <option value="nama-asc">Nama A-Z</option>
+                            <option value="nama-desc">Nama Z-A</option>
+                            <option value="terbaru">Terbaru</option>
+                            <option value="terlama">Terlama</option>
+                            <option value="kunjungan-terbanyak">Kunjungan Terbanyak</option>
+                            <option value="box-terbanyak">Box Terbanyak</option>
+                        </select>
+                        <div className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none">
+                            <ArrowDownUp size={16} />
                         </div>
+                    </div>
+                </div>
 
-                        <form id="toko-form" onSubmit={simpanToko} className="flex-1 overflow-y-auto p-5 space-y-4">
-                            <div>
-                                <label className="block text-sm font-medium text-slate-700 mb-1">Nama Toko *</label>
-                                <input type="text" value={nama} onChange={(e) => setNama(e.target.value)} placeholder="Contoh: Toko Jaya Abadi" className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500" required />
-                            </div>
-                            <div>
-                                <label className="block text-sm font-medium text-slate-700 mb-1">Kode Toko (Opsional)</label>
-                                <input type="text" value={kode} onChange={(e) => setKode(e.target.value)} placeholder="Contoh: TJ001" className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500" />
-                            </div>
-                            <div>
-                                <label className="block text-sm font-medium text-slate-700 mb-1">Kode Freezer (Opsional)</label>
-                                <input type="text" value={kodeFreezer} onChange={(e) => setKodeFreezer(e.target.value)} placeholder="Contoh: FZ001" className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500" />
-                            </div>
-                            <div>
-                                <label className="block text-sm font-medium text-slate-700 mb-1">Nomor WhatsApp (Opsional)</label>
-                                <input type="tel" value={nomorWa} onChange={handleNomorWaChange} placeholder="Contoh: 628123456789" className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500" />
+                {/* Filter Hari (Listbox style) */}
+                <div className="mb-6">
+                    <h3 className="text-xs font-semibold text-slate-600 mb-2 flex items-center gap-1.5">
+                        <Filter size={12} /> Filter Jadwal
+                    </h3>
+                    <div className="flex items-center gap-2 overflow-x-auto pb-2 -mx-5 px-5" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
+                        {['semua', ...HARI].map((hari) => (
+                            <button key={hari} onClick={() => setFilterHari(hari)} className={`px-4 py-1.5 rounded-full text-sm font-medium transition-colors whitespace-nowrap ${filterHari === hari ? 'bg-purple-600 text-white shadow' : 'bg-white text-slate-700 border border-slate-300 hover:bg-slate-50'}`}>
+                                {hari === 'semua' ? 'Semua Hari' : HARI_LABEL[hari]}
+                            </button>
+                        ))}
+                    </div>
+                </div>
+
+                {/* Form */}
+                <div className={`fixed inset-0 z-50 transition-colors duration-300 ${showForm ? 'bg-black/40' : 'bg-transparent pointer-events-none'}`}>
+                    <div className={`absolute inset-y-0 left-0 w-full max-w-md bg-slate-50 shadow-2xl transition-transform duration-300 ease-in-out transform ${showForm ? 'translate-x-0' : '-translate-x-full'}`}>
+                        <div className="h-full flex flex-col">
+                            <div className="flex items-center justify-between p-4 bg-white">
+                                <button type="button" onClick={toggleForm} className="p-2 rounded-full hover:bg-slate-100">
+                                    <ArrowLeft size={20} />
+                                </button>
+                                <h2 className="text-lg font-bold text-slate-800">{editingId ? 'Edit Toko' : 'Tambah Toko Baru'}</h2>
+                                <div className="w-10"></div> {/* Spacer */}
                             </div>
 
-                            {/* Jadwal Kunjungan */}
-                            <div className=" pt-4">
-                                <h3 className="font-semibold text-slate-800 mb-3 flex items-center gap-1.5">
-                                    <Calendar size={16} className="text-purple-600" />
-                                    Hari Kunjungan
-                                </h3>
-                                <div className="grid grid-cols-3 gap-2">
-                                    {HARI.map((hari) => (
-                                        <label key={hari} className={`flex items-center justify-center p-2 rounded-lg cursor-pointer transition ${jadwalKunjungan.includes(hari) ? 'bg-purple-100 text-purple-700 border border-purple-300' : 'bg-slate-100 text-slate-700 border border-slate-200 hover:bg-slate-200'}`}>
-                                            <input type="checkbox" checked={jadwalKunjungan.includes(hari)} onChange={() => toggleHari(hari)} className="sr-only" />
-                                            <span className="font-medium">{HARI_LABEL[hari]}</span>
-                                        </label>
-                                    ))}
+                            <form id="toko-form" onSubmit={simpanToko} className="flex-1 overflow-y-auto p-5 space-y-4">
+                                <div>
+                                    <label className="block text-sm font-medium text-slate-700 mb-1">Nama Toko *</label>
+                                    <input type="text" value={nama} onChange={(e) => setNama(e.target.value)} placeholder="Contoh: Toko Jaya Abadi" className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500" required />
                                 </div>
-                            </div>
-                        </form>
+                                <div>
+                                    <label className="block text-sm font-medium text-slate-700 mb-1">Kode Toko (Opsional)</label>
+                                    <input type="text" value={kode} onChange={(e) => setKode(e.target.value)} placeholder="Contoh: TJ001" className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500" />
+                                </div>
+                                <div>
+                                    <label className="block text-sm font-medium text-slate-700 mb-1">Kode Freezer (Opsional)</label>
+                                    <input type="text" value={kodeFreezer} onChange={(e) => setKodeFreezer(e.target.value)} placeholder="Contoh: FZ001" className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500" />
+                                </div>
+                                <div>
+                                    <label className="block text-sm font-medium text-slate-700 mb-1">Nomor WhatsApp (Opsional)</label>
+                                    <input type="tel" value={nomorWa} onChange={handleNomorWaChange} placeholder="Contoh: 628123456789" className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500" />
+                                </div>
 
-                        <div className="bg-white/80 backdrop-blur-sm py-4 px-5 border-t border-gray-200">
-                            <button type="submit" form="toko-form" className="w-full py-3 bg-purple-600 text-white rounded-lg font-bold hover:bg-purple-700 transition">
-                                {editingId ? 'Update Toko' : 'Simpan Toko'}
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            {/* Daftar Toko */}
-            {loading ? (
-                <div className="py-10">
-                    <div className="flex items-center justify-center">
-                        <Loader text="Memuat daftar toko..." />
-                    </div>
-                </div>
-            ) : tokoList.length === 0 ? (
-                <div className="text-center py-10 text-gray-500 bg-slate-50 rounded-xl">
-                    Belum ada toko.
-                    <br />
-                    <span className="text-sm">Klik "Tambah" untuk membuat toko baru.</span>
-                </div>
-            ) : filteredToko.length === 0 ? (
-                <div className="text-center py-10 text-gray-500 bg-slate-50 rounded-xl">Tidak ada toko yang cocok dengan pencarian Anda.</div>
-            ) : (
-                <div className="space-y-4">
-                    {filteredToko.map((toko) => (
-                        <div key={toko.id} className="bg-white rounded-xl p-4 border border-gray-200 shadow-sm">
-                            <div className="flex justify-between items-start">
-                                <div className="flex-grow">
-                                    <h3 className="font-bold text-base text-slate-800 pr-4">{toko.nama}</h3>
-                                    <p className="text-xs text-slate-600 mt-1">
-                                        Kode:{' '}
-                                        <span onClick={() => handleCopy(toko.kode, 'Kode Toko')} title="Klik untuk salin" className="font-mono bg-slate-100 px-1.5 py-0.5 rounded cursor-pointer hover:bg-slate-200 active:bg-slate-300 transition-colors">
-                                            {toko.kode}
-                                        </span>
-                                    </p>
-                                    <p className="text-xs text-slate-600 mt-1">
-                                        Freezer:{' '}
-                                        <span onClick={() => handleCopy(toko.kodeFreezer, 'Kode Freezer')} title="Klik untuk salin" className="font-mono bg-slate-100 px-1.5 py-0.5 rounded cursor-pointer hover:bg-slate-200 active:bg-slate-300 transition-colors">
-                                            {toko.kodeFreezer || '-'}
-                                        </span>
-                                    </p>
-                                    <div className="mt-3 space-y-2">
-                                        {toko.nomorWa && (
-                                            <a href={`https://wa.me/${toko.nomorWa}`} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1.5 text-xs text-green-700 hover:underline">
-                                                <MessageSquare size={12} /> {toko.nomorWa}
-                                            </a>
-                                        )}
-                                        <div className="flex items-center gap-1 text-xs text-purple-700">
-                                            <Calendar size={12} className="text-purple-600" />
-                                            <span>{formatHari(toko.jadwalKunjungan)}</span>
-                                        </div>
+                                {/* Jadwal Kunjungan */}
+                                <div className=" pt-4">
+                                    <h3 className="font-semibold text-slate-800 mb-3 flex items-center gap-1.5">
+                                        <Calendar size={16} className="text-purple-600" />
+                                        Hari Kunjungan
+                                    </h3>
+                                    <div className="grid grid-cols-3 gap-2">
+                                        {HARI.map((hari) => (
+                                            <label key={hari} className={`flex items-center justify-center p-2 rounded-lg cursor-pointer transition ${jadwalKunjungan.includes(hari) ? 'bg-purple-100 text-purple-700 border border-purple-300' : 'bg-slate-100 text-slate-700 border border-slate-200 hover:bg-slate-200'}`}>
+                                                <input type="checkbox" checked={jadwalKunjungan.includes(hari)} onChange={() => toggleHari(hari)} className="sr-only" />
+                                                <span className="font-medium">{HARI_LABEL[hari]}</span>
+                                            </label>
+                                        ))}
                                     </div>
                                 </div>
-                                <div className="flex flex-col items-end gap-2">
-                                    <button onClick={() => openEditForm(toko)} className="p-1 rounded-full hover:bg-blue-100 text-blue-500 transition-colors">
-                                        <Pencil size={14} />
-                                    </button>
-                                    <button onClick={() => openDeleteConfirm(toko)} className="p-1 rounded-full hover:bg-red-100 text-red-500 transition-colors">
-                                        <Trash2 size={14} />
-                                    </button>
-                                </div>
-                            </div>
-                            {/* Statistik Toko */}
-                            <div className="mt-4 pt-3 border-t border-slate-100 grid grid-cols-2 gap-3 text-center">
-                                <div>
-                                    <p className="text-lg font-bold text-slate-700">{getTokoStats(toko.id).totalKunjungan}</p>
-                                    <p className="text-xs text-slate-500 flex items-center justify-center gap-1">
-                                        <MapPin size={12} /> Kunjungan
-                                    </p>
-                                </div>
-                                <div>
-                                    <p className="text-lg font-bold text-slate-700">{getTokoStats(toko.id).totalBox}</p>
-                                    <p className="text-xs text-slate-500 flex items-center justify-center gap-1">
-                                        <Package size={12} /> Box Order
-                                    </p>
-                                </div>
-                            </div>
-                        </div>
-                    ))}
-                </div>
-            )}
+                            </form>
 
-            <div className="mt-8 text-center text-xs text-slate-500">
-                <div className="flex items-center justify-center gap-1 mb-1">
-                    <CheckCircle2 size={14} className="text-green-500" />
-                    <span>Data disimpan di cloud</span>
-                </div>
-                <p>
-                    Total: {filteredToko.length} toko {(searchTerm || filterHari !== 'semua') && `(dari ${tokoList.length} total)`}
-                </p>
-            </div>
-
-            {/* Modal Konfirmasi Hapus */}
-            {showDeleteConfirm && (
-                <div className="fixed inset-0 z-[100] bg-black/60 flex items-center justify-center p-4 animate-in fade-in">
-                    <div className="bg-white rounded-2xl shadow-2xl p-6 w-full max-w-sm animate-in zoom-in-95 slide-in-from-bottom-5">
-                        <div className="text-center">
-                            <div className="w-16 h-16 mx-auto flex items-center justify-center bg-red-100 rounded-full">
-                                <Trash2 size={32} className="text-red-600" />
+                            <div className="bg-white/80 backdrop-blur-sm py-4 px-5 border-t border-gray-200">
+                                <button type="submit" form="toko-form" className="w-full py-3 bg-purple-600 text-white rounded-lg font-bold hover:bg-purple-700 transition">
+                                    {editingId ? 'Update Toko' : 'Simpan Toko'}
+                                </button>
                             </div>
-                            <h3 className="mt-4 text-xl font-bold text-slate-800">Hapus Toko?</h3>
-                            <p className="mt-2 text-sm text-slate-500">
-                                Anda akan menghapus <strong className="text-slate-700">{itemToDelete?.nama}</strong>. Tindakan ini tidak dapat dibatalkan.
-                            </p>
-                        </div>
-                        <div className="mt-6 grid grid-cols-2 gap-3">
-                            <button onClick={() => setShowDeleteConfirm(false)} className="w-full py-3 bg-slate-100 text-slate-700 rounded-lg font-semibold hover:bg-slate-200 transition">
-                                Batal
-                            </button>
-                            <button onClick={handleConfirmDelete} className="w-full py-3 bg-red-600 text-white rounded-lg font-semibold hover:bg-red-700 transition">
-                                Ya, Hapus
-                            </button>
                         </div>
                     </div>
                 </div>
-            )}
+
+                {/* Daftar Toko */}
+                {loading ? (
+                    <div className="py-10">
+                        <div className="flex items-center justify-center">
+                            <Loader text="Memuat daftar toko..." />
+                        </div>
+                    </div>
+                ) : tokoList.length === 0 ? (
+                    <div className="text-center py-10 text-gray-500 bg-slate-50 rounded-xl">
+                        Belum ada toko.
+                        <br />
+                        <span className="text-sm">Klik "Tambah" untuk membuat toko baru.</span>
+                    </div>
+                ) : filteredAndSortedToko.length === 0 ? (
+                    <div className="text-center py-10 text-gray-500 bg-slate-50 rounded-xl">Tidak ada toko yang cocok dengan pencarian Anda.</div>
+                ) : (
+                    <div className="space-y-4">
+                        {filteredAndSortedToko.map((toko) => (
+                            <div key={toko.id} className="bg-white rounded-xl p-4 border border-gray-200 shadow-sm">
+                                <div className="flex justify-between items-start">
+                                    <div className="flex-grow">
+                                        <h3 className="font-bold text-base text-slate-800 pr-4">{toko.nama}</h3>
+                                        <p className="text-xs text-slate-600 mt-1">
+                                            Kode:{' '}
+                                            <span onClick={() => handleCopy(toko.kode, 'Kode Toko')} title="Klik untuk salin" className="font-mono bg-slate-100 px-1.5 py-0.5 rounded cursor-pointer hover:bg-slate-200 active:bg-slate-300 transition-colors">
+                                                {toko.kode}
+                                            </span>
+                                        </p>
+                                        <p className="text-xs text-slate-600 mt-1">
+                                            Freezer:{' '}
+                                            <span onClick={() => handleCopy(toko.kodeFreezer, 'Kode Freezer')} title="Klik untuk salin" className="font-mono bg-slate-100 px-1.5 py-0.5 rounded cursor-pointer hover:bg-slate-200 active:bg-slate-300 transition-colors">
+                                                {toko.kodeFreezer || '-'}
+                                            </span>
+                                        </p>
+                                        <div className="mt-3 space-y-2">
+                                            {toko.nomorWa && (
+                                                <a href={`https://wa.me/${toko.nomorWa}`} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1.5 text-xs text-green-700 hover:underline">
+                                                    <MessageSquare size={12} /> {toko.nomorWa}
+                                                </a>
+                                            )}
+                                            <div className="flex items-center gap-1 text-xs text-purple-700">
+                                                <Calendar size={12} className="text-purple-600" />
+                                                <span>{formatHari(toko.jadwalKunjungan)}</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div className="flex flex-col items-end gap-2">
+                                        <button onClick={() => openEditForm(toko)} className="p-1 rounded-full hover:bg-blue-100 text-blue-500 transition-colors">
+                                            <Pencil size={14} />
+                                        </button>
+                                        <button onClick={() => openDeleteConfirm(toko)} className="p-1 rounded-full hover:bg-red-100 text-red-500 transition-colors">
+                                            <Trash2 size={14} />
+                                        </button>
+                                    </div>
+                                </div>
+                                {/* Statistik Toko */}
+                                <div className="mt-4 pt-3 border-t border-slate-100 grid grid-cols-2 gap-3 text-center">
+                                    <div onClick={() => setViewingDetail({ type: 'kunjungan', toko })} className="p-2 rounded-lg hover:bg-slate-50 cursor-pointer transition">
+                                        <p className="text-lg font-bold text-slate-700">{toko.stats.totalKunjungan}</p>
+                                        <p className="text-xs text-slate-500 flex items-center justify-center gap-1">
+                                            <MapPin size={12} /> Kunjungan
+                                        </p>
+                                    </div>
+                                    <div onClick={() => setViewingDetail({ type: 'order', toko })} className="p-2 rounded-lg hover:bg-slate-50 cursor-pointer transition">
+                                        <p className="text-lg font-bold text-slate-700">{toko.stats.totalBox}</p>
+                                        <p className="text-xs text-slate-500 flex items-center justify-center gap-1">
+                                            <Package size={12} /> Box Order
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                )}
+
+                <div className="mt-8 text-center text-xs text-slate-500">
+                    <div className="flex items-center justify-center gap-1 mb-1">
+                        <CheckCircle2 size={14} className="text-green-500" />
+                        <span>Data disimpan di cloud</span>
+                    </div>
+                    <p>
+                        Total: {filteredAndSortedToko.length} toko {(searchTerm || filterHari !== 'semua') && `(dari ${tokoList.length} total)`}
+                    </p>
+                </div>
+
+                {/* Modal Konfirmasi Hapus */}
+                {showDeleteConfirm && (
+                    <div className="fixed inset-0 z-[100] bg-black/60 flex items-center justify-center p-4 animate-in fade-in">
+                        <div className="bg-white rounded-2xl shadow-2xl p-6 w-full max-w-sm animate-in zoom-in-95 slide-in-from-bottom-5">
+                            <div className="text-center">
+                                <div className="w-16 h-16 mx-auto flex items-center justify-center bg-red-100 rounded-full">
+                                    <Trash2 size={32} className="text-red-600" />
+                                </div>
+                                <h3 className="mt-4 text-xl font-bold text-slate-800">Hapus Toko?</h3>
+                                <p className="mt-2 text-sm text-slate-500">
+                                    Anda akan menghapus <strong className="text-slate-700">{itemToDelete?.nama}</strong>. Tindakan ini tidak dapat dibatalkan.
+                                </p>
+                            </div>
+                            <div className="mt-6 grid grid-cols-2 gap-3">
+                                <button onClick={() => setShowDeleteConfirm(false)} className="w-full py-3 bg-slate-100 text-slate-700 rounded-lg font-semibold hover:bg-slate-200 transition">
+                                    Batal
+                                </button>
+                                <button onClick={handleConfirmDelete} className="w-full py-3 bg-red-600 text-white rounded-lg font-semibold hover:bg-red-700 transition">
+                                    Ya, Hapus
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                )}
+
+                {/* Modal Konfirmasi Update dari Impor */}
+                {showUpdateConfirm && (
+                    <div className="fixed inset-0 z-[100] bg-black/60 flex items-center justify-center p-4 animate-in fade-in">
+                        <div className="bg-white rounded-2xl shadow-2xl p-6 w-full max-w-sm animate-in zoom-in-95 slide-in-from-bottom-5">
+                            <div className="text-center">
+                                <div className="w-16 h-16 mx-auto flex items-center justify-center bg-blue-100 rounded-full">
+                                    <FileUp size={32} className="text-blue-600" />
+                                </div>
+                                <h3 className="mt-4 text-xl font-bold text-slate-800">Konfirmasi Impor</h3>
+                                <p className="mt-2 text-sm text-slate-500">
+                                    Ditemukan <strong className="text-slate-700">{storesToUpdate.length} data</strong> yang sudah ada di database dan <strong className="text-slate-700">{storesToAdd.length} data baru</strong>.
+                                </p>
+                                <p className="mt-1 text-sm text-slate-500">Apakah Anda ingin memperbarui data yang sudah ada dan menambahkan data baru?</p>
+                            </div>
+                            <div className="mt-6 grid grid-cols-2 gap-3">
+                                <button onClick={() => setShowUpdateConfirm(false)} className="w-full py-3 bg-slate-100 text-slate-700 rounded-lg font-semibold hover:bg-slate-200 transition">
+                                    Batal
+                                </button>
+                                <button onClick={handleConfirmUpdate} className="w-full py-3 bg-blue-600 text-white rounded-lg font-semibold hover:bg-blue-700 transition">
+                                    Ya, Proses
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                )}
+            </div>
         </div>
     );
 }

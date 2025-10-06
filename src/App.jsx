@@ -70,7 +70,7 @@ export default function App() {
         >
             <div style={{ flex: 1, paddingBottom: '70px' }}>
                 {activePage === 'home' && <HomePage daftarToko={daftarToko} kunjunganList={kunjunganList} produkList={produkList} orderList={orderList} setActivePage={setActivePage} />}
-                {activePage === 'toko' && <TokoPage setActivePage={setActivePage} />}
+                {activePage === 'toko' && <TokoPage setActivePage={setActivePage} orderList={orderList} kunjunganList={kunjunganList} />}
                 {activePage === 'produk' && <ProdukPage setActivePage={setActivePage} />}
                 {activePage === 'order' && <OrderPage setActivePage={setActivePage} />}
                 {activePage === 'produk-terlaris' && <ProdukTerlarisPage produkList={produkList} kunjunganList={kunjunganList} orderList={orderList} setActivePage={setActivePage} />}

@@ -167,12 +167,16 @@ export default function HomePage({ daftarToko, kunjunganList = [], produkList = 
                 ) : (
                     <div className="space-y-2">
                         {kunjunganList.slice(0, 5).map((kunjungan) => {
-                            // Cari order yang cocok berdasarkan tokoId dan waktu pembuatan yang sangat berdekatan
-                            const visitTimestamp = kunjungan.createdAt?.seconds;
-                            const relatedOrder = orderList.find((order) => order.tokoId === kunjungan.tokoId && visitTimestamp && Math.abs(order.createdAt?.seconds - visitTimestamp) < 5);
+                            // Cari SEMUA order yang cocok berdasarkan tokoId dan tanggal yang sama
+                            const visitDate = new Date(kunjungan.createdAt.seconds * 1000);
+                            const relatedOrders = orderList.filter((order) => {
+                                if (!order.createdAt?.seconds) return false;
+                                const orderDate = new Date(order.createdAt.seconds * 1000);
+                                return order.tokoId === kunjungan.tokoId && visitDate.toDateString() === orderDate.toDateString();
+                            });
 
-                            const displayTotal = relatedOrder ? relatedOrder.total : 0;
-                            const totalBoxes = relatedOrder ? relatedOrder.items.reduce((sum, item) => sum + item.qtyBox, 0) : 0;
+                            const displayTotal = relatedOrders.reduce((sum, order) => sum + (order.total || 0), 0);
+                            const totalBoxes = relatedOrders.reduce((sum, order) => sum + (order.items?.reduce((itemSum, item) => itemSum + item.qtyBox, 0) || 0), 0);
 
                             return (
                                 <div key={kunjungan.id} className="bg-white rounded-lg p-3 flex items-center gap-3 shadow-sm border border-gray-100">
