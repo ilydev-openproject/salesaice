@@ -345,7 +345,23 @@ export default function VisitPage({ setActivePage, orderList = [] }) {
                     return;
                 }
 
+                // Fungsi untuk memastikan semua gambar di dalam node sudah termuat
+                const waitForImages = async (nodeElement) => {
+                    const images = Array.from(nodeElement.getElementsByTagName('img'));
+                    const promises = images.map((img) => {
+                        if (img.complete) {
+                            return Promise.resolve();
+                        }
+                        return new Promise((resolve, reject) => {
+                            img.onload = resolve;
+                            img.onerror = reject;
+                        });
+                    });
+                    await Promise.all(promises);
+                };
+
                 try {
+                    await waitForImages(node); // Tunggu gambar selesai dimuat
                     const dataUrl = await toPng(node, { cacheBust: true, pixelRatio: 2 });
                     setPreviewImageUrl(dataUrl);
                     setPreviewImageFilename(`resi-${kunjungan.tokoNama.replace(/\s/g, '_')}-${format(new Date(), 'yyyyMMdd')}.png`);
