@@ -1,8 +1,9 @@
 // src/pages/RutePage.jsx
 import { useState, useEffect } from 'react';
-import { ArrowLeft, Map, Navigation, Check, AlertTriangle, Locate, Loader2 } from 'lucide-react';
+import { ArrowLeft, Map, Navigation, Check, AlertTriangle, Loader2, Shuffle, ListOrdered } from 'lucide-react';
 import { MapContainer, TileLayer, Marker, Popup, Polyline, useMap } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
+import 'leaflet-routing-machine';
 import L from 'leaflet';
 
 // Fix untuk ikon default Leaflet yang rusak di React
@@ -15,11 +16,73 @@ L.Icon.Default.mergeOptions({
 
 const HARI = ['minggu', 'senin', 'selasa', 'rabu', 'kamis', 'jumat', 'sabtu'];
 
+// Fungsi untuk menghitung jarak antara dua titik koordinat (Haversine formula)
+function getDistance(lat1, lon1, lat2, lon2) {
+    const R = 6371; // Radius bumi dalam km
+    const dLat = (lat2 - lat1) * (Math.PI / 180);
+    const dLon = (lon2 - lon1) * (Math.PI / 180);
+    const a = Math.sin(dLat / 2) * Math.sin(dLat / 2) + Math.cos(lat1 * (Math.PI / 180)) * Math.cos(lat2 * (Math.PI / 180)) * Math.sin(dLon / 2) * Math.sin(dLon / 2);
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+    return R * c; // Jarak dalam km
+}
+
+// Algoritma Nearest Neighbor untuk optimasi rute
+function optimizeRoute(startPoint, waypoints) {
+    if (waypoints.length === 0) return [startPoint];
+
+    let unvisited = [...waypoints];
+    let optimizedRoute = [startPoint];
+    let currentPoint = startPoint;
+
+    while (unvisited.length > 0) {
+        let nearestIndex = -1;
+        let minDistance = Infinity;
+
+        unvisited.forEach((point, index) => {
+            const distance = getDistance(currentPoint.lat, currentPoint.lng, point.latitude, point.longitude);
+            if (distance < minDistance) {
+                minDistance = distance;
+                nearestIndex = index;
+            }
+        });
+
+        const nearestPoint = unvisited.splice(nearestIndex, 1)[0];
+        optimizedRoute.push(nearestPoint);
+        currentPoint = { lat: nearestPoint.latitude, lng: nearestPoint.longitude };
+    }
+
+    return optimizedRoute;
+}
+
+// Komponen untuk mengintegrasikan Leaflet Routing Machine
+const RoutingMachine = ({ waypoints }) => {
+    const map = useMap();
+
+    useEffect(() => {
+        if (!map || waypoints.length < 2) return;
+
+        const routingControl = L.Routing.control({
+            waypoints: waypoints.map((p) => L.latLng(p.lat, p.lng)),
+            routeWhileDragging: true,
+            show: false, // Sembunyikan panel instruksi
+            addWaypoints: false, // Jangan izinkan user menambah titik
+            lineOptions: {
+                styles: [{ color: 'purple', opacity: 0.8, weight: 6 }],
+            },
+        }).addTo(map);
+
+        return () => map.removeControl(routingControl);
+    }, [map, waypoints]);
+
+    return null;
+};
+
 export default function RutePage({ tokoList, setActivePage }) {
     const [currentLocation, setCurrentLocation] = useState(null);
-    const [routeCoordinates, setRouteCoordinates] = useState([]);
+    const [routeWaypoints, setRouteWaypoints] = useState([]);
     const [locationError, setLocationError] = useState('');
     const [loadingLocation, setLoadingLocation] = useState(true);
+    const [optimized, setOptimized] = useState(true); // State untuk toggle optimasi
 
     // Ikon kustom untuk lokasi saat ini
     const currentLocationIcon = new L.Icon({
@@ -57,25 +120,36 @@ export default function RutePage({ tokoList, setActivePage }) {
     const hariIni = HARI[new Date().getDay()];
     const tokoHariIni = tokoList.filter((toko) => toko.jadwalKunjungan?.includes(hariIni) && toko.latitude && toko.longitude);
 
-    const showRoute = () => {
+    useEffect(() => {
         if (!currentLocation) {
-            alert('Lokasi saat ini tidak tersedia.');
             return;
         }
         if (tokoHariIni.length === 0) {
-            alert('Tidak ada toko terjadwal untuk ditampilkan di rute.');
+            setRouteWaypoints([]);
             return;
         }
 
-        const coordinates = [[currentLocation.lat, currentLocation.lng], ...tokoHariIni.map((toko) => [toko.latitude, toko.longitude])];
-        setRouteCoordinates(coordinates);
-    };
+        const startPoint = { lat: currentLocation.lat, lng: currentLocation.lng, nama: 'Lokasi Anda' };
+        let waypoints = [];
+
+        if (optimized) {
+            const optimizedPoints = optimizeRoute(startPoint, tokoHariIni);
+            waypoints = optimizedPoints.map((p) => ({ lat: p.lat || p.latitude, lng: p.lng || p.longitude, nama: p.nama }));
+        } else {
+            waypoints = [startPoint, ...tokoHariIni].map((p) => ({ lat: p.lat || p.latitude, lng: p.lng || p.longitude, nama: p.nama }));
+        }
+
+        setRouteWaypoints(waypoints);
+    }, [currentLocation, tokoList, optimized]); // Re-run saat lokasi, toko, atau mode optimasi berubah
 
     // Komponen untuk auto-fit bounds peta
     function ChangeView({ bounds }) {
         const map = useMap();
         if (bounds.length > 0) {
-            map.fitBounds(bounds, { padding: [50, 50] });
+            map.fitBounds(
+                bounds.map((p) => [p.lat, p.lng]),
+                { padding: [50, 50] },
+            );
         }
         return null;
     }
@@ -110,15 +184,19 @@ export default function RutePage({ tokoList, setActivePage }) {
                     <MapContainer center={[currentLocation.lat, currentLocation.lng]} zoom={13} scrollWheelZoom={true} style={{ height: '100%', width: '100%' }}>
                         <TileLayer attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors' url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
                         <Marker position={[currentLocation.lat, currentLocation.lng]} icon={currentLocationIcon}>
-                            <Popup>Lokasi Anda Saat Ini</Popup>
+                            <Popup>
+                                <b>Lokasi Anda Saat Ini</b>
+                            </Popup>
                         </Marker>
                         {tokoHariIni.map((toko) => (
                             <Marker key={toko.id} position={[toko.latitude, toko.longitude]}>
-                                <Popup>{toko.nama}</Popup>
+                                <Popup>
+                                    <b>{toko.nama}</b>
+                                </Popup>
                             </Marker>
                         ))}
-                        {routeCoordinates.length > 0 && <Polyline pathOptions={{ color: 'purple' }} positions={routeCoordinates} />}
-                        <ChangeView bounds={routeCoordinates.length > 0 ? routeCoordinates : tokoHariIni.map((t) => [t.latitude, t.longitude])} />
+                        {routeWaypoints.length > 1 && <RoutingMachine waypoints={routeWaypoints} />}
+                        <ChangeView bounds={routeWaypoints.length > 0 ? routeWaypoints : [{ lat: currentLocation.lat, lng: currentLocation.lng }]} />
                     </MapContainer>
                 ) : (
                     <div className="bg-slate-200 h-full w-full flex items-center justify-center text-slate-500">
@@ -127,27 +205,30 @@ export default function RutePage({ tokoList, setActivePage }) {
                 )}
             </div>
 
-            <div className="bg-white p-4 rounded-xl shadow-sm border border-gray-100 mb-4">
-                <h2 className="font-bold text-slate-800">Toko terjadwal ({tokoHariIni.length})</h2>
+            <div className="bg-white p-4 rounded-xl shadow-sm border border-gray-100 mb-4 flex flex-col">
+                <div className="flex justify-between items-center mb-2">
+                    <h2 className="font-bold text-slate-800">Toko terjadwal ({routeWaypoints.length > 0 ? routeWaypoints.length - 1 : 0})</h2>
+                    <button onClick={() => setOptimized(!optimized)} className="flex items-center gap-1.5 text-xs font-semibold text-purple-700 bg-purple-100 px-2 py-1 rounded-full hover:bg-purple-200 transition">
+                        {optimized ? <ListOrdered size={14} /> : <Shuffle size={14} />}
+                        {optimized ? 'Rute Terpendek' : 'Urutan Manual'}
+                    </button>
+                </div>
                 <p className="text-xs text-slate-500 mb-3">Hanya toko dengan data GPS yang akan ditampilkan.</p>
-                <div className="space-y-2 max-h-60 overflow-y-auto pr-2">
-                    {tokoHariIni.length > 0 ? (
-                        tokoHariIni.map((toko) => (
-                            <div key={toko.id} className="bg-slate-50 p-2 rounded-lg flex items-center gap-2">
-                                <Check size={16} className="text-green-500 flex-shrink-0" />
-                                <p className="text-sm font-medium text-slate-700">{toko.nama}</p>
+                <div className="space-y-2 max-h-48 overflow-y-auto pr-2 -mr-2">
+                    {routeWaypoints.length > 1 ? (
+                        routeWaypoints.slice(1).map((waypoint, index) => (
+                            <div key={index} className="bg-slate-50 p-2 rounded-lg flex items-center gap-3">
+                                <span className="font-bold text-purple-600 text-sm w-5 text-center">{index + 1}</span>
+                                <p className="text-sm font-medium text-slate-700">{waypoint.nama}</p>
                             </div>
                         ))
                     ) : (
-                        <p className="text-sm text-center text-slate-400 py-4">Tidak ada toko terjadwal dengan data GPS.</p>
+                        <p className="text-sm text-center text-slate-400 py-4">Tidak ada toko terjadwal dengan data GPS untuk hari ini.</p>
                     )}
                 </div>
             </div>
 
-            <button onClick={showRoute} disabled={!currentLocation || tokoHariIni.length === 0 || loadingLocation} className="w-full py-3 bg-purple-600 text-white rounded-xl font-bold text-base hover:bg-purple-700 transition flex items-center justify-center gap-2 shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed disabled:shadow-md">
-                <Navigation size={20} />
-                Tampilkan Rute di Peta
-            </button>
+            <p className="text-center text-xs text-slate-400 mt-4">Rute di peta akan otomatis diperbarui. Rute terpendek adalah perkiraan dan mungkin bukan yang paling optimal.</p>
         </div>
     );
 }

@@ -2,7 +2,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { collection, getDocs, addDoc, updateDoc, deleteDoc, doc, serverTimestamp, writeBatch } from 'firebase/firestore';
 import { db } from '../lib/firebase';
-import Loader from '../components/Loader'; //
+import Loader from '../components/Loader';
 import { Store, Plus, Trash2, Pencil, CheckCircle2, Calendar, Filter, ArrowLeft, Package, MapPin, AlertTriangle, ArrowDownUp, FileUp, FileDown, Send, LocateFixed, Loader2 } from 'lucide-react';
 import { MessageSquare } from 'lucide-react'; // Import MessageSquare
 import * as XLSX from 'xlsx'; // Import xlsx library
@@ -200,8 +200,8 @@ export default function TokoPage({ orderList = [], kunjunganList = [] }) {
         setIsFetchingLocation(true);
         navigator.geolocation.getCurrentPosition(
             (position) => {
-                setLatitude(position.coords.latitude.toFixed(7));
-                setLongitude(position.coords.longitude.toFixed(7));
+                setLatitude(position.coords.latitude);
+                setLongitude(position.coords.longitude);
                 setIsFetchingLocation(false);
             },
             (error) => {
@@ -212,6 +212,25 @@ export default function TokoPage({ orderList = [], kunjunganList = [] }) {
         );
     };
 
+    const handleGmapsLinkPaste = (e) => {
+        const pastedText = e.target.value;
+
+        // Regex untuk mengekstrak koordinat dari berbagai format URL Google Maps
+        // Contoh: https://www.google.com/maps/place/Monas/@-6.1753924,106.8271528,17z
+        // Contoh: https://maps.app.goo.gl/abcdefg
+        // Contoh: -6.1753924, 106.8271528
+        const regex = /@(-?\d+\.\d+),(-?\d+\.\d+)|(-?\d+\.\d+),\s*(-?\d+\.\d+)/;
+        const match = pastedText.match(regex);
+
+        if (match) {
+            // `match[1]` dan `match[2]` untuk format URL dengan `@`
+            // `match[3]` dan `match[4]` untuk format teks "lat, lng"
+            const lat = parseFloat(match[1] || match[3]);
+            const lng = parseFloat(match[2] || match[4]);
+            setLatitude(lat);
+            setLongitude(lng);
+        }
+    };
     const handleBroadcastWA = () => {
         if (filterHari === 'semua') {
             alert('Pilih hari spesifik untuk broadcast.');
@@ -303,6 +322,7 @@ export default function TokoPage({ orderList = [], kunjunganList = [] }) {
                 const jadwalStr = row[4]?.toString().toLowerCase().trim() || '';
 
                 // Proses jadwal
+                // prettier-ignore
                 const jadwalToko = jadwalStr
                     .split(',')
                     .map((h) => h.trim())
@@ -546,9 +566,10 @@ export default function TokoPage({ orderList = [], kunjunganList = [] }) {
                                         <MapPin size={16} className="text-purple-600" />
                                         Lokasi GPS (Opsional)
                                     </h3>
-                                    <div className="grid grid-cols-2 gap-3">
-                                        <input type="text" value={latitude} onChange={(e) => setLatitude(e.target.value)} placeholder="Latitude" className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500" />
-                                        <input type="text" value={longitude} onChange={(e) => setLongitude(e.target.value)} placeholder="Longitude" className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500" />
+                                    <div className="space-y-2">
+                                        <input type="text" onChange={handleGmapsLinkPaste} placeholder="Tempel link Google Maps di sini" className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500" />
+                                        <input type="text" value={latitude} onChange={(e) => setLatitude(e.target.value)} placeholder="Latitude (otomatis)" className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 bg-slate-100" readOnly />
+                                        <input type="text" value={longitude} onChange={(e) => setLongitude(e.target.value)} placeholder="Longitude (otomatis)" className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 bg-slate-100" readOnly />
                                     </div>
                                     <button type="button" onClick={fetchCurrentLocation} disabled={isFetchingLocation} className="mt-2 w-full flex items-center justify-center gap-2 text-sm font-semibold text-purple-700 bg-purple-100 p-2 rounded-lg hover:bg-purple-200 transition disabled:opacity-70">
                                         {isFetchingLocation ? <Loader2 size={16} className="animate-spin" /> : <LocateFixed size={16} />}
@@ -627,10 +648,10 @@ export default function TokoPage({ orderList = [], kunjunganList = [] }) {
                                                 <span>{formatHari(toko.jadwalKunjungan)}</span>
                                             </div>
                                             {toko.latitude && toko.longitude && (
-                                                <div className="flex items-center gap-1 text-xs text-blue-700">
+                                                <a href={`https://www.google.com/maps?q=${toko.latitude},${toko.longitude}`} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1 text-xs text-blue-700 hover:underline">
                                                     <MapPin size={12} className="text-blue-600" />
-                                                    <span>GPS Tersimpan</span>
-                                                </div>
+                                                    <span>Buka di Peta</span>
+                                                </a>
                                             )}
                                         </div>
                                     </div>
