@@ -5,7 +5,7 @@ import { Package, Plus, Trash2, TrendingUp, Wallet, Tag, Box, CheckCircle2, XCir
 import Loader from '../components/Loader';
 import { db } from '../lib/firebase';
 
-export default function ProdukPage({ setActivePage }) {
+export default function ProdukPage({ setActivePage, onModalChange }) {
     const [produkList, setProdukList] = useState([]);
     const [loading, setLoading] = useState(true);
     const [showForm, setShowForm] = useState(false);
@@ -23,6 +23,24 @@ export default function ProdukPage({ setActivePage }) {
     // State untuk modal konfirmasi hapus
     const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
     const [itemToDelete, setItemToDelete] = useState(null);
+
+    // Efek untuk memberitahu App.jsx jika ada modal yang terbuka
+    useEffect(() => {
+        const isAnyModalOpen = showForm || showDeleteConfirm;
+        onModalChange(isAnyModalOpen);
+
+        const handlePopState = (event) => {
+            if (isAnyModalOpen) {
+                event.preventDefault();
+                if (showForm) setShowForm(false);
+                else if (showDeleteConfirm) setShowDeleteConfirm(false);
+            }
+        };
+
+        if (isAnyModalOpen) window.history.pushState({ modal: 'produk' }, '');
+        window.addEventListener('popstate', handlePopState);
+        return () => window.removeEventListener('popstate', handlePopState);
+    }, [showForm, showDeleteConfirm, onModalChange]);
 
     useEffect(() => {
         const loadProduk = async () => {

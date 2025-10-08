@@ -20,7 +20,7 @@ const HARI_LABEL = {
     sabtu: 'Sabtu',
 };
 
-export default function TokoPage({ orderList = [], kunjunganList = [] }) {
+export default function TokoPage({ orderList = [], kunjunganList = [], onModalChange }) {
     const [tokoList, setTokoList] = useState([]);
     const [loading, setLoading] = useState(true);
     const [showForm, setShowForm] = useState(false);
@@ -58,6 +58,28 @@ export default function TokoPage({ orderList = [], kunjunganList = [] }) {
 
     // Ref untuk file input
     const fileInputRef = useRef(null);
+
+    // Efek untuk memberitahu App.jsx jika ada modal yang terbuka
+    useEffect(() => {
+        const isAnyModalOpen = showForm || showDeleteConfirm || showUpdateConfirm || showBroadcastModal;
+        onModalChange(isAnyModalOpen);
+
+        const handlePopState = (event) => {
+            if (isAnyModalOpen) {
+                event.preventDefault();
+                // Tutup modal yang paling atas
+                if (showForm) setShowForm(false);
+                else if (showDeleteConfirm) setShowDeleteConfirm(false);
+                else if (showUpdateConfirm) setShowUpdateConfirm(false);
+                else if (showBroadcastModal) setShowBroadcastModal(false);
+            }
+        };
+
+        // Tambahkan state dummy untuk menangkap event back button
+        if (isAnyModalOpen) window.history.pushState({ modal: 'toko' }, '');
+        window.addEventListener('popstate', handlePopState);
+        return () => window.removeEventListener('popstate', handlePopState);
+    }, [showForm, showDeleteConfirm, showUpdateConfirm, showBroadcastModal, onModalChange]);
 
     // Load data
     useEffect(() => {

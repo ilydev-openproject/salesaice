@@ -10,7 +10,7 @@ import { Store, Package, Plus, Minus, CheckCircle2, XCircle, ChevronDown, ArrowL
 import Loader from '../components/Loader';
 import VisitReceipt from '../components/VisitReceipt'; // Re-using VisitReceipt for orders
 
-export default function OrderPage({ setActivePage }) {
+export default function OrderPage({ setActivePage, onModalChange }) {
     const [orderList, setOrderList] = useState([]);
     const [loading, setLoading] = useState(true);
 
@@ -59,6 +59,26 @@ export default function OrderPage({ setActivePage }) {
     };
 
     const [openMenuId, setOpenMenuId] = useState(null);
+
+    // Efek untuk memberitahu App.jsx jika ada modal yang terbuka
+    useEffect(() => {
+        const isAnyModalOpen = showForm || showReceiptPreview || showDeleteConfirm;
+        onModalChange(isAnyModalOpen);
+
+        const handlePopState = (event) => {
+            if (isAnyModalOpen) {
+                event.preventDefault();
+                // Tutup modal yang paling atas
+                if (showForm) setShowForm(false);
+                else if (showReceiptPreview) closePreview();
+                else if (showDeleteConfirm) setShowDeleteConfirm(false);
+            }
+        };
+
+        if (isAnyModalOpen) window.history.pushState({ modal: 'order' }, '');
+        window.addEventListener('popstate', handlePopState);
+        return () => window.removeEventListener('popstate', handlePopState);
+    }, [showForm, showReceiptPreview, showDeleteConfirm, onModalChange]);
 
     useEffect(() => {
         const loadInitialData = async () => {

@@ -1,15 +1,15 @@
 // src/App.jsx
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { collection, getDocs, query, orderBy, doc, getDoc } from 'firebase/firestore';
 import { db } from './lib/firebase';
 import HomePage from './pages/HomePage';
 import TokoPage from './pages/TokoPage';
 import ProdukPage from './pages/ProdukPage';
-import OrderPage from './pages/OrderPage'; // Import OrderPage
-import ProdukTerlarisPage from './pages/ProdukTerlarisPage'; // Import ProdukTerlarisPage
-import TargetPage from './pages/TargetPage'; // Import TargetPage
-import AnalisisTokoPage from './pages/AnalisisTokoPage'; // Import AnalisisTokoPage
-import RutePage from './pages/RutePage'; // Import RutePage
+import OrderPage from './pages/OrderPage';
+import ProdukTerlarisPage from './pages/ProdukTerlarisPage';
+import TargetPage from './pages/TargetPage';
+import AnalisisTokoPage from './pages/AnalisisTokoPage';
+import RutePage from './pages/RutePage';
 import VisitPage from './pages/VisitPage';
 import { Home, Package, Store, MapPin, ShoppingBag, Navigation } from 'lucide-react';
 import Loader from './components/Loader';
@@ -26,6 +26,11 @@ export default function App() {
         TARGET_BOX_BULANAN: 1000, // Default value
         TARGET_PENDAPATAN_BULANAN: 100000000, // Default value
     });
+
+    // State untuk mengelola back button & konfirmasi keluar
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    const [exitConfirm, setExitConfirm] = useState(false);
+    const [notification, setNotification] = useState({ show: false, message: '' });
 
     // === Load data dari Firebase ===
     useEffect(() => {
@@ -65,10 +70,56 @@ export default function App() {
         setTargets((prev) => ({ ...prev, ...newTargets }));
     };
 
+    const handleSetModalOpen = useCallback((isOpen) => {
+        setIsModalOpen(isOpen);
+    }, []);
+
+    const showExitNotification = () => {
+        setNotification({ show: true, message: 'Tekan sekali lagi untuk keluar' });
+        setTimeout(() => {
+            setNotification({ show: false, message: '' });
+        }, 2000); // Sembunyikan setelah 2 detik
+    };
+
     // === Simpan activePage ke localStorage setiap kali berubah ===
     useEffect(() => {
         localStorage.setItem('activePage', activePage);
+        // Setiap kali halaman berubah, reset konfirmasi keluar
+        setExitConfirm(false);
+
+        // Menambahkan state ke history browser untuk deteksi tombol kembali
+        window.history.pushState({ page: activePage }, '');
     }, [activePage]);
+
+    // Efek untuk menangani tombol kembali (back button)
+    useEffect(() => {
+        const handlePopState = (event) => {
+            // Mencegah perilaku default browser
+            event.preventDefault();
+
+            // Jika ada modal yang terbuka, event ini seharusnya tidak melakukan apa-apa
+            // karena modal akan ditutup oleh komponennya sendiri.
+            // Kita hanya perlu menangani kasus saat tidak ada modal.
+            if (!isModalOpen) {
+                if (activePage === 'home') {
+                    if (exitConfirm) {
+                        // Jika pengguna menekan kembali lagi, tutup aplikasi (di PWA/WebView)
+                        navigator.app?.exitApp();
+                    } else {
+                        setExitConfirm(true);
+                        showExitNotification();
+                        setTimeout(() => setExitConfirm(false), 2000); // Reset setelah 2 detik
+                    }
+                } else {
+                    // Kembali ke halaman home jika bukan di home
+                    setActivePage('home');
+                }
+            }
+        };
+
+        window.addEventListener('popstate', handlePopState);
+        return () => window.removeEventListener('popstate', handlePopState);
+    }, [activePage, exitConfirm, isModalOpen]);
 
     if (loading) {
         return (
@@ -80,6 +131,8 @@ export default function App() {
 
     return (
         <div
+            // Menambahkan div notifikasi di level App
+            className="relative"
             style={{
                 fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif',
                 backgroundColor: '#f8f6fc',
@@ -88,16 +141,23 @@ export default function App() {
                 flexDirection: 'column',
             }}
         >
+            {notification.show && (
+                <div className="fixed top-4 left-1/2 -translate-x-1/2 z-[200] w-full max-w-sm px-4">
+                    <div className="flex items-center justify-center gap-3 w-full p-3 rounded-xl shadow-2xl bg-gray-800 text-white">
+                        <p className="font-semibold text-sm">{notification.message}</p>
+                    </div>
+                </div>
+            )}
             <div style={{ flex: 1, paddingBottom: '70px' }}>
                 {activePage === 'home' && <HomePage daftarToko={daftarToko} kunjunganList={kunjunganList} produkList={produkList} orderList={orderList} setActivePage={setActivePage} targets={targets} />}
-                {activePage === 'toko' && <TokoPage setActivePage={setActivePage} orderList={orderList} kunjunganList={kunjunganList} />}
-                {activePage === 'produk' && <ProdukPage setActivePage={setActivePage} />}
-                {activePage === 'order' && <OrderPage setActivePage={setActivePage} />}
+                {activePage === 'toko' && <TokoPage setActivePage={setActivePage} orderList={orderList} kunjunganList={kunjunganList} onModalChange={handleSetModalOpen} />}
+                {activePage === 'produk' && <ProdukPage setActivePage={setActivePage} onModalChange={handleSetModalOpen} />}
+                {activePage === 'order' && <OrderPage setActivePage={setActivePage} onModalChange={handleSetModalOpen} />}
                 {activePage === 'produk-terlaris' && <ProdukTerlarisPage produkList={produkList} kunjunganList={kunjunganList} orderList={orderList} setActivePage={setActivePage} />}
                 {activePage === 'target' && <TargetPage setActivePage={setActivePage} targets={targets} onTargetsUpdate={handleTargetsUpdate} />}
                 {activePage === 'analisis-toko' && <AnalisisTokoPage tokoList={daftarToko} orderList={orderList} kunjunganList={kunjunganList} setActivePage={setActivePage} />}
                 {activePage === 'rute' && <RutePage tokoList={daftarToko} setActivePage={setActivePage} />}
-                {activePage === 'visit' && <VisitPage setActivePage={setActivePage} orderList={orderList} />}
+                {activePage === 'visit' && <VisitPage setActivePage={setActivePage} orderList={orderList} onModalChange={handleSetModalOpen} />}
             </div>
 
             {/* Bottom Navigation */}

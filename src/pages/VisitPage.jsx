@@ -10,7 +10,7 @@ import { Store, Package, Plus, Minus, CheckCircle2, XCircle, ChevronDown, MapPin
 import Loader from '../components/Loader';
 import VisitReceipt from '../components/VisitReceipt';
 
-export default function VisitPage({ setActivePage, orderList = [] }) {
+export default function VisitPage({ setActivePage, orderList = [], onModalChange }) {
     // State untuk daftar kunjungan
     const [kunjunganList, setKunjunganList] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -57,6 +57,26 @@ export default function VisitPage({ setActivePage, orderList = [] }) {
     };
 
     const [openMenuId, setOpenMenuId] = useState(null); // State untuk menu titik tiga
+
+    // Efek untuk memberitahu App.jsx jika ada modal yang terbuka
+    useEffect(() => {
+        const isAnyModalOpen = showForm || showReceiptPreview || showDeleteConfirm;
+        onModalChange(isAnyModalOpen);
+
+        const handlePopState = (event) => {
+            if (isAnyModalOpen) {
+                event.preventDefault();
+                // Tutup modal yang paling atas
+                if (showForm) setShowForm(false);
+                else if (showReceiptPreview) closePreview();
+                else if (showDeleteConfirm) setShowDeleteConfirm(false);
+            }
+        };
+
+        if (isAnyModalOpen) window.history.pushState({ modal: 'visit' }, '');
+        window.addEventListener('popstate', handlePopState);
+        return () => window.removeEventListener('popstate', handlePopState);
+    }, [showForm, showReceiptPreview, showDeleteConfirm, onModalChange]);
 
     // Load daftar kunjungan
     useEffect(() => {
