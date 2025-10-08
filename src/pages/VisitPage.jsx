@@ -402,15 +402,17 @@ export default function VisitPage({ setActivePage, orderList = [] }) {
         console.log('Kunjungan being shared:', kunjungan);
 
         const toko = tokoList.find((t) => t.id === kunjungan.tokoId);
-        if (!toko) {
+        // Handle case where createdAt is not yet populated by the server
+        const visitDate = kunjungan.createdAt?.seconds ? new Date(kunjungan.createdAt.seconds * 1000) : new Date(); // Fallback to now() if createdAt is null
+
+        if (!toko || !visitDate) {
             showNotification('Data toko tidak ditemukan untuk membuat laporan.', 'error');
             console.error('Toko not found for tokoId:', kunjungan.tokoId);
             return;
         }
         console.log('Found Toko:', toko);
 
-        const visitDate = new Date(kunjungan.createdAt.seconds * 1000);
-        console.log('Visit Date (from kunjungan.createdAt):', visitDate);
+        console.log('Visit Date (from kunjungan.createdAt or fallback):', visitDate);
 
         // 1. No Urut Kunjungan Hari Ini
         const visitsToday = kunjunganList

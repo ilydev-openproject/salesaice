@@ -2,8 +2,8 @@
 import { useState, useEffect, useRef } from 'react';
 import { collection, getDocs, addDoc, updateDoc, deleteDoc, doc, serverTimestamp, writeBatch } from 'firebase/firestore';
 import { db } from '../lib/firebase';
-import Loader from '../components/Loader';
-import { Store, Plus, Trash2, Pencil, CheckCircle2, Calendar, Filter, ArrowLeft, Package, MapPin, AlertTriangle, ArrowDownUp, FileUp, FileDown } from 'lucide-react';
+import Loader from '../components/Loader'; //
+import { Store, Plus, Trash2, Pencil, CheckCircle2, Calendar, Filter, ArrowLeft, Package, MapPin, AlertTriangle, ArrowDownUp, FileUp, FileDown, Send, LocateFixed, Loader2 } from 'lucide-react';
 import { MessageSquare } from 'lucide-react'; // Import MessageSquare
 import * as XLSX from 'xlsx'; // Import xlsx library
 
@@ -31,6 +31,9 @@ export default function TokoPage({ orderList = [], kunjunganList = [] }) {
     const [kode, setKode] = useState('');
     const [jadwalKunjungan, setJadwalKunjungan] = useState([]);
     const [kodeFreezer, setKodeFreezer] = useState(''); // New state for kodeFreezer
+    const [latitude, setLatitude] = useState('');
+    const [longitude, setLongitude] = useState('');
+    const [isFetchingLocation, setIsFetchingLocation] = useState(false);
     const [searchTerm, setSearchTerm] = useState(''); // New state for search term
     const [nomorWa, setNomorWa] = useState('');
     const [filterHari, setFilterHari] = useState('semua');
@@ -44,6 +47,11 @@ export default function TokoPage({ orderList = [], kunjunganList = [] }) {
     const [showUpdateConfirm, setShowUpdateConfirm] = useState(false);
     const [storesToUpdate, setStoresToUpdate] = useState([]);
     const [storesToAdd, setStoresToAdd] = useState([]);
+
+    // State untuk modal broadcast WA
+    const [showBroadcastModal, setShowBroadcastModal] = useState(false);
+    const [broadcastList, setBroadcastList] = useState([]);
+    const [broadcastMessage, setBroadcastMessage] = useState('Halo Toko {nama_toko}, kami informasikan akan ada kunjungan besok. Mohon persiapannya, terima kasih.');
 
     // State untuk menampilkan halaman detail
     const [viewingDetail, setViewingDetail] = useState({ type: null, toko: null });
@@ -86,6 +94,8 @@ export default function TokoPage({ orderList = [], kunjunganList = [] }) {
         setJadwalKunjungan([]);
         setKodeFreezer(''); // Reset kodeFreezer
         setNomorWa('');
+        setLatitude('');
+        setLongitude('');
         setEditingId(null);
         setShowForm(false);
     };
@@ -102,6 +112,8 @@ export default function TokoPage({ orderList = [], kunjunganList = [] }) {
         setKodeFreezer(toko.kodeFreezer || ''); // Set kodeFreezer for editing
         setJadwalKunjungan(Array.isArray(toko.jadwalKunjungan) ? toko.jadwalKunjungan : []);
         setNomorWa(toko.nomorWa || '');
+        setLatitude(toko.latitude || '');
+        setLongitude(toko.longitude || '');
         setShowForm(true);
     };
 
@@ -152,6 +164,8 @@ export default function TokoPage({ orderList = [], kunjunganList = [] }) {
             jadwalKunjungan: jadwalKunjungan, // Ensure this is an array of strings
             kodeFreezer: kodeFreezer.trim(), // Include kodeFreezer
             nomorWa: nomorWa.trim(),
+            latitude: latitude,
+            longitude: longitude,
         };
 
         try {
@@ -178,6 +192,42 @@ export default function TokoPage({ orderList = [], kunjunganList = [] }) {
         }
     };
 
+    const fetchCurrentLocation = () => {
+        if (!navigator.geolocation) {
+            alert('Geolocation tidak didukung oleh browser Anda.');
+            return;
+        }
+        setIsFetchingLocation(true);
+        navigator.geolocation.getCurrentPosition(
+            (position) => {
+                setLatitude(position.coords.latitude.toFixed(7));
+                setLongitude(position.coords.longitude.toFixed(7));
+                setIsFetchingLocation(false);
+            },
+            (error) => {
+                alert(`Gagal mendapatkan lokasi: ${error.message}`);
+                setIsFetchingLocation(false);
+            },
+            { enableHighAccuracy: true },
+        );
+    };
+
+    const handleBroadcastWA = () => {
+        if (filterHari === 'semua') {
+            alert('Pilih hari spesifik untuk broadcast.');
+            return;
+        }
+
+        const list = tokoList.filter((toko) => toko.jadwalKunjungan && toko.jadwalKunjungan.includes(filterHari) && toko.nomorWa);
+
+        if (list.length === 0) {
+            alert(`Tidak ada toko dengan jadwal hari ${HARI_LABEL[filterHari]} yang memiliki nomor WhatsApp.`);
+            return;
+        }
+
+        setBroadcastList(list);
+        setShowBroadcastModal(true);
+    };
     const handleConfirmUpdate = async () => {
         const batch = writeBatch(db);
         let updatedCount = 0;
@@ -451,6 +501,12 @@ export default function TokoPage({ orderList = [], kunjunganList = [] }) {
                                 {hari === 'semua' ? 'Semua Hari' : HARI_LABEL[hari]}
                             </button>
                         ))}
+                        {/* Tombol Broadcast WA */}
+                        <div className="ml-auto pl-2">
+                            <button onClick={handleBroadcastWA} disabled={filterHari === 'semua'} className="flex items-center gap-2 px-4 py-1.5 rounded-full text-sm font-semibold bg-green-100 text-green-800 border border-green-200 hover:bg-green-200 transition disabled:opacity-50 disabled:cursor-not-allowed disabled:bg-slate-100 disabled:text-slate-500 disabled:border-slate-200">
+                                <MessageSquare size={14} /> Broadcast WA
+                            </button>
+                        </div>
                     </div>
                 </div>
 
@@ -482,6 +538,22 @@ export default function TokoPage({ orderList = [], kunjunganList = [] }) {
                                 <div>
                                     <label className="block text-sm font-medium text-slate-700 mb-1">Nomor WhatsApp (Opsional)</label>
                                     <input type="tel" value={nomorWa} onChange={handleNomorWaChange} placeholder="Contoh: 628123456789" className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500" />
+                                </div>
+
+                                {/* Lokasi GPS */}
+                                <div className="pt-4">
+                                    <h3 className="font-semibold text-slate-800 mb-3 flex items-center gap-1.5">
+                                        <MapPin size={16} className="text-purple-600" />
+                                        Lokasi GPS (Opsional)
+                                    </h3>
+                                    <div className="grid grid-cols-2 gap-3">
+                                        <input type="text" value={latitude} onChange={(e) => setLatitude(e.target.value)} placeholder="Latitude" className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500" />
+                                        <input type="text" value={longitude} onChange={(e) => setLongitude(e.target.value)} placeholder="Longitude" className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500" />
+                                    </div>
+                                    <button type="button" onClick={fetchCurrentLocation} disabled={isFetchingLocation} className="mt-2 w-full flex items-center justify-center gap-2 text-sm font-semibold text-purple-700 bg-purple-100 p-2 rounded-lg hover:bg-purple-200 transition disabled:opacity-70">
+                                        {isFetchingLocation ? <Loader2 size={16} className="animate-spin" /> : <LocateFixed size={16} />}
+                                        {isFetchingLocation ? 'Mencari Lokasi...' : 'Gunakan Lokasi Saat Ini'}
+                                    </button>
                                 </div>
 
                                 {/* Jadwal Kunjungan */}
@@ -554,6 +626,12 @@ export default function TokoPage({ orderList = [], kunjunganList = [] }) {
                                                 <Calendar size={12} className="text-purple-600" />
                                                 <span>{formatHari(toko.jadwalKunjungan)}</span>
                                             </div>
+                                            {toko.latitude && toko.longitude && (
+                                                <div className="flex items-center gap-1 text-xs text-blue-700">
+                                                    <MapPin size={12} className="text-blue-600" />
+                                                    <span>GPS Tersimpan</span>
+                                                </div>
+                                            )}
                                         </div>
                                     </div>
                                     <div className="flex flex-col items-end gap-2">
@@ -640,6 +718,53 @@ export default function TokoPage({ orderList = [], kunjunganList = [] }) {
                                 </button>
                                 <button onClick={handleConfirmUpdate} className="w-full py-3 bg-blue-600 text-white rounded-lg font-semibold hover:bg-blue-700 transition">
                                     Ya, Proses
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                )}
+
+                {/* Modal Broadcast WA */}
+                {showBroadcastModal && (
+                    <div className="fixed inset-0 z-[100] bg-black/60 flex items-center justify-center p-4 animate-in fade-in">
+                        <div className="bg-white rounded-2xl shadow-2xl p-6 w-full max-w-md animate-in zoom-in-95 slide-in-from-bottom-5 flex flex-col max-h-[90vh]">
+                            <div className="text-center mb-4">
+                                <div className="w-16 h-16 mx-auto flex items-center justify-center bg-green-100 rounded-full">
+                                    <MessageSquare size={32} className="text-green-600" />
+                                </div>
+                                <h3 className="mt-4 text-xl font-bold text-slate-800">Broadcast Kunjungan</h3>
+                                <p className="text-sm text-slate-500">
+                                    Kirim pengingat ke <strong className="text-slate-700">{broadcastList.length} toko</strong> untuk hari <strong className="text-slate-700">{HARI_LABEL[filterHari]}</strong>.
+                                </p>
+                            </div>
+
+                            <div className="mb-4">
+                                <label className="block text-xs font-medium text-slate-600 mb-1">Template Pesan:</label>
+                                <textarea value={broadcastMessage} onChange={(e) => setBroadcastMessage(e.target.value)} className="w-full p-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-purple-500" rows="3"></textarea>
+                                <p className="text-xs text-slate-400 mt-1">Gunakan `&#123;nama_toko&#125;` untuk nama toko otomatis.</p>
+                            </div>
+
+                            <div className="flex-1 overflow-y-auto space-y-2 pr-2 -mr-2">
+                                {broadcastList.map((toko) => {
+                                    const message = broadcastMessage.replace(/\{nama_toko\}/g, toko.nama);
+                                    const waUrl = `https://wa.me/${toko.nomorWa}?text=${encodeURIComponent(message)}`;
+                                    return (
+                                        <div key={toko.id} className="bg-slate-50 p-2.5 rounded-lg flex justify-between items-center">
+                                            <div>
+                                                <p className="font-semibold text-sm text-slate-800">{toko.nama}</p>
+                                                <p className="text-xs text-slate-500">{toko.nomorWa}</p>
+                                            </div>
+                                            <a href={waUrl} target="_blank" rel="noopener noreferrer" className="bg-green-500 text-white px-3 py-1.5 rounded-full text-xs font-semibold flex items-center gap-1.5 hover:bg-green-600 transition">
+                                                <Send size={12} /> Kirim
+                                            </a>
+                                        </div>
+                                    );
+                                })}
+                            </div>
+
+                            <div className="mt-6">
+                                <button onClick={() => setShowBroadcastModal(false)} className="w-full py-3 bg-slate-100 text-slate-700 rounded-lg font-semibold hover:bg-slate-200 transition">
+                                    Tutup
                                 </button>
                             </div>
                         </div>

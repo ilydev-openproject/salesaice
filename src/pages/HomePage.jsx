@@ -1,7 +1,7 @@
 // src/pages/HomePage.jsx
-import { MapPin, Package, Wallet, Plus, TrendingUp, ChevronRight } from 'lucide-react';
+import { MapPin, Package, Wallet, Plus, TrendingUp, Target, Award, BarChart2, Navigation } from 'lucide-react';
 
-export default function HomePage({ daftarToko, kunjunganList = [], produkList = [], orderList = [], setActivePage }) {
+export default function HomePage({ daftarToko, kunjunganList = [], produkList = [], orderList = [], setActivePage, targets }) {
     // --- Hitung data HARI INI dari 'kunjunganList' & 'orderList' ---
     const todayStart = new Date();
     todayStart.setHours(0, 0, 0, 0);
@@ -49,6 +49,29 @@ export default function HomePage({ daftarToko, kunjunganList = [], produkList = 
 
     const totalKunjunganBulanIni = kunjunganBulanIni.length;
     const totalBoxTerjualBulanIni = [...kunjunganBulanIni, ...orderBulanIni].reduce((sum, item) => sum + (item.items?.reduce((qty, subItem) => qty + subItem.qtyBox, 0) || 0), 0);
+    const totalPendapatanBulanIni = [...kunjunganBulanIni, ...orderBulanIni].reduce((sum, item) => sum + item.total, 0);
+
+    // --- Target Penjualan (Contoh) ---
+    const TARGET_BOX_BULANAN = targets.TARGET_BOX_BULANAN || 1000; // Gunakan target dari props, fallback ke 1000
+    const progressPersen = Math.min((totalBoxTerjualBulanIni / TARGET_BOX_BULANAN) * 100, 100);
+    const sisaTarget = Math.max(0, TARGET_BOX_BULANAN - totalBoxTerjualBulanIni);
+
+    // --- Hitung sisa hari kerja & target harian ---
+    const getSisaHariKerja = () => {
+        const today = new Date();
+        const lastDayOfMonth = new Date(today.getFullYear(), today.getMonth() + 1, 0).getDate();
+        let sisaHari = 0;
+        for (let d = today.getDate(); d <= lastDayOfMonth; d++) {
+            const currentDate = new Date(today.getFullYear(), today.getMonth(), d);
+            if (currentDate.getDay() !== 0) {
+                // 0 = Minggu, asumsikan libur
+                sisaHari++;
+            }
+        }
+        return sisaHari;
+    };
+    const sisaHariKerja = getSisaHariKerja();
+    const targetHarian = sisaHariKerja > 0 ? Math.ceil(sisaTarget / sisaHariKerja) : 0;
 
     // --- Hitung Produk Terlaris Bulan Ini (Top 5) ---
     const productSalesMap = new Map(); // Map: productId -> totalQtyBox
@@ -112,6 +135,42 @@ export default function HomePage({ daftarToko, kunjunganList = [], produkList = 
                 </div>
             </div>
 
+            {/* Kartu Target Kinerja */}
+            <div className="mb-4">
+                <h2 className="text-base font-semibold text-slate-700 mb-2 flex items-center gap-2">
+                    <Target size={18} className="text-purple-600" />
+                    Target Bulan Ini
+                </h2>
+                <div className="bg-white p-4 rounded-xl shadow-sm border border-gray-100">
+                    <div className="flex justify-between items-center mb-1">
+                        <span className="text-sm font-medium text-slate-600">Target Box Terjual</span>
+                        <span className="text-sm font-bold text-purple-700">{TARGET_BOX_BULANAN.toLocaleString('id-ID')} box</span>
+                    </div>
+                    <div className="w-full bg-slate-200 rounded-full h-2.5 mb-2">
+                        <div className="bg-gradient-to-r from-green-400 to-blue-500 h-2.5 rounded-full" style={{ width: `${progressPersen}%` }}></div>
+                    </div>
+                    <div className="flex justify-between items-center text-xs text-slate-500">
+                        <span>
+                            Tercapai: <span className="font-bold">{totalBoxTerjualBulanIni.toLocaleString('id-ID')}</span>
+                        </span>
+                        <span>
+                            Sisa: <span className="font-bold">{sisaTarget.toLocaleString('id-ID')}</span>
+                        </span>
+                    </div>
+                    {sisaTarget === 0 && (
+                        <div className="mt-3 text-center bg-green-50 text-green-800 p-2 rounded-lg text-sm font-semibold flex items-center justify-center gap-2">
+                            <Award size={16} />
+                            Selamat! Target bulan ini tercapai!
+                        </div>
+                    )}
+                    {sisaTarget > 0 && targetHarian > 0 && (
+                        <p className="text-center text-xs text-slate-500 mt-3 pt-3 border-t border-slate-100">
+                            Perlu <strong className="text-purple-700">{targetHarian} box/hari</strong> untuk mencapai target ({sisaHariKerja} hari kerja tersisa).
+                        </p>
+                    )}
+                </div>
+            </div>
+
             {/* Ringkasan Hari Ini */}
             <div className="mb-4">
                 <h2 className="text-base font-semibold text-slate-700 mb-2">Ringkasan Hari Ini</h2>
@@ -140,15 +199,46 @@ export default function HomePage({ daftarToko, kunjunganList = [], produkList = 
             {/* Menu Laporan */}
             <div className="mb-4">
                 <h2 className="text-base font-semibold text-slate-700 mb-2">Menu Laporan</h2>
-                <div className="bg-white p-2 rounded-lg shadow-sm border border-gray-100">
-                    <button onClick={() => setActivePage('produk-terlaris')} className="w-full flex items-center justify-between p-2 rounded-md hover:bg-slate-50 transition-colors">
-                        <div className="flex items-center gap-3">
-                            <div className="w-8 h-8 flex items-center justify-center bg-purple-100 text-purple-600 rounded-lg">
-                                <TrendingUp size={18} />
-                            </div>
-                            <span className="font-semibold text-sm text-slate-700">Produk Terlaris</span>
+                <div className="bg-white p-3 rounded-xl shadow-sm border border-gray-100 grid grid-cols-4 gap-2">
+                    <button onClick={() => setActivePage('produk-terlaris')} className="flex flex-col items-center justify-center gap-1 p-2 rounded-md hover:bg-slate-50 transition-colors w-24">
+                        <div className="w-10 h-10 flex items-center justify-center bg-purple-100 text-purple-600 rounded-lg">
+                            <TrendingUp size={20} />
                         </div>
-                        <ChevronRight size={20} className="text-slate-400" />
+                        <span className="font-semibold text-[10px] text-slate-700 text-center">
+                            Produk
+                            <br />
+                            Terlaris
+                        </span>
+                    </button>
+                    <button onClick={() => setActivePage('target')} className="flex flex-col items-center justify-center gap-1 p-2 rounded-md hover:bg-slate-50 transition-colors w-24">
+                        <div className="w-10 h-10 flex items-center justify-center bg-blue-100 text-blue-600 rounded-lg">
+                            <Target size={20} />
+                        </div>
+                        <span className="font-semibold text-[10px] text-slate-700 text-center">
+                            Atur
+                            <br />
+                            Target
+                        </span>
+                    </button>
+                    <button onClick={() => setActivePage('analisis-toko')} className="flex flex-col items-center justify-center gap-1 p-2 rounded-md hover:bg-slate-50 transition-colors w-24">
+                        <div className="w-10 h-10 flex items-center justify-center bg-green-100 text-green-600 rounded-lg">
+                            <BarChart2 size={20} />
+                        </div>
+                        <span className="font-semibold text-[10px] text-slate-700 text-center">
+                            Analisis
+                            <br />
+                            Toko
+                        </span>
+                    </button>
+                    <button onClick={() => setActivePage('rute')} className="flex flex-col items-center justify-center gap-1 p-2 rounded-md hover:bg-slate-50 transition-colors w-24">
+                        <div className="w-10 h-10 flex items-center justify-center bg-orange-100 text-orange-600 rounded-lg">
+                            <Navigation size={20} />
+                        </div>
+                        <span className="font-semibold text-[10px] text-slate-700 text-center">
+                            Rute
+                            <br />
+                            Kunjungan
+                        </span>
                     </button>
                 </div>
             </div>

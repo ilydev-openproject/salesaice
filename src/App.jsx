@@ -1,14 +1,17 @@
 // src/App.jsx
 import { useState, useEffect } from 'react';
-import { collection, getDocs, query, orderBy } from 'firebase/firestore'; // Removed unused 'where' import
+import { collection, getDocs, query, orderBy, doc, getDoc } from 'firebase/firestore';
 import { db } from './lib/firebase';
 import HomePage from './pages/HomePage';
 import TokoPage from './pages/TokoPage';
 import ProdukPage from './pages/ProdukPage';
 import OrderPage from './pages/OrderPage'; // Import OrderPage
 import ProdukTerlarisPage from './pages/ProdukTerlarisPage'; // Import ProdukTerlarisPage
+import TargetPage from './pages/TargetPage'; // Import TargetPage
+import AnalisisTokoPage from './pages/AnalisisTokoPage'; // Import AnalisisTokoPage
+import RutePage from './pages/RutePage'; // Import RutePage
 import VisitPage from './pages/VisitPage';
-import { Home, Package, Store, MapPin, ShoppingBag, TrendingUp } from 'lucide-react';
+import { Home, Package, Store, MapPin, ShoppingBag, Navigation } from 'lucide-react';
 import Loader from './components/Loader';
 
 export default function App() {
@@ -19,17 +22,30 @@ export default function App() {
     const [kunjunganList, setKunjunganList] = useState([]);
     const [produkList, setProdukList] = useState([]); // New state for produkList
     const [loading, setLoading] = useState(true);
+    const [targets, setTargets] = useState({
+        TARGET_BOX_BULANAN: 1000, // Default value
+        TARGET_PENDAPATAN_BULANAN: 100000000, // Default value
+    });
 
     // === Load data dari Firebase ===
     useEffect(() => {
         const loadData = async () => {
             try {
-                const [tokoSnapshot, kunjunganSnapshot, produkSnapshot, orderSnapshot] = await Promise.all([
+                const targetDocRef = doc(db, 'config', 'salesTarget');
+                const [tokoSnapshot, kunjunganSnapshot, produkSnapshot, orderSnapshot, targetSnapshot] = await Promise.all([
                     getDocs(collection(db, 'toko')),
                     getDocs(query(collection(db, 'kunjungan'), orderBy('createdAt', 'desc'))),
                     getDocs(query(collection(db, 'produk'), orderBy('nama', 'asc'))),
                     getDocs(query(collection(db, 'orders'), orderBy('createdAt', 'desc'))), // Load orders
+                    getDoc(targetDocRef),
                 ]);
+
+                if (targetSnapshot.exists()) {
+                    setTargets(targetSnapshot.data());
+                } else {
+                    // Jika dokumen target belum ada, Anda bisa set default atau membiarkannya
+                    console.log('Dokumen target belum ada, menggunakan nilai default.');
+                }
 
                 setDaftarToko(tokoSnapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() })));
                 setKunjunganList(kunjunganSnapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() })));
@@ -44,6 +60,10 @@ export default function App() {
         };
         loadData();
     }, []);
+
+    const handleTargetsUpdate = (newTargets) => {
+        setTargets((prev) => ({ ...prev, ...newTargets }));
+    };
 
     // === Simpan activePage ke localStorage setiap kali berubah ===
     useEffect(() => {
@@ -69,11 +89,14 @@ export default function App() {
             }}
         >
             <div style={{ flex: 1, paddingBottom: '70px' }}>
-                {activePage === 'home' && <HomePage daftarToko={daftarToko} kunjunganList={kunjunganList} produkList={produkList} orderList={orderList} setActivePage={setActivePage} />}
+                {activePage === 'home' && <HomePage daftarToko={daftarToko} kunjunganList={kunjunganList} produkList={produkList} orderList={orderList} setActivePage={setActivePage} targets={targets} />}
                 {activePage === 'toko' && <TokoPage setActivePage={setActivePage} orderList={orderList} kunjunganList={kunjunganList} />}
                 {activePage === 'produk' && <ProdukPage setActivePage={setActivePage} />}
                 {activePage === 'order' && <OrderPage setActivePage={setActivePage} />}
                 {activePage === 'produk-terlaris' && <ProdukTerlarisPage produkList={produkList} kunjunganList={kunjunganList} orderList={orderList} setActivePage={setActivePage} />}
+                {activePage === 'target' && <TargetPage setActivePage={setActivePage} targets={targets} onTargetsUpdate={handleTargetsUpdate} />}
+                {activePage === 'analisis-toko' && <AnalisisTokoPage tokoList={daftarToko} orderList={orderList} kunjunganList={kunjunganList} setActivePage={setActivePage} />}
+                {activePage === 'rute' && <RutePage tokoList={daftarToko} setActivePage={setActivePage} />}
                 {activePage === 'visit' && <VisitPage setActivePage={setActivePage} orderList={orderList} />}
             </div>
 
@@ -146,6 +169,22 @@ export default function App() {
                 <button onClick={() => setActivePage('produk')} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', background: 'none', border: 'none', outline: 'none', fontSize: '10px', cursor: 'pointer' }}>
                     <Package size={18} color={activePage === 'produk' ? '#402566' : '#999'} />
                     <span style={{ marginTop: '2px', color: activePage === 'produk' ? '#402566' : '#999' }}>Produk</span>
+                </button>
+                <button
+                    onClick={() => setActivePage('rute')}
+                    style={{
+                        display: 'flex',
+                        flexDirection: 'column',
+                        alignItems: 'center',
+                        background: 'none',
+                        border: 'none',
+                        fontSize: '10px',
+                        outline: 'none',
+                        cursor: 'pointer',
+                    }}
+                >
+                    <Navigation size={18} color={activePage === 'rute' ? '#402566' : '#999'} />
+                    <span style={{ marginTop: '2px', color: activePage === 'rute' ? '#402566' : '#999' }}>Rute</span>
                 </button>
                 <button
                     onClick={() => setActivePage('toko')}
