@@ -4,14 +4,14 @@ import { X, Camera, SwitchCamera, MapPin, Download, Loader2 } from 'lucide-react
 import { format } from 'date-fns';
 import { id } from 'date-fns/locale';
 
-const TimestampCamera = ({ onClose, onCapture }) => {
+const TimestampCamera = ({ onClose, visitData }) => {
     const videoRef = useRef(null);
     const canvasRef = useRef(null);
     const [stream, setStream] = useState(null);
     const [location, setLocation] = useState(null);
     const [locationError, setLocationError] = useState('');
     const [facingMode, setFacingMode] = useState('environment'); // 'user' for front, 'environment' for back
-    const [isProcessing, setIsProcessing] = useState(false);
+    const [isProcessing, setIsProcessing] = useState(true); // Start with processing to get location
 
     const startCamera = useCallback(
         async (mode) => {
@@ -38,6 +38,7 @@ const TimestampCamera = ({ onClose, onCapture }) => {
 
     useEffect(() => {
         // 1. Dapatkan Lokasi
+        setIsProcessing(true);
         setLocationError('');
         navigator.geolocation.getCurrentPosition(
             (position) => {
@@ -71,7 +72,7 @@ const TimestampCamera = ({ onClose, onCapture }) => {
 
     const handleCapture = async () => {
         if (!videoRef.current || !canvasRef.current) return;
-        setIsProcessing(true);
+        setIsProcessing(true); // Show loader while processing image
 
         const video = videoRef.current;
         const canvas = canvasRef.current;
@@ -89,31 +90,36 @@ const TimestampCamera = ({ onClose, onCapture }) => {
         // Siapkan teks timestamp
         const now = new Date();
         const timestampText = format(now, "d MMM yyyy, HH:mm:ss 'WIB'", { locale: id });
-        const locationText = location ? `Lat: ${location.lat.toFixed(5)}, Lng: ${location.lng.toFixed(5)}` : locationError || 'Lokasi tidak tersedia';
+        const locationText = location ? `Lat: ${location.lat.toFixed(5)}, Lng: ${location.lng.toFixed(5)}` : locationError || 'Mencari lokasi...';
+        const tokoText = `${visitData?.tokoNama || 'Nama Toko'} (${visitData?.kodeToko || 'Kode'})`;
 
         // Styling teks
-        const fontSize = Math.max(24, videoWidth / 40); // Ukuran font responsif
+        const fontSize = Math.max(24, videoWidth / 45); // Ukuran font responsif
         context.font = `bold ${fontSize}px Arial`;
         context.fillStyle = 'rgba(0, 0, 0, 0.5)'; // Latar belakang semi-transparan
-        context.fillRect(0, videoHeight - fontSize * 2.8, videoWidth, fontSize * 2.8);
+        const textBgHeight = fontSize * 3.8;
+        context.fillRect(0, videoHeight - textBgHeight, videoWidth, textBgHeight);
 
         context.fillStyle = 'white';
         context.textAlign = 'left';
         const padding = 15;
 
         // Tulis teks ke canvas
+        context.fillText(tokoText, padding, videoHeight - fontSize * 2.5 - padding / 2);
         context.fillText(timestampText, padding, videoHeight - fontSize * 1.5 - padding / 2);
         context.fillText(locationText, padding, videoHeight - fontSize * 0.5 - padding / 2);
 
-        // Panggil callback onCapture dengan data gambar (sebagai blob)
-        canvas.toBlob(
-            (blob) => {
-                onCapture(blob, `visit_${format(now, 'yyyyMMdd_HHmmss')}.jpg`);
-            },
-            'image/jpeg',
-            0.9,
-        );
+        // Buat link download
+        const dataUrl = canvas.toDataURL('image/jpeg', 0.9);
+        const link = document.createElement('a');
+        link.href = dataUrl;
+        link.download = `visit_${visitData.tokoNama.replace(/\s/g, '_')}_${format(now, 'yyyyMMdd_HHmmss')}.jpg`;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+
         setIsProcessing(false);
+        alert('Foto berhasil disimpan ke perangkat Anda!');
         onClose();
     };
 
@@ -127,7 +133,7 @@ const TimestampCamera = ({ onClose, onCapture }) => {
                 {/* Header */}
                 <div className="flex justify-between items-center text-white">
                     <div className="bg-black/40 p-2 rounded-lg text-xs font-semibold flex items-center gap-1.5">
-                        <MapPin size={14} className={location ? 'text-green-400' : 'text-red-400'} />
+                        <MapPin size={14} className={location && !locationError ? 'text-green-400' : 'text-red-400'} />
                         {location ? 'GPS Terkunci' : locationError || 'Mencari GPS...'}
                     </div>
                     <button onClick={onClose} className="p-2 bg-black/40 rounded-full">
@@ -141,7 +147,7 @@ const TimestampCamera = ({ onClose, onCapture }) => {
                     <div className="w-16 h-16"></div>
 
                     {/* Capture Button */}
-                    <button onClick={handleCapture} disabled={isProcessing} className="w-20 h-20 rounded-full border-4 border-white bg-white/30 flex items-center justify-center disabled:opacity-50">
+                    <button onClick={handleCapture} disabled={isProcessing || !!locationError} className="w-20 h-20 rounded-full border-4 border-white bg-white/30 flex items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed">
                         {isProcessing ? <Loader2 className="animate-spin text-white" size={32} /> : <Camera size={32} className="text-white" />}
                     </button>
 
