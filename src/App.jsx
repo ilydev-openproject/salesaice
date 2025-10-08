@@ -11,6 +11,7 @@ import TargetPage from './pages/TargetPage';
 import AnalisisTokoPage from './pages/AnalisisTokoPage';
 import RutePage from './pages/RutePage';
 import VisitPage from './pages/VisitPage';
+import TimestampCamera from './pages/TimestampCamera'; // Import TimestampCamera
 import { Home, Package, Store, MapPin, ShoppingBag, Navigation } from 'lucide-react';
 import Loader from './components/Loader';
 
@@ -158,6 +159,7 @@ export default function App() {
                 {activePage === 'analisis-toko' && <AnalisisTokoPage tokoList={daftarToko} orderList={orderList} kunjunganList={kunjunganList} setActivePage={setActivePage} />}
                 {activePage === 'rute' && <RutePage tokoList={daftarToko} setActivePage={setActivePage} />}
                 {activePage === 'visit' && <VisitPage setActivePage={setActivePage} orderList={orderList} onModalChange={handleSetModalOpen} />}
+                {activePage === 'camera' && <TimestampCamera onClose={() => setActivePage('visit')} />}
             </div>
 
             {/* Bottom Navigation */}

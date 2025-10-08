@@ -4,11 +4,12 @@ import { collection, getDocs, addDoc, serverTimestamp, query, orderBy, doc, upda
 import { DayPicker } from 'react-day-picker';
 import 'react-day-picker/dist/style.css';
 import { format, isSameDay, isSameMonth, startOfMonth, endOfMonth } from 'date-fns'; // Added isSameDay, isSameMonth, startOfMonth, endOfMonth
-import { toPng } from 'html-to-image';
+import { toPng } from 'html-to-image'; //
 import { db } from '../lib/firebase'; //
-import { Store, Package, Plus, Minus, CheckCircle2, XCircle, ChevronDown, MapPin, ArrowLeft, ShoppingCart, Calendar, Pencil, Trash2, Wallet, Search, CalendarRange, Download, MoreVertical, Eye, X, MessageSquare, AlertTriangle } from 'lucide-react';
+import { Store, Package, Plus, Minus, CheckCircle2, XCircle, ChevronDown, MapPin, ArrowLeft, ShoppingCart, Calendar, Pencil, Trash2, Wallet, Search, CalendarRange, Download, MoreVertical, Eye, X, MessageSquare, AlertTriangle, Camera } from 'lucide-react';
 import Loader from '../components/Loader';
 import VisitReceipt from '../components/VisitReceipt';
+import TimestampCamera from './TimestampCamera'; // Impor komponen kamera
 
 export default function VisitPage({ setActivePage, orderList = [], onModalChange }) {
     // State untuk daftar kunjungan
@@ -33,6 +34,11 @@ export default function VisitPage({ setActivePage, orderList = [], onModalChange
     const [filterType, setFilterType] = useState('today'); // 'today', 'custom'
     const [customDate, setCustomDate] = useState(new Date());
     const [showCalendar, setShowCalendar] = useState(false);
+
+    // State untuk fitur kamera
+    const [showCamera, setShowCamera] = useState(false);
+    const [capturedImage, setCapturedImage] = useState(null); // Untuk menyimpan blob gambar
+    const [capturedImagePreview, setCapturedImagePreview] = useState(null); // Untuk URL pratinjau
     // State dan Ref untuk ekspor resi
     const [receiptKunjungan, setReceiptKunjungan] = useState(null);
     const receiptRef = useRef(null);
@@ -60,7 +66,7 @@ export default function VisitPage({ setActivePage, orderList = [], onModalChange
 
     // Efek untuk memberitahu App.jsx jika ada modal yang terbuka
     useEffect(() => {
-        const isAnyModalOpen = showForm || showReceiptPreview || showDeleteConfirm;
+        const isAnyModalOpen = showForm || showReceiptPreview || showDeleteConfirm || showCamera;
         onModalChange(isAnyModalOpen);
 
         const handlePopState = (event) => {
@@ -70,13 +76,14 @@ export default function VisitPage({ setActivePage, orderList = [], onModalChange
                 if (showForm) setShowForm(false);
                 else if (showReceiptPreview) closePreview();
                 else if (showDeleteConfirm) setShowDeleteConfirm(false);
+                else if (showCamera) setShowCamera(false);
             }
         };
 
         if (isAnyModalOpen) window.history.pushState({ modal: 'visit' }, '');
         window.addEventListener('popstate', handlePopState);
         return () => window.removeEventListener('popstate', handlePopState);
-    }, [showForm, showReceiptPreview, showDeleteConfirm, onModalChange]);
+    }, [showForm, showReceiptPreview, showDeleteConfirm, showCamera, onModalChange]);
 
     // Load daftar kunjungan
     useEffect(() => {
@@ -212,6 +219,7 @@ export default function VisitPage({ setActivePage, orderList = [], onModalChange
                     tokoNama: kunjunganData.tokoNama,
                     kodeToko: kunjunganData.kodeToko,
                     catatan: kunjunganData.catatan,
+                    fotoUrl: '', // Placeholder untuk URL foto setelah diunggah
                     // items dan total tidak diubah dari sini untuk menghindari duplikasi/konflik
                 });
                 showNotification('Kunjungan berhasil diperbarui.');
@@ -224,6 +232,7 @@ export default function VisitPage({ setActivePage, orderList = [], onModalChange
                     catatan: kunjunganData.catatan,
                     items: [], // Selalu kosong di kunjungan
                     total: 0, // Selalu nol di kunjungan
+                    fotoUrl: '', // Placeholder, akan diisi setelah upload
                     createdAt: serverTimestamp(),
                 });
                 showNotification('Kunjungan berhasil dicatat.');
@@ -240,6 +249,12 @@ export default function VisitPage({ setActivePage, orderList = [], onModalChange
                         createdAt: serverTimestamp(),
                     });
                     showNotification('Order dari kunjungan berhasil disimpan.', 'success');
+                }
+
+                // Jika ada foto, unggah foto tersebut
+                if (capturedImage) {
+                    // TODO: Tambahkan logika untuk mengunggah `capturedImage` (blob) ke Firebase Storage
+                    // Setelah berhasil, dapatkan URL-nya dan update dokumen kunjungan yang baru dibuat.
                 }
             }
 
@@ -268,6 +283,9 @@ export default function VisitPage({ setActivePage, orderList = [], onModalChange
         setSelectedTokoId(tokoList.length > 0 ? tokoList[0].id : '');
         setTokoSearchTerm('');
         setProductSearchTerm(''); // Reset filter produk saat form ditutup
+        setCapturedImage(null);
+        setCapturedImagePreview(null);
+        URL.revokeObjectURL(capturedImagePreview); // Hapus URL pratinjau dari memori
     };
 
     const handleEdit = async (kunjungan) => {
@@ -283,6 +301,12 @@ export default function VisitPage({ setActivePage, orderList = [], onModalChange
             return acc;
         }, {});
         setCart(initialCart);
+
+        // Jika ada foto, tampilkan sebagai pratinjau
+        if (kunjungan.fotoUrl) {
+            setCapturedImagePreview(kunjungan.fotoUrl);
+            setCapturedImage(null); // Tidak perlu blob saat edit, hanya pratinjau
+        }
 
         setShowForm(true);
     };
@@ -511,6 +535,16 @@ ${padRight('No HP', 15)}: ${toko.nomorWa || '-'}
         closeMenu();
     };
 
+    const handlePhotoCaptured = (imageBlob, filename) => {
+        setCapturedImage(imageBlob);
+        // Buat URL sementara untuk pratinjau
+        if (capturedImagePreview) {
+            URL.revokeObjectURL(capturedImagePreview);
+        }
+        setCapturedImagePreview(URL.createObjectURL(imageBlob));
+        setShowCamera(false); // Tutup kamera setelah foto diambil
+    };
+
     if (loading) {
         return (
             <div className="min-h-[calc(100vh-120px)] flex items-center justify-center">
@@ -533,6 +567,9 @@ ${padRight('No HP', 15)}: ${toko.nomorWa || '-'}
                     </div>
                 </div>
             )}
+
+            {/* Render Komponen Kamera */}
+            {showCamera && <TimestampCamera onClose={() => setShowCamera(false)} onCapture={handlePhotoCaptured} />}
 
             {/* Halaman Utama: Daftar Kunjungan */}
             <div className=" pb-20 max-w-md mx-auto" onClick={closeMenu}>
@@ -733,6 +770,31 @@ ${padRight('No HP', 15)}: ${toko.nomorWa || '-'}
                                 <div>
                                     <label className="block text-sm font-medium text-slate-700 mb-2">Catatan (Opsional)</label>
                                     <textarea value={catatan} onChange={(e) => setCatatan(e.target.value)} placeholder="Catatan hasil kunjungan..." className="w-full p-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500" rows="3" />
+                                </div>
+
+                                {/* Tombol Ambil Foto & Pratinjau */}
+                                <div>
+                                    <label className="block text-sm font-medium text-slate-700 mb-2">Foto Kunjungan (Opsional)</label>
+                                    {capturedImagePreview ? (
+                                        <div className="relative w-full h-48 rounded-lg overflow-hidden border-2 border-purple-300">
+                                            <img src={capturedImagePreview} alt="Pratinjau Kunjungan" className="w-full h-full object-cover" />
+                                            <button
+                                                type="button"
+                                                onClick={() => {
+                                                    setCapturedImage(null);
+                                                    setCapturedImagePreview(null);
+                                                }}
+                                                className="absolute top-2 right-2 w-8 h-8 bg-black/50 rounded-full flex items-center justify-center text-white hover:bg-black/70"
+                                            >
+                                                <X size={18} />
+                                            </button>
+                                        </div>
+                                    ) : (
+                                        <button type="button" onClick={() => setShowCamera(true)} className="w-full flex flex-col items-center justify-center p-6 border-2 border-dashed border-gray-300 rounded-lg hover:bg-slate-100 transition">
+                                            <Camera size={32} className="text-slate-400 mb-2" />
+                                            <span className="text-sm font-semibold text-slate-600">Ambil Foto dengan Timestamp</span>
+                                        </button>
+                                    )}
                                 </div>
 
                                 {/* Daftar Produk */}
