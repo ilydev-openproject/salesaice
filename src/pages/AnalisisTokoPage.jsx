@@ -1,6 +1,6 @@
 // src/pages/AnalisisTokoPage.jsx
 import { useState, useMemo } from 'react';
-import { ArrowLeft, BarChart2, ArrowDownUp, TrendingDown, TrendingUp, Star, AlertCircle, Package } from 'lucide-react';
+import { ArrowLeft, BarChart2, ArrowDownUp, TrendingDown, TrendingUp, Star, AlertCircle, Package, Calendar } from 'lucide-react';
 import { differenceInDays, parseISO, format } from 'date-fns';
 import { id } from 'date-fns/locale';
 
@@ -113,6 +113,12 @@ export default function AnalisisTokoPage({ tokoList, orderList, kunjunganList, s
                                             <span className={`px-2 py-0.5 rounded-full text-[10px] font-semibold ${status.color}`}>{status.text}</span>
                                             {toko.daysSinceLastOrder > 30 && toko.daysSinceLastOrder !== Infinity && <AlertCircle size={14} className="text-yellow-600" title="Perlu di-follow up" />}
                                         </div>
+                                        {toko.lastOrderDate && (
+                                            <div className="flex items-center gap-1 text-slate-500 text-[11px] mt-1">
+                                                <Calendar size={12} />
+                                                <span>{format(toko.lastOrderDate, 'd MMM yyyy', { locale: id })}</span>
+                                            </div>
+                                        )}
                                     </div>
                                 </div>
 

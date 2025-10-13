@@ -1,14 +1,28 @@
 // src/pages/OrderPage.jsx
-import { useState, useEffect, useRef, useCallback } from 'react';
-import { collection, getDocs, addDoc, serverTimestamp, query, orderBy, doc, updateDoc, deleteDoc } from 'firebase/firestore';
-import { DayPicker } from 'react-day-picker';
+import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react';
+import { collection, getDocs, addDoc, serverTimestamp, query, orderBy, doc, updateDoc, deleteDoc, writeBatch } from 'firebase/firestore';
+import { DayPicker } from 'react-day-picker'; // Pastikan ini ada
 import 'react-day-picker/dist/style.css';
 import { format } from 'date-fns';
-import { toPng } from 'html-to-image';
+import { id } from 'date-fns/locale';
+import { toPng } from 'html-to-image'; //
 import { db } from '../lib/firebase';
-import { Store, Package, Plus, Minus, CheckCircle2, XCircle, ChevronDown, ArrowLeft, ShoppingCart, Calendar, Pencil, Trash2, Search, CalendarRange, Download, MoreVertical, Eye, X, AlertTriangle, ShoppingBag } from 'lucide-react';
+import { Store, Package, Plus, Minus, CheckCircle2, XCircle, ChevronDown, ArrowLeft, ShoppingCart, Calendar, Pencil, Trash2, Search, CalendarRange, Download, MoreVertical, Eye, X, AlertTriangle, ShoppingBag, Star, List } from 'lucide-react';
 import Loader from '../components/Loader';
 import VisitReceipt from '../components/VisitReceipt'; // Re-using VisitReceipt for orders
+
+// Komponen MiniLoader
+function MiniLoader({ text = 'Memuat...' }) {
+    return (
+        <div className="flex items-center justify-center gap-2 text-sm text-slate-500 py-2">
+            <svg className="animate-spin h-4 w-4 text-purple-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+            </svg>
+            <span>{text}</span>
+        </div>
+    );
+}
 
 export default function OrderPage({ setActivePage, onModalChange }) {
     const [orderList, setOrderList] = useState([]);
@@ -20,15 +34,19 @@ export default function OrderPage({ setActivePage, onModalChange }) {
     const [produkList, setProdukList] = useState([]);
     const [selectedTokoId, setSelectedTokoId] = useState('');
     const [catatan, setCatatan] = useState('');
+    const [orderDate, setOrderDate] = useState(new Date()); // State untuk tanggal di form
     const [submitting, setSubmitting] = useState(false);
     const [editingOrderId, setEditingOrderId] = useState(null);
     const [cart, setCart] = useState({}); // { productId: jumlahBox }
     const [isTokoDropdownOpen, setIsTokoDropdownOpen] = useState(false);
     const [isDataLoaded, setIsDataLoaded] = useState(false);
     const [tokoSearchTerm, setTokoSearchTerm] = useState('');
+    const [showFormCalendar, setShowFormCalendar] = useState(false); // State untuk kalender di form
     const [searchTerm, setSearchTerm] = useState('');
     const [productSearchTerm, setProductSearchTerm] = useState('');
+    const [productSortBy, setProductSortBy] = useState('terlaris'); // 'terlaris', 'abjad', 'tersedia'
 
+    const [viewMode, setViewMode] = useState('list'); // 'list' or 'calendar'
     // Date filter state
     const [filterType, setFilterType] = useState('today'); // 'today', 'custom'
     const [customDate, setCustomDate] = useState(new Date());
@@ -50,6 +68,11 @@ export default function OrderPage({ setActivePage, onModalChange }) {
     // Delete confirmation modal state
     const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
     const [itemToDelete, setItemToDelete] = useState(null);
+
+    const [justAddedProductId, setJustAddedProductId] = useState(null); // State untuk animasi
+    // State untuk rekomendasi produk
+    const [productRecommendations, setProductRecommendations] = useState([]);
+    const [loadingRecommendations, setLoadingRecommendations] = useState(false);
 
     const showNotification = (message, type = 'success') => {
         setNotification({ show: true, message, type });
@@ -108,11 +131,54 @@ export default function OrderPage({ setActivePage, onModalChange }) {
         }
     }, [showForm, isDataLoaded]);
 
+    // Memoized product sales calculation
+    const productSales = useMemo(() => {
+        const salesMap = new Map();
+        orderList.forEach((order) => {
+            order.items?.forEach((item) => {
+                salesMap.set(item.productId, (salesMap.get(item.productId) || 0) + item.qtyBox);
+            });
+        });
+        return salesMap;
+    }, [orderList]);
+
+    // Efek untuk memuat rekomendasi produk saat toko dipilih
+    useEffect(() => {
+        if (selectedTokoId && produkList.length > 0 && orderList.length > 0) {
+            setLoadingRecommendations(true);
+            const timer = setTimeout(() => {
+                // 1. Cari produk yang sering dibeli toko ini
+                const purchaseHistory = new Map();
+                orderList
+                    .filter((o) => o.tokoId === selectedTokoId)
+                    .forEach((order) => {
+                        order.items?.forEach((item) => {
+                            purchaseHistory.set(item.productId, (purchaseHistory.get(item.productId) || 0) + 1);
+                        });
+                    });
+
+                const frequentProductIds = [...purchaseHistory.entries()].sort((a, b) => b[1] - a[1]).map((entry) => entry[0]);
+
+                // 2. Cari produk terlaris global yang belum pernah dibeli toko ini
+                const globalBestSellers = [...productSales.entries()].sort((a, b) => b[1] - a[1]).map((entry) => entry[0]);
+                const unboughtBestSellers = globalBestSellers.filter((productId) => !purchaseHistory.has(productId));
+
+                // 3. Gabungkan dan ambil 5 teratas
+                const recommendationIds = [...new Set([...frequentProductIds, ...unboughtBestSellers])].slice(0, 5);
+                const recommendations = recommendationIds.map((id) => produkList.find((p) => p.id === id)).filter(Boolean);
+
+                setProductRecommendations(recommendations);
+                setLoadingRecommendations(false);
+            }, 300);
+            return () => clearTimeout(timer);
+        }
+    }, [selectedTokoId, produkList, orderList, productSales]);
+
     const fetchOrders = async () => {
         try {
-            const q = query(collection(db, 'orders'), orderBy('createdAt', 'desc'));
+            const q = query(collection(db, 'orders'), orderBy('createdAt', 'asc'));
             const snapshot = await getDocs(q);
-            const list = snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
+            const list = snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() })).reverse(); // Reverse client-side to keep newest first
             setOrderList(list);
         } catch (error) {
             console.error('Error fetching orders:', error);
@@ -143,6 +209,15 @@ export default function OrderPage({ setActivePage, onModalChange }) {
             if (newQty === 0) delete newCart[productId];
             return newCart;
         });
+
+        // Memicu animasi hanya saat menambah item
+        if (delta > 0) {
+            setJustAddedProductId(productId);
+            // Hapus state setelah animasi selesai
+            setTimeout(() => {
+                setJustAddedProductId(null);
+            }, 400); // Durasi harus sama dengan durasi animasi di CSS
+        }
     };
 
     const getTotalHarga = (produk) => (cart[produk.id] || 0) * (produk.hargaPerBox || 0);
@@ -174,6 +249,7 @@ export default function OrderPage({ setActivePage, onModalChange }) {
             tokoNama: selectedToko?.nama || 'Toko Tidak Diketahui',
             kodeToko: selectedToko?.kode || '',
             items,
+            createdAt: orderDate, // Gunakan tanggal dari form
             catatan: catatan.trim(),
             total: getGrandTotal(),
         };
@@ -182,11 +258,14 @@ export default function OrderPage({ setActivePage, onModalChange }) {
         try {
             if (editingOrderId) {
                 const orderRef = doc(db, 'orders', editingOrderId);
-                await updateDoc(orderRef, orderData);
+                // Saat edit, jangan ubah createdAt, hanya data lainnya
+                await updateDoc(orderRef, { ...orderData, createdAt: orderList.find((o) => o.id === editingOrderId).createdAt });
                 showNotification('Order berhasil diperbarui.');
             } else {
+                // Saat buat baru, gunakan tanggal dari form
                 await addDoc(collection(db, 'orders'), {
                     ...orderData,
+                    // Gunakan serverTimestamp jika ingin waktu server, atau orderDate jika ingin waktu dari form
                     createdAt: serverTimestamp(),
                 });
                 showNotification('Order berhasil disimpan.');
@@ -212,8 +291,10 @@ export default function OrderPage({ setActivePage, onModalChange }) {
         setCart({});
         setCatatan('');
         setSelectedTokoId('');
+        setOrderDate(new Date()); // Reset tanggal ke hari ini
         setTokoSearchTerm('');
         setProductSearchTerm('');
+        setProductRecommendations([]); // Kosongkan rekomendasi
     };
 
     const handleEdit = async (order) => {
@@ -221,6 +302,8 @@ export default function OrderPage({ setActivePage, onModalChange }) {
         setEditingOrderId(order.id);
         setSelectedTokoId(order.tokoId);
         setCatatan(order.catatan || '');
+        // Pastikan orderDate selalu objek Date yang valid
+        setOrderDate(order.createdAt?.seconds && typeof order.createdAt.seconds === 'number' && !isNaN(order.createdAt.seconds) ? new Date(order.createdAt.seconds * 1000) : new Date());
         const initialCart = order.items.reduce((acc, item) => {
             acc[item.productId] = item.qtyBox;
             return acc;
@@ -336,6 +419,116 @@ export default function OrderPage({ setActivePage, onModalChange }) {
         link.click();
     };
 
+    // Memoized sorted product list
+    const sortedProdukList = useMemo(() => {
+        return [...produkList]
+            .filter((p) => p.nama.toLowerCase().includes(productSearchTerm.toLowerCase()))
+            .sort((a, b) => {
+                if (productSortBy === 'terlaris') {
+                    return (productSales.get(b.id) || 0) - (productSales.get(a.id) || 0);
+                }
+                if (productSortBy === 'abjad') {
+                    return a.nama.localeCompare(b.nama);
+                }
+                return a.available === b.available ? a.nama.localeCompare(b.nama) : a.available ? -1 : 1;
+            });
+    }, [produkList, productSearchTerm, productSortBy, productSales]);
+
+    // Komponen untuk tampilan kalender
+    const CalendarView = () => {
+        const [currentMonth, setCurrentMonth] = useState(new Date());
+
+        const dailyTotals = useMemo(() => {
+            const totals = new Map();
+            orderList.forEach((order) => {
+                // Periksa apakah createdAt.seconds ada, bertipe number, dan bukan NaN
+                if (order.createdAt && typeof order.createdAt.seconds === 'number' && !isNaN(order.createdAt.seconds)) {
+                    const date = new Date(order.createdAt.seconds * 1000);
+                    // Pastikan objek Date yang dibuat juga valid
+                    if (!isNaN(date.getTime())) {
+                        const dateString = format(date, 'yyyy-MM-dd');
+                        const orderBoxes = order.items.reduce((sum, item) => sum + (item.qtyBox || 0), 0);
+                        totals.set(dateString, (totals.get(dateString) || 0) + orderBoxes);
+                    } else {
+                        // Log peringatan jika objek Date tidak valid setelah dibuat
+                        console.warn('Order with invalid Date object created from timestamp:', order.id, order.createdAt);
+                    }
+                } else {
+                    // Log peringatan jika createdAt.seconds tidak valid
+                    console.warn('Order with missing, non-numeric, or NaN createdAt.seconds:', order.id, order.createdAt);
+                }
+            });
+            return totals;
+        }, [orderList]);
+
+        const monthlyTotal = useMemo(() => {
+            let total = 0;
+            dailyTotals.forEach((amount, dateString) => {
+                const date = new Date(dateString.replace(/-/g, '/')); // Fix: Ensure date is parsed in local time
+                if (date.getMonth() === currentMonth.getMonth() && date.getFullYear() === currentMonth.getFullYear()) {
+                    total += amount; // Ini sekarang menjumlahkan box
+                }
+            });
+            return total;
+        }, [dailyTotals, currentMonth]);
+
+        const DayWithRevenue = ({ day, ...tdProps }) => {
+            const { date, displayMonth } = day;
+            // Pemeriksaan defensif: jika tanggal tidak valid, tampilkan fallback
+            if (!date || isNaN(date.getTime())) {
+                console.error('DayWithRevenue received an invalid date:', date);
+                return (
+                    <td {...tdProps}>
+                        <div className="w-full h-full flex items-center justify-center text-red-500 text-xs">Err</div>
+                    </td>
+                );
+            }
+
+            const dateString = format(date, 'yyyy-MM-dd');
+            const total = dailyTotals.get(dateString);
+            const isCurrentMonth = date.getMonth() === displayMonth.getMonth();
+
+            return (
+                <td {...tdProps}>
+                    <div className={`flex aspect-square w-full flex-col items-center justify-center rounded-lg transition-colors ${total > 0 ? 'bg-green-100 font-bold text-green-900 hover:bg-green-200' : 'hover:bg-slate-100'} ${!isCurrentMonth ? 'text-slate-300' : 'text-slate-700'}`}>
+                        <time dateTime={date.toISOString()} className="text-sm">
+                            {format(date, 'd')}
+                        </time>
+                        {total > 0 && <span className="text-[10px] -mt-1 text-blue-700">{`${total} box`}</span>}
+                    </div>
+                </td>
+            );
+        };
+
+        return (
+            <div className="bg-white p-2 sm:p-4 rounded-xl shadow-sm border border-gray-100">
+                <DayPicker
+                    mode="single"
+                    month={currentMonth}
+                    onMonthChange={setCurrentMonth}
+                    components={{
+                        Day: DayWithRevenue,
+                    }}
+                    showOutsideDays
+                    locale={id}
+                    captionLayout="dropdown-buttons"
+                    fromYear={2020}
+                    toYear={new Date().getFullYear() + 1}
+                    classNames={{
+                        root: 'w-full',
+                        caption_label: 'text-lg font-bold text-purple-800',
+                        head_cell: 'w-1/7 font-semibold text-xs text-slate-500 p-2', // Menentukan lebar kolom
+                        table: 'w-full border-collapse table-fixed', // table-fixed adalah kunci utama
+                        cell: 'p-0.5', // Beri sedikit padding pada sel
+                        day: 'w-full', // Pastikan konten mengisi sel
+                        day_today: 'text-purple-600 ring-2 ring-purple-300 rounded-lg',
+                    }}
+                    footer={<div className="text-center text-sm font-bold text-purple-800 mt-4 pt-2 border-t">Total Box Bulan Ini: {monthlyTotal.toLocaleString('id-ID')} box</div>}
+                />
+            </div>
+        );
+    };
+
     if (loading) {
         return (
             <div className="min-h-[calc(100vh-120px)] flex items-center justify-center">
@@ -358,8 +551,8 @@ export default function OrderPage({ setActivePage, onModalChange }) {
                 </div>
             )}
 
-            <div className="pb-20 max-w-md mx-auto" onClick={closeMenu}>
-                <div className="p-5 pb-20 max-w-md mx-auto">
+            <div className={`pb-20 ${viewMode === 'list' ? 'max-w-md mx-auto' : ''}`} onClick={closeMenu}>
+                <div className={`${viewMode === 'list' ? 'p-5' : 'p-2 sm:p-4'} pb-20`}>
                     <div className="flex justify-between items-center mb-6">
                         <h2 className="text-2xl font-bold text-slate-800 flex items-center gap-2">
                             <ShoppingBag className="text-purple-600" />
@@ -376,23 +569,32 @@ export default function OrderPage({ setActivePage, onModalChange }) {
                     </div>
 
                     <div className="relative mb-6 flex items-center gap-2">
-                        <button onClick={() => setFilterType('today')} className={`flex-1 flex items-center justify-center gap-2 px-4 py-2 text-sm font-semibold rounded-lg transition-all ${filterType === 'today' ? 'bg-purple-600 text-white shadow-md' : 'bg-white text-slate-600 border border-slate-300'}`}>
-                            <Calendar size={16} />
-                            Hari Ini
-                        </button>
-                        <button onClick={() => setShowCalendar(!showCalendar)} className={`flex-1 flex items-center justify-center gap-2 px-4 py-2 text-sm font-semibold rounded-lg transition-all ${filterType === 'custom' ? 'bg-purple-600 text-white shadow-md' : 'bg-white text-slate-600 border border-slate-300'}`}>
-                            <CalendarRange size={16} />
-                            {filterType === 'custom' ? format(customDate, 'd MMM yyyy') : 'Pilih Tanggal'}
+                        {viewMode === 'list' && (
+                            <>
+                                <button onClick={() => setFilterType('today')} className={`flex-1 flex items-center justify-center gap-2 px-4 py-2 text-sm font-semibold rounded-lg transition-all ${filterType === 'today' ? 'bg-purple-600 text-white shadow-md' : 'bg-white text-slate-600 border border-slate-300'}`}>
+                                    <Calendar size={16} />
+                                    Hari Ini
+                                </button>
+                                <button onClick={() => setShowCalendar(!showCalendar)} className={`flex-1 flex items-center justify-center gap-2 px-4 py-2 text-sm font-semibold rounded-lg transition-all ${filterType === 'custom' ? 'bg-purple-600 text-white shadow-md' : 'bg-white text-slate-600 border border-slate-300'}`}>
+                                    <CalendarRange size={16} />
+                                    {filterType === 'custom' ? format(customDate, 'd MMM yyyy', { locale: id }) : 'Pilih Tanggal'}
+                                </button>
+                            </>
+                        )}
+                        <button onClick={() => setViewMode(viewMode === 'list' ? 'calendar' : 'list')} className="p-2 bg-white text-slate-600 border border-slate-300 rounded-lg transition-all hover:bg-slate-100">
+                            {viewMode === 'list' ? <Calendar size={16} /> : <List size={16} />}
                         </button>
 
-                        {showCalendar && (
+                        {showCalendar && viewMode === 'list' && (
                             <div className="absolute top-full mt-2 z-20 bg-white rounded-2xl shadow-2xl border p-2" onMouseLeave={() => setShowCalendar(false)}>
                                 <DayPicker mode="single" selected={customDate} onSelect={handleDateSelect} captionLayout="dropdown-buttons" fromYear={2020} toYear={new Date().getFullYear() + 1} classNames={{ caption_label: 'text-lg font-bold', head_cell: 'font-semibold', day_selected: 'bg-purple-600 text-white rounded-full hover:bg-purple-700 focus:bg-purple-700', day_today: 'font-bold text-purple-600' }} />
                             </div>
                         )}
                     </div>
 
-                    {filteredOrders.length === 0 ? (
+                    {viewMode === 'calendar' ? (
+                        <CalendarView />
+                    ) : filteredOrders.length === 0 ? (
                         <div className="text-center text-gray-500 py-10 bg-slate-50 rounded-lg">
                             <ShoppingCart size={40} className="mx-auto text-gray-400 mb-2" />
                             {searchTerm ? 'Order tidak ditemukan.' : 'Belum ada order yang tercatat.'}
@@ -474,6 +676,33 @@ export default function OrderPage({ setActivePage, onModalChange }) {
 
                             <form id="order-form" onSubmit={handleSubmit} className="flex-1 overflow-y-auto p-4 space-y-4">
                                 <div>
+                                    <label className="block text-sm font-medium text-slate-700 mb-2">Tanggal Order *</label>
+                                    <div className="relative">
+                                        <button type="button" onClick={() => setShowFormCalendar(!showFormCalendar)} className="w-full p-2.5 text-left bg-white border border-gray-300 rounded-lg flex justify-between items-center focus:outline-none focus:ring-2 focus:ring-purple-500">
+                                            <span className="flex items-center gap-2">
+                                                <Calendar size={18} className="text-slate-500" />
+                                                {format(orderDate, 'EEEE, d MMMM yyyy', { locale: id })}
+                                            </span>
+                                            <ChevronDown size={20} className={`transition-transform ${showFormCalendar ? 'rotate-180' : ''}`} />
+                                        </button>
+                                        {showFormCalendar && (
+                                            <div className="absolute top-full mt-2 z-30 bg-white rounded-2xl shadow-2xl border p-2" onMouseLeave={() => setShowFormCalendar(false)}>
+                                                <DayPicker
+                                                    mode="single"
+                                                    selected={orderDate}
+                                                    onSelect={(date) => {
+                                                        if (date) setOrderDate(date);
+                                                        setShowFormCalendar(false);
+                                                    }}
+                                                    defaultMonth={orderDate}
+                                                    classNames={{ day_selected: 'bg-purple-600 text-white rounded-full', day_today: 'font-bold text-purple-600' }}
+                                                    required
+                                                />
+                                            </div>
+                                        )}
+                                    </div>
+                                </div>
+                                <div>
                                     <label className="block text-sm font-medium text-slate-700 mb-2">Toko</label>
                                     <div className="relative" style={{ pointerEvents: editingOrderId ? 'none' : 'auto', opacity: editingOrderId ? 0.7 : 1 }}>
                                         <button type="button" onClick={() => setIsTokoDropdownOpen(!isTokoDropdownOpen)} className="w-full p-2.5 text-left bg-white border border-gray-300 rounded-lg flex justify-between items-center focus:outline-none focus:ring-2 focus:ring-purple-500">
@@ -507,6 +736,30 @@ export default function OrderPage({ setActivePage, onModalChange }) {
                                         )}
                                     </div>
                                 </div>
+
+                                {/* Rekomendasi Produk */}
+                                {productRecommendations.length > 0 && (
+                                    <div className="pt-2">
+                                        <h3 className="text-sm font-semibold text-slate-700 mb-2 flex items-center gap-1.5">
+                                            <Star size={16} className="text-yellow-500 fill-current" />
+                                            <span>Rekomendasi Untuk Toko Ini</span>
+                                        </h3>
+                                        {loadingRecommendations ? (
+                                            <MiniLoader text="Menganalisis..." />
+                                        ) : (
+                                            <div className="flex gap-2 overflow-x-auto pb-2 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
+                                                {productRecommendations.map((produk) => (
+                                                    <button type="button" key={produk.id} onClick={() => updateQty(produk.id, 1)} disabled={!produk.available} className={`flex-shrink-0 w-24 text-center p-2 bg-white border border-slate-200 rounded-lg hover:bg-purple-50 hover:border-purple-300 transition disabled:opacity-50 ${justAddedProductId === produk.id ? 'animate-pop' : ''}`}>
+                                                        <img src={produk.foto || 'https://via.placeholder.com/100?text=Produk'} alt={produk.nama} className="w-12 h-12 mx-auto object-cover rounded-md" />
+                                                        <p className="text-xs font-medium text-slate-700 mt-1 truncate">{produk.nama}</p>
+                                                        {cart[produk.id] > 0 && <span className="text-xs font-bold text-green-600">({cart[produk.id]} box)</span>}
+                                                    </button>
+                                                ))}
+                                            </div>
+                                        )}
+                                    </div>
+                                )}
+
                                 <div>
                                     <label className="block text-sm font-medium text-slate-700 mb-2">Catatan (Opsional)</label>
                                     <textarea value={catatan} onChange={(e) => setCatatan(e.target.value)} placeholder="Catatan untuk order..." className="w-full p-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500" rows="3" />
@@ -521,12 +774,21 @@ export default function OrderPage({ setActivePage, onModalChange }) {
                                         <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={20} />
                                     </div>
                                     {produkList.length === 0 ? (
-                                        <div className="text-center py-2 text-gray-500 text-sm">Memuat produk...</div>
+                                        <div className="text-center py-6 text-gray-500 text-sm">Memuat produk...</div>
+                                    ) : sortedProdukList.length === 0 ? (
+                                        <div className="text-center py-6 text-slate-500">Produk tidak ditemukan.</div>
                                     ) : (
-                                        <div className="space-y-3">
-                                            {produkList
-                                                .filter((p) => p.nama.toLowerCase().includes(productSearchTerm.toLowerCase()))
-                                                .map((produk) => {
+                                        <>
+                                            {/* Filter Produk */}
+                                            <div className="flex items-center gap-2 mb-4 p-1 bg-slate-200 rounded-full">
+                                                {['terlaris', 'abjad', 'tersedia'].map((filter) => (
+                                                    <button key={filter} type="button" onClick={() => setProductSortBy(filter)} className={`flex-1 capitalize text-xs font-semibold py-1.5 rounded-full transition-all duration-300 ${productSortBy === filter ? 'bg-white text-purple-700 shadow-sm' : 'bg-transparent text-slate-500'}`}>
+                                                        {filter === 'abjad' ? 'A-Z' : filter}
+                                                    </button>
+                                                ))}
+                                            </div>
+                                            <div className="space-y-3">
+                                                {sortedProdukList.map((produk) => {
                                                     const qty = cart[produk.id] || 0;
                                                     const isAvailable = produk.available;
                                                     return (
@@ -564,7 +826,8 @@ export default function OrderPage({ setActivePage, onModalChange }) {
                                                         </div>
                                                     );
                                                 })}
-                                        </div>
+                                            </div>
+                                        </>
                                     )}
                                 </div>
                             </form>

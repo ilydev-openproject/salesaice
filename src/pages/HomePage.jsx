@@ -1,5 +1,5 @@
-// src/pages/HomePage.jsx
-import { MapPin, Package, Wallet, Plus, TrendingUp, Target, Award, BarChart2, Navigation } from 'lucide-react';
+import { MapPin, Package, Wallet, Plus, TrendingUp, Target, Award, BarChart2, Gift, X, Zap } from 'lucide-react';
+import { useMemo, useState } from 'react';
 
 export default function HomePage({ daftarToko, kunjunganList = [], produkList = [], orderList = [], setActivePage, targets }) {
     // --- Hitung data HARI INI dari 'kunjunganList' & 'orderList' ---
@@ -32,7 +32,7 @@ export default function HomePage({ daftarToko, kunjunganList = [], produkList = 
 
     const filterThisMonth = (item) => {
         if (!item.createdAt?.seconds) return false;
-        const itemDate = new aDate(item.createdAt.seconds * 1000);
+        const itemDate = new Date(item.createdAt.seconds * 1000);
         return itemDate >= monthStart && itemDate <= monthEnd;
     };
 
@@ -104,10 +104,69 @@ export default function HomePage({ daftarToko, kunjunganList = [], produkList = 
         .sort((a, b) => b.totalQtyBox - a.totalQtyBox) // Sort descending by totalQtyBox
         .slice(0, 5); // Take top 5
 
+    // --- Logika Notifikasi Mystery Box ---
+    const [showRewardNotification, setShowRewardNotification] = useState(true);
+
+    const eligibleForLastMonthReward = useMemo(() => {
+        const today = new Date();
+        // Notifikasi hanya tampil sampai tanggal 15 bulan ini
+        if (today.getDate() > 15) {
+            return [];
+        }
+
+        const lastMonth = new Date(today.getFullYear(), today.getMonth() - 1, 1);
+        const lastMonthYear = lastMonth.getFullYear();
+        const lastMonthMonth = lastMonth.getMonth();
+        const lastMonthKey = `${lastMonthYear}-${String(lastMonthMonth + 1).padStart(2, '0')}`;
+
+        const eligibleToko = daftarToko
+            .map((toko) => {
+                const ordersLastMonth = orderList.filter((order) => {
+                    if (!order.createdAt?.seconds) return false;
+                    const orderDate = new Date(order.createdAt.seconds * 1000);
+                    return order.tokoId === toko.id && orderDate.getFullYear() === lastMonthYear && orderDate.getMonth() === lastMonthMonth;
+                });
+
+                const totalBoxesLastMonth = ordersLastMonth.reduce((sum, order) => sum + (order.items?.reduce((itemSum, item) => itemSum + item.qtyBox, 0) || 0), 0);
+
+                const eligibleRewards = Math.floor(totalBoxesLastMonth / 25);
+                const claimedRewards = toko.monthlyRewardsClaimed?.[lastMonthKey] || 0;
+
+                if (eligibleRewards > claimedRewards) {
+                    return {
+                        ...toko,
+                        pendingRewards: eligibleRewards - claimedRewards,
+                    };
+                }
+                return null;
+            })
+            .filter(Boolean);
+
+        return eligibleToko;
+    }, [daftarToko, orderList]);
+
     const salesPerson = { name: 'Sales App', initial: 'S' }; // Placeholder
 
     return (
         <div className="p-4 max-w-md mx-auto">
+            {/* Notifikasi Mystery Box */}
+            {showRewardNotification && eligibleForLastMonthReward.length > 0 && (
+                <div className="bg-purple-100 border-l-4 border-purple-500 text-purple-700 p-4 rounded-r-lg mb-4 shadow-md animate-in fade-in duration-300" role="alert">
+                    <div className="flex justify-between items-start">
+                        <div className="flex">
+                            <Gift className="mr-3 flex-shrink-0" />
+                            <div>
+                                <p className="font-bold">Ada Hadiah Mystery Box!</p>
+                                <p className="text-sm">{eligibleForLastMonthReward.length} toko berhak mendapatkan hadiah untuk performa bulan lalu. Segera berikan di halaman Hadiah.</p>
+                            </div>
+                        </div>
+                        <button onClick={() => setShowRewardNotification(false)} className="ml-2 -mt-1 -mr-1 p-1 rounded-full hover:bg-purple-200">
+                            <X size={18} />
+                        </button>
+                    </div>
+                </div>
+            )}
+
             {/* Header */}
             <header className="flex justify-between items-center mb-4">
                 <div>
@@ -199,7 +258,7 @@ export default function HomePage({ daftarToko, kunjunganList = [], produkList = 
             {/* Menu Laporan */}
             <div className="mb-4">
                 <h2 className="text-base font-semibold text-slate-700 mb-2">Menu Laporan</h2>
-                <div className="bg-white p-3 rounded-xl shadow-sm border border-gray-100 grid grid-cols-4 gap-2">
+                <div className="bg-white p-3 rounded-xl shadow-sm border border-gray-100 grid grid-cols-5 gap-1 justify-items-center">
                     <button onClick={() => setActivePage('produk-terlaris')} className="flex flex-col items-center justify-center gap-1 p-2 rounded-md hover:bg-slate-50 transition-colors w-24">
                         <div className="w-10 h-10 flex items-center justify-center bg-purple-100 text-purple-600 rounded-lg">
                             <TrendingUp size={20} />
@@ -230,14 +289,24 @@ export default function HomePage({ daftarToko, kunjunganList = [], produkList = 
                             Toko
                         </span>
                     </button>
-                    <button onClick={() => setActivePage('rute')} className="flex flex-col items-center justify-center gap-1 p-2 rounded-md hover:bg-slate-50 transition-colors w-24">
-                        <div className="w-10 h-10 flex items-center justify-center bg-orange-100 text-orange-600 rounded-lg">
-                            <Navigation size={20} />
+                    <button onClick={() => setActivePage('mystery-box')} className="flex flex-col items-center justify-center gap-1 p-2 rounded-md hover:bg-slate-50 transition-colors w-24">
+                        <div className="w-10 h-10 flex items-center justify-center bg-yellow-100 text-yellow-600 rounded-lg">
+                            <Gift size={20} />
                         </div>
                         <span className="font-semibold text-[10px] text-slate-700 text-center">
-                            Rute
+                            Hadiah
                             <br />
-                            Kunjungan
+                            (Box)
+                        </span>
+                    </button>
+                    <button onClick={() => setActivePage('product-velocity')} className="flex flex-col items-center justify-center gap-1 p-2 rounded-md hover:bg-slate-50 transition-colors w-24">
+                        <div className="w-10 h-10 flex items-center justify-center bg-cyan-100 text-cyan-600 rounded-lg">
+                            <Zap size={20} />
+                        </div>
+                        <span className="font-semibold text-[10px] text-slate-700 text-center">
+                            Kecepatan
+                            <br />
+                            Produk
                         </span>
                     </button>
                 </div>

@@ -9,10 +9,10 @@ import OrderPage from './pages/OrderPage';
 import ProdukTerlarisPage from './pages/ProdukTerlarisPage';
 import TargetPage from './pages/TargetPage';
 import AnalisisTokoPage from './pages/AnalisisTokoPage';
-import RutePage from './pages/RutePage';
-import VisitPage from './pages/VisitPage';
-import TimestampCamera from './pages/TimestampCamera'; // Import TimestampCamera
-import { Home, Package, Store, MapPin, ShoppingBag, Navigation } from 'lucide-react';
+import VisitPage from './pages/VisitPage'; //
+import ProductVelocityPage from './pages/ProductVelocityPage'; // Impor halaman baru
+import MysteryBoxPage from './pages/MysteryBoxPage'; // Impor halaman baru
+import { Home, Package, Store, MapPin, ShoppingBag } from 'lucide-react';
 import Loader from './components/Loader';
 
 export default function App() {
@@ -157,9 +157,9 @@ export default function App() {
                 {activePage === 'produk-terlaris' && <ProdukTerlarisPage produkList={produkList} kunjunganList={kunjunganList} orderList={orderList} setActivePage={setActivePage} />}
                 {activePage === 'target' && <TargetPage setActivePage={setActivePage} targets={targets} onTargetsUpdate={handleTargetsUpdate} />}
                 {activePage === 'analisis-toko' && <AnalisisTokoPage tokoList={daftarToko} orderList={orderList} kunjunganList={kunjunganList} setActivePage={setActivePage} />}
-                {activePage === 'rute' && <RutePage tokoList={daftarToko} setActivePage={setActivePage} />}
                 {activePage === 'visit' && <VisitPage setActivePage={setActivePage} orderList={orderList} onModalChange={handleSetModalOpen} />}
-                {activePage === 'camera' && <TimestampCamera onClose={() => setActivePage('visit')} />}
+                {activePage === 'product-velocity' && <ProductVelocityPage tokoList={daftarToko} orderList={orderList} setActivePage={setActivePage} />}
+                {activePage === 'mystery-box' && <MysteryBoxPage />}
             </div>
 
             {/* Bottom Navigation */}
@@ -231,22 +231,6 @@ export default function App() {
                 <button onClick={() => setActivePage('produk')} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', background: 'none', border: 'none', outline: 'none', fontSize: '10px', cursor: 'pointer' }}>
                     <Package size={18} color={activePage === 'produk' ? '#402566' : '#999'} />
                     <span style={{ marginTop: '2px', color: activePage === 'produk' ? '#402566' : '#999' }}>Produk</span>
-                </button>
-                <button
-                    onClick={() => setActivePage('rute')}
-                    style={{
-                        display: 'flex',
-                        flexDirection: 'column',
-                        alignItems: 'center',
-                        background: 'none',
-                        border: 'none',
-                        fontSize: '10px',
-                        outline: 'none',
-                        cursor: 'pointer',
-                    }}
-                >
-                    <Navigation size={18} color={activePage === 'rute' ? '#402566' : '#999'} />
-                    <span style={{ marginTop: '2px', color: activePage === 'rute' ? '#402566' : '#999' }}>Rute</span>
                 </button>
                 <button
                     onClick={() => setActivePage('toko')}

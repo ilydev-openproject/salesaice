@@ -1,15 +1,29 @@
 // src/pages/VisitPage.jsx
-import { useState, useEffect, useRef, useCallback } from 'react';
-import { collection, getDocs, addDoc, serverTimestamp, query, orderBy, doc, updateDoc, deleteDoc } from 'firebase/firestore';
+import { useState, useEffect, useRef, useCallback, useMemo } from 'react';
+import { collection, getDocs, addDoc, query, orderBy, doc, updateDoc, deleteDoc, writeBatch, where } from 'firebase/firestore';
 import { DayPicker } from 'react-day-picker';
-import 'react-day-picker/dist/style.css';
-import { format, isSameDay, isSameMonth, startOfMonth, endOfMonth } from 'date-fns'; // Added isSameDay, isSameMonth, startOfMonth, endOfMonth
+import { format, isSameDay, isSameMonth, startOfMonth, endOfMonth } from 'date-fns';
+import { id } from 'date-fns/locale';
 import { toPng } from 'html-to-image';
+import 'react-day-picker/dist/style.css';
 import { db } from '../lib/firebase'; //
-import { Store, Package, Plus, Minus, CheckCircle2, XCircle, ChevronDown, MapPin, ArrowLeft, ShoppingCart, Calendar, Pencil, Trash2, Wallet, Search, CalendarRange, Download, MoreVertical, Eye, X, MessageSquare, AlertTriangle, Camera } from 'lucide-react';
+import { Store, Package, Plus, Minus, CheckCircle2, XCircle, ChevronDown, MapPin, ArrowLeft, ShoppingCart, Calendar, Pencil, Trash2, Wallet, Search, CalendarRange, Download, MoreVertical, Eye, X, MessageSquare, AlertTriangle, Camera, Star } from 'lucide-react';
 import Loader from '../components/Loader';
 import VisitReceipt from '../components/VisitReceipt';
 import TimestampCamera from './TimestampCamera'; // Impor komponen kamera
+
+// Komponen MiniLoader kita definisikan di sini untuk memperbaiki error
+export function MiniLoader({ text = 'Memuat...' }) {
+    return (
+        <div className="flex items-center justify-center gap-2 text-sm text-slate-500 py-2">
+            <svg className="animate-spin h-4 w-4 text-purple-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+            </svg>
+            <span>{text}</span>
+        </div>
+    );
+}
 
 export default function VisitPage({ setActivePage, orderList = [], onModalChange }) {
     // State untuk daftar kunjungan
@@ -22,14 +36,18 @@ export default function VisitPage({ setActivePage, orderList = [], onModalChange
     const [produkList, setProdukList] = useState([]);
     const [selectedTokoId, setSelectedTokoId] = useState('');
     const [catatan, setCatatan] = useState('');
+    const [visitDate, setVisitDate] = useState(new Date()); // State untuk tanggal di form
     const [submitting, setSubmitting] = useState(false);
     const [editingVisitId, setEditingVisitId] = useState(null);
     const [cart, setCart] = useState({}); // { productId: jumlahBox }
     const [isTokoDropdownOpen, setIsTokoDropdownOpen] = useState(false);
     const [isDataLoaded, setIsDataLoaded] = useState(false); // Untuk load data form sekali saja
     const [tokoSearchTerm, setTokoSearchTerm] = useState(''); // State untuk pencarian di dropdown toko
+    const [showFormCalendar, setShowFormCalendar] = useState(false); // State untuk kalender di form
     const [searchTerm, setSearchTerm] = useState('');
     const [productSearchTerm, setProductSearchTerm] = useState(''); // State untuk filter produk di form
+    const [productSortBy, setProductSortBy] = useState('terlaris'); // 'terlaris', 'abjad', 'tersedia'
+    const [justAddedProductId, setJustAddedProductId] = useState(null); // State untuk animasi
     // State untuk filter tanggal
     const [filterType, setFilterType] = useState('today'); // 'today', 'custom'
     const [customDate, setCustomDate] = useState(new Date());
@@ -53,6 +71,10 @@ export default function VisitPage({ setActivePage, orderList = [], onModalChange
     // State untuk modal konfirmasi hapus
     const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
     const [itemToDelete, setItemToDelete] = useState(null);
+
+    // State untuk rekomendasi produk
+    const [productRecommendations, setProductRecommendations] = useState([]);
+    const [loadingRecommendations, setLoadingRecommendations] = useState(false);
 
     const showNotification = (message, type = 'success') => {
         setNotification({ show: true, message, type });
@@ -122,6 +144,46 @@ export default function VisitPage({ setActivePage, orderList = [], onModalChange
         }
     }, [showForm, isDataLoaded]);
 
+    // Efek untuk memuat rekomendasi produk saat toko dipilih
+    useEffect(() => {
+        if (selectedTokoId && produkList.length > 0 && orderList.length > 0) {
+            setLoadingRecommendations(true);
+            // Beri sedikit delay agar tidak terasa lag saat memilih toko
+            const timer = setTimeout(() => {
+                // 1. Cari produk yang sering dibeli toko ini
+                const purchaseHistory = new Map();
+                orderList
+                    .filter((o) => o.tokoId === selectedTokoId)
+                    .forEach((order) => {
+                        order.items?.forEach((item) => {
+                            purchaseHistory.set(item.productId, (purchaseHistory.get(item.productId) || 0) + 1); // Hitung frekuensi order
+                        });
+                    });
+
+                // Urutkan berdasarkan frekuensi pembelian
+                const frequentProductIds = [...purchaseHistory.entries()].sort((a, b) => b[1] - a[1]).map((entry) => entry[0]);
+
+                // 2. Cari produk terlaris global yang belum pernah dibeli toko ini
+                const globalBestSellers = [...productSales.entries()].sort((a, b) => b[1] - a[1]).map((entry) => entry[0]);
+
+                const unboughtBestSellers = globalBestSellers.filter((productId) => !purchaseHistory.has(productId));
+
+                // 3. Gabungkan dan ambil 5 teratas
+                const recommendationIds = [...new Set([...frequentProductIds, ...unboughtBestSellers])].slice(0, 5);
+
+                const recommendations = recommendationIds.map((id) => produkList.find((p) => p.id === id)).filter(Boolean); // Filter jika produk sudah dihapus
+
+                setProductRecommendations(recommendations);
+                setLoadingRecommendations(false);
+            }, 300);
+
+            return () => clearTimeout(timer);
+        } else {
+            setProductRecommendations([]);
+        }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [selectedTokoId, produkList, orderList]); // productSales sudah di-memoize, jadi aman
+
     const fetchKunjungan = async () => {
         try {
             const q = query(collection(db, 'kunjungan'), orderBy('createdAt', 'desc'));
@@ -157,6 +219,15 @@ export default function VisitPage({ setActivePage, orderList = [], onModalChange
             if (newQty === 0) delete newCart[productId]; // Hapus dari cart jika qty 0
             return newCart;
         });
+
+        // Memicu animasi hanya saat menambah item
+        if (delta > 0) {
+            setJustAddedProductId(productId);
+            // Hapus state setelah animasi selesai agar bisa di-trigger lagi
+            setTimeout(() => {
+                setJustAddedProductId(null);
+            }, 400); // Durasi harus sama dengan durasi animasi di CSS
+        }
     };
 
     const getTotalHarga = (produk) => {
@@ -210,28 +281,71 @@ export default function VisitPage({ setActivePage, orderList = [], onModalChange
         try {
             if (editingVisitId) {
                 // Update
+                const batch = writeBatch(db);
                 const visitRef = doc(db, 'kunjungan', editingVisitId);
-                // Saat edit, kita hanya update data kunjungan.
-                // Asumsi: Order yang terkait diedit terpisah di halaman Order.
-                // Untuk menyederhanakan, kita hanya update catatan dan data non-item.
-                await updateDoc(visitRef, {
+
+                // 1. Update data kunjungan (tanpa item)
+                batch.update(visitRef, {
                     tokoId: kunjunganData.tokoId,
                     tokoNama: kunjunganData.tokoNama,
                     kodeToko: kunjunganData.kodeToko,
                     catatan: kunjunganData.catatan,
-                    // items dan total tidak diubah dari sini untuk menghindari duplikasi/konflik
+                    // createdAt tidak diubah
                 });
+
+                // 2. Cari dan update order terkait
+                const originalVisit = kunjunganList.find((v) => v.id === editingVisitId);
+                const originalVisitDate = new Date(originalVisit.createdAt.seconds * 1000);
+
+                // Buat salinan tanggal agar tidak mengubah state asli
+                const startOfDay = new Date(originalVisitDate);
+                startOfDay.setHours(0, 0, 0, 0);
+                const endOfDay = new Date(originalVisitDate);
+                endOfDay.setHours(23, 59, 59, 999);
+
+                // --- PERUBAHAN LOGIKA ---
+                // Ambil semua order yang relevan dari state (orderList) yang sudah di-fetch sebelumnya.
+                // Ini menghindari query kompleks ke Firestore yang butuh index.
+                const relatedOrders = orderList.filter((order) => {
+                    if (!order.createdAt?.seconds) return false;
+                    const orderDate = new Date(order.createdAt.seconds * 1000);
+                    return order.tokoId === originalVisit.tokoId && orderDate >= startOfDay && orderDate <= endOfDay;
+                });
+
+                if (relatedOrders.length > 0) {
+                    // Jika ada order terkait
+                    const orderToUpdateRef = doc(db, 'orders', relatedOrders[0].id);
+                    if (hasOrder) {
+                        // Jika sekarang ada item, update order tersebut
+                        batch.update(orderToUpdateRef, {
+                            tokoId: kunjunganData.tokoId,
+                            tokoNama: kunjunganData.tokoNama,
+                            items: kunjunganData.items,
+                            total: kunjunganData.total,
+                            catatan: `Order dari kunjungan: ${kunjunganData.catatan}`,
+                        });
+                    } else {
+                        // Jika sekarang tidak ada item, hapus order tersebut
+                        batch.delete(orderToUpdateRef);
+                    }
+                } else if (hasOrder) {
+                    // Jika tidak ada order terkait tapi sekarang ada item, buat order baru
+                    const newOrderRef = doc(collection(db, 'orders'));
+                    batch.set(newOrderRef, { ...kunjunganData, createdAt: originalVisitDate });
+                }
+
+                await batch.commit();
                 showNotification('Kunjungan berhasil diperbarui.');
             } else {
-                // Create Kunjungan (tanpa item dan total)
+                // Create Kunjungan baru (tanpa item dan total)
                 await addDoc(collection(db, 'kunjungan'), {
                     tokoId: kunjunganData.tokoId,
                     tokoNama: kunjunganData.tokoNama,
                     kodeToko: kunjunganData.kodeToko,
                     catatan: kunjunganData.catatan,
-                    items: [], // Selalu kosong di kunjungan
-                    total: 0, // Selalu nol di kunjungan
-                    createdAt: serverTimestamp(),
+                    items: [],
+                    total: 0,
+                    createdAt: visitDate, // Gunakan tanggal dari form
                 });
                 showNotification('Kunjungan berhasil dicatat.');
 
@@ -244,7 +358,7 @@ export default function VisitPage({ setActivePage, orderList = [], onModalChange
                         items: kunjunganData.items,
                         catatan: `Order dari kunjungan: ${kunjunganData.catatan}`,
                         total: kunjunganData.total,
-                        createdAt: serverTimestamp(),
+                        createdAt: visitDate, // Gunakan tanggal yang sama dengan kunjungan
                     });
                     showNotification('Order dari kunjungan berhasil disimpan.', 'success');
                 }
@@ -272,7 +386,8 @@ export default function VisitPage({ setActivePage, orderList = [], onModalChange
         setEditingVisitId(null);
         setCart({});
         setCatatan('');
-        setSelectedTokoId(tokoList.length > 0 ? tokoList[0].id : '');
+        setSelectedTokoId('');
+        setVisitDate(new Date()); // Reset tanggal ke hari ini
         setTokoSearchTerm('');
         setProductSearchTerm(''); // Reset filter produk saat form ditutup
     };
@@ -283,12 +398,23 @@ export default function VisitPage({ setActivePage, orderList = [], onModalChange
         setEditingVisitId(kunjungan.id);
         setSelectedTokoId(kunjungan.tokoId);
         setCatatan(kunjungan.catatan || '');
+        setVisitDate(kunjungan.createdAt?.seconds ? new Date(kunjungan.createdAt.seconds * 1000) : new Date());
 
-        // Buat ulang cart dari data kunjungan
-        const initialCart = kunjungan.items.reduce((acc, item) => {
-            acc[item.productId] = item.qtyBox;
-            return acc;
-        }, {});
+        // Saat edit, cart diisi dari data 'order' yang terkait, bukan dari 'kunjungan'
+        const visitDate = new Date(kunjungan.createdAt.seconds * 1000);
+        const relatedOrder = orderList.find((order) => {
+            if (!order.createdAt?.seconds) return false;
+            const orderDate = new Date(order.createdAt.seconds * 1000);
+            return order.tokoId === kunjungan.tokoId && isSameDay(orderDate, visitDate);
+        });
+
+        let initialCart = {};
+        if (relatedOrder && relatedOrder.items) {
+            initialCart = relatedOrder.items.reduce((acc, item) => {
+                acc[item.productId] = item.qtyBox;
+                return acc;
+            }, {});
+        }
         setCart(initialCart);
 
         setShowForm(true);
@@ -518,6 +644,33 @@ ${padRight('No HP', 15)}: ${toko.nomorWa || '-'}
         closeMenu();
     };
 
+    // Memoized product sales calculation
+    const productSales = useMemo(() => {
+        const salesMap = new Map();
+        orderList.forEach((order) => {
+            order.items?.forEach((item) => {
+                salesMap.set(item.productId, (salesMap.get(item.productId) || 0) + item.qtyBox);
+            });
+        });
+        return salesMap;
+    }, [orderList]);
+
+    // Memoized sorted product list
+    const sortedProdukList = useMemo(() => {
+        return [...produkList]
+            .filter((p) => p.nama.toLowerCase().includes(productSearchTerm.toLowerCase()))
+            .sort((a, b) => {
+                if (productSortBy === 'terlaris') {
+                    return (productSales.get(b.id) || 0) - (productSales.get(a.id) || 0);
+                }
+                if (productSortBy === 'abjad') {
+                    return a.nama.localeCompare(b.nama);
+                }
+                // Default to 'tersedia'
+                return a.available === b.available ? a.nama.localeCompare(b.nama) : a.available ? -1 : 1;
+            });
+    }, [produkList, productSearchTerm, productSortBy, productSales]);
+
     if (loading) {
         return (
             <div className="min-h-[calc(100vh-120px)] flex items-center justify-center">
@@ -579,7 +732,7 @@ ${padRight('No HP', 15)}: ${toko.nomorWa || '-'}
                         </button>
                         <button onClick={() => setShowCalendar(!showCalendar)} className={`flex-1 flex items-center justify-center gap-2 px-4 py-2 text-sm font-semibold rounded-lg transition-all ${filterType === 'custom' ? 'bg-purple-600 text-white shadow-md' : 'bg-white text-slate-600 border border-slate-300'}`}>
                             <CalendarRange size={16} />
-                            {filterType === 'custom' ? format(customDate, 'd MMM yyyy') : 'Pilih Tanggal'}
+                            {filterType === 'custom' ? format(customDate, 'd MMM yyyy', { locale: id }) : 'Pilih Tanggal'}
                         </button>
 
                         {showCalendar && (
@@ -712,6 +865,33 @@ ${padRight('No HP', 15)}: ${toko.nomorWa || '-'}
                             </div>
 
                             <form id="visit-form" onSubmit={handleSubmit} className="flex-1 overflow-y-auto p-4 space-y-4">
+                                <div>
+                                    <label className="block text-sm font-medium text-slate-700 mb-2">Tanggal Kunjungan *</label>
+                                    <div className="relative">
+                                        <button type="button" onClick={() => setShowFormCalendar(!showFormCalendar)} className="w-full p-2.5 text-left bg-white border border-gray-300 rounded-lg flex justify-between items-center focus:outline-none focus:ring-2 focus:ring-purple-500">
+                                            <span className="flex items-center gap-2">
+                                                <Calendar size={18} className="text-slate-500" />
+                                                {format(visitDate, 'EEEE, d MMMM yyyy', { locale: id })}
+                                            </span>
+                                            <ChevronDown size={20} className={`transition-transform ${showFormCalendar ? 'rotate-180' : ''}`} />
+                                        </button>
+                                        {showFormCalendar && (
+                                            <div className="absolute top-full mt-2 z-30 bg-white rounded-2xl shadow-2xl border p-2" onMouseLeave={() => setShowFormCalendar(false)}>
+                                                <DayPicker
+                                                    mode="single"
+                                                    selected={visitDate}
+                                                    onSelect={(date) => {
+                                                        if (date) setVisitDate(date);
+                                                        setShowFormCalendar(false);
+                                                    }}
+                                                    defaultMonth={visitDate}
+                                                    classNames={{ day_selected: 'bg-purple-600 text-white rounded-full', day_today: 'font-bold text-purple-600' }}
+                                                    required
+                                                />
+                                            </div>
+                                        )}
+                                    </div>
+                                </div>
                                 {/* Pilih Toko */}
                                 <div>
                                     <label className="block text-sm font-medium text-slate-700 mb-2">Toko yang Dikunjungi</label>
@@ -757,6 +937,29 @@ ${padRight('No HP', 15)}: ${toko.nomorWa || '-'}
                                     </div>
                                 </div>
 
+                                {/* Rekomendasi Produk */}
+                                {productRecommendations.length > 0 && (
+                                    <div className="pt-2">
+                                        <h3 className="text-sm font-semibold text-slate-700 mb-2 flex items-center gap-1.5">
+                                            <Star size={16} className="text-yellow-500 fill-current" />
+                                            <span>Rekomendasi Untuk Toko Ini</span>
+                                        </h3>
+                                        {loadingRecommendations ? (
+                                            <MiniLoader text="Menganalisis..." />
+                                        ) : (
+                                            <div className="flex gap-2 overflow-x-auto pb-2 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
+                                                {productRecommendations.map((produk) => (
+                                                    <button type="button" key={produk.id} onClick={() => updateQty(produk.id, 1)} disabled={!produk.available} className={`flex-shrink-0 w-24 text-center p-2 bg-white border border-slate-200 rounded-lg hover:bg-purple-50 hover:border-purple-300 transition disabled:opacity-50 ${justAddedProductId === produk.id ? 'animate-pop' : ''}`}>
+                                                        <img src={produk.foto || 'https://via.placeholder.com/100?text=Produk'} alt={produk.nama} className="w-12 h-12 mx-auto object-cover rounded-md" />
+                                                        <p className="text-xs font-medium text-slate-700 mt-1 truncate">{produk.nama}</p>
+                                                        {cart[produk.id] > 0 && <span className="text-xs font-bold text-green-600">({cart[produk.id]} box)</span>}
+                                                    </button>
+                                                ))}
+                                            </div>
+                                        )}
+                                    </div>
+                                )}
+
                                 {/* Catatan */}
                                 <div>
                                     <label className="block text-sm font-medium text-slate-700 mb-2">Catatan (Opsional)</label>
@@ -776,41 +979,42 @@ ${padRight('No HP', 15)}: ${toko.nomorWa || '-'}
                                     </div>
                                     {produkList.length === 0 ? (
                                         <div className="space-y-2">
-                                            {[...Array(3)].map(
-                                                (
-                                                    _,
-                                                    index, // Render 3 skeleton items
-                                                ) => (
-                                                    <div key={index} className="rounded-xl p-2.5 border border-gray-200 bg-white animate-pulse">
-                                                        <div className="flex items-center gap-3">
-                                                            {/* Image Placeholder */}
-                                                            <div className="w-14 h-14 flex-shrink-0 bg-gray-200 rounded-lg"></div>
-                                                            {/* Text Placeholders */}
-                                                            <div className="flex-grow space-y-1">
-                                                                <div className="h-3 bg-gray-200 rounded w-3/4"></div>
-                                                                <div className="h-2.5 bg-gray-200 rounded w-1/2"></div>
-                                                            </div>
-                                                            {/* Quantity Control Placeholders */}
-                                                            <div className="flex items-center gap-1 flex-shrink-0">
-                                                                <div className="w-7 h-7 rounded-full bg-gray-200"></div>
-                                                                <div className="w-7 h-7 bg-gray-200 rounded"></div>
-                                                                <div className="w-7 h-7 rounded-full bg-gray-200"></div>
-                                                            </div>
+                                            {[...Array(3)].map((_, index) => (
+                                                <div key={index} className="rounded-xl p-2.5 border border-gray-200 bg-white animate-pulse">
+                                                    <div className="flex items-center gap-3">
+                                                        <div className="w-14 h-14 flex-shrink-0 bg-gray-200 rounded-lg"></div>
+                                                        <div className="flex-grow space-y-1">
+                                                            <div className="h-3 bg-gray-200 rounded w-3/4"></div>
+                                                            <div className="h-2.5 bg-gray-200 rounded w-1/2"></div>
+                                                        </div>
+                                                        <div className="flex items-center gap-1 flex-shrink-0">
+                                                            <div className="w-7 h-7 rounded-full bg-gray-200"></div>
+                                                            <div className="w-7 h-7 bg-gray-200 rounded"></div>
+                                                            <div className="w-7 h-7 rounded-full bg-gray-200"></div>
                                                         </div>
                                                     </div>
-                                                ),
-                                            )}
+                                                </div>
+                                            ))}
                                             <div className="text-center py-2 text-gray-500 text-sm">Memuat produk...</div>
                                         </div>
+                                    ) : sortedProdukList.length === 0 ? (
+                                        <div className="text-center py-6 text-slate-500">Produk tidak ditemukan.</div>
                                     ) : (
-                                        <div className="space-y-3">
-                                            {produkList // Reduce product list item padding, image size, and font sizes
-                                                .filter((p) => p.nama.toLowerCase().includes(productSearchTerm.toLowerCase()))
-                                                .map((produk) => {
+                                        <>
+                                            {/* Filter Produk */}
+                                            <div className="flex items-center gap-2 mb-4 p-1 bg-slate-200 rounded-full">
+                                                {['terlaris', 'abjad', 'tersedia'].map((filter) => (
+                                                    <button key={filter} type="button" onClick={() => setProductSortBy(filter)} className={`flex-1 capitalize text-xs font-semibold py-1.5 rounded-full transition-all duration-300 ${productSortBy === filter ? 'bg-white text-purple-700 shadow-sm' : 'bg-transparent text-slate-500'}`}>
+                                                        {filter === 'abjad' ? 'A-Z' : filter}
+                                                    </button>
+                                                ))}
+                                            </div>
+                                            <div className="space-y-3">
+                                                {sortedProdukList.map((produk) => {
                                                     const qty = cart[produk.id] || 0;
                                                     const isAvailable = produk.available;
                                                     return (
-                                                        <div key={produk.id} className={`rounded-xl p-2.5 border transition-all duration-300 ${qty > 0 ? 'bg-lime-400 border-lime-400' : 'bg-white border-gray-200'} ${!isAvailable ? 'bg-slate-100 border-slate-200' : ''}`}>
+                                                        <div key={produk.id} className={`rounded-xl p-2.5 border transition-all duration-300 ${qty > 0 ? 'bg-lime-400 border-lime-400' : 'bg-white border-gray-200'} ${!isAvailable ? 'bg-slate-100 border-slate-200' : ''} ${justAddedProductId === produk.id ? 'animate-pop' : ''}`}>
                                                             <div className="flex items-center gap-3">
                                                                 <div className="relative w-14 h-14 flex-shrink-0">
                                                                     <img
@@ -844,7 +1048,8 @@ ${padRight('No HP', 15)}: ${toko.nomorWa || '-'}
                                                         </div>
                                                     );
                                                 })}
-                                        </div>
+                                            </div>
+                                        </>
                                     )}
                                 </div>
                             </form>

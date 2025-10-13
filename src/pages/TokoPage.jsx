@@ -188,6 +188,9 @@ export default function TokoPage({ orderList = [], kunjunganList = [], onModalCh
             nomorWa: nomorWa.trim(),
             latitude: latitude,
             longitude: longitude,
+            totalBoxesOrdered: 0, // Inisialisasi field baru
+            mysteryBoxesAwarded: 0, // Inisialisasi field baru
+            monthlyRewardsClaimed: {}, // Inisialisasi untuk hadiah bulanan
         };
 
         try {
@@ -195,7 +198,7 @@ export default function TokoPage({ orderList = [], kunjunganList = [], onModalCh
                 // 🔧 Update
                 await updateDoc(doc(db, 'toko', editingId), tokoData);
                 // Perbarui state lokal tanpa refetch
-                setTokoList((prevList) => prevList.map((toko) => (toko.id === editingId ? { ...toko, ...tokoData } : toko)));
+                setTokoList((prevList) => prevList.map((toko) => (toko.id === editingId ? { ...toko, ...tokoData, totalBoxesOrdered: toko.totalBoxesOrdered, mysteryBoxesAwarded: toko.mysteryBoxesAwarded, monthlyRewardsClaimed: toko.monthlyRewardsClaimed || {} } : toko)));
             } else {
                 // ➕ Create
                 const docRef = await addDoc(collection(db, 'toko'), {
@@ -370,7 +373,7 @@ export default function TokoPage({ orderList = [], kunjunganList = [], onModalCh
                     updatedStores.push({ id: existingToko.id, ...tokoData });
                 } else {
                     // Toko baru, siapkan untuk ditambah
-                    newStores.push({ ...tokoData, createdAt: serverTimestamp() });
+                    newStores.push({ ...tokoData, createdAt: serverTimestamp(), totalBoxesOrdered: 0, mysteryBoxesAwarded: 0, monthlyRewardsClaimed: {} });
                 }
             }
 
