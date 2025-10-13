@@ -487,21 +487,22 @@ export default function OrderPage({ setActivePage, onModalChange }) {
             const dateString = format(date, 'yyyy-MM-dd');
             const total = dailyTotals.get(dateString);
             const isCurrentMonth = date.getMonth() === displayMonth.getMonth();
+            const hasOrder = total > 0;
 
             return (
                 <td {...tdProps}>
-                    <div className={`flex aspect-square w-full flex-col items-center justify-center rounded-lg transition-colors ${total > 0 ? 'bg-green-100 font-bold text-green-900 hover:bg-green-200' : 'hover:bg-slate-100'} ${!isCurrentMonth ? 'text-slate-300' : 'text-slate-700'}`}>
+                    <div className={`flex aspect-square w-full flex-col items-center justify-center rounded-lg transition-colors ${hasOrder ? 'bg-green-100 font-bold text-green-900 hover:bg-green-200' : 'bg-slate-50 hover:bg-slate-100'} ${!isCurrentMonth ? 'text-slate-300 bg-slate-50/50' : 'text-slate-700'}`}>
                         <time dateTime={date.toISOString()} className="text-sm">
                             {format(date, 'd')}
                         </time>
-                        {total > 0 && <span className="text-[10px] -mt-1 text-blue-700">{`${total} box`}</span>}
+                        {(hasOrder || isCurrentMonth) && <span className={`text-[10px] -mt-1 ${hasOrder ? 'text-blue-700' : 'text-slate-400'}`}>{`${total || 0} box`}</span>}
                     </div>
                 </td>
             );
         };
 
         return (
-            <div className="bg-white p-2 sm:p-4 rounded-xl shadow-sm border border-gray-100">
+            <div className="bg-white p-2 sm:p-4 rounded-xl shadow-sm border border-gray-200">
                 <DayPicker
                     mode="single"
                     month={currentMonth}
@@ -517,7 +518,7 @@ export default function OrderPage({ setActivePage, onModalChange }) {
                     classNames={{
                         root: 'w-full',
                         caption_label: 'text-lg font-bold text-purple-800',
-                        head_cell: 'w-1/7 font-semibold text-xs text-slate-500 p-2', // Menentukan lebar kolom
+                        head_cell: 'w-[14.28%] font-semibold text-xs text-slate-500 p-1', // Set lebar eksplisit untuk setiap kolom hari
                         table: 'w-full border-collapse table-fixed', // table-fixed adalah kunci utama
                         cell: 'p-0.5', // Beri sedikit padding pada sel
                         day: 'w-full', // Pastikan konten mengisi sel
@@ -551,8 +552,8 @@ export default function OrderPage({ setActivePage, onModalChange }) {
                 </div>
             )}
 
-            <div className={`pb-20 ${viewMode === 'list' ? 'max-w-md mx-auto' : ''}`} onClick={closeMenu}>
-                <div className={`${viewMode === 'list' ? 'p-5' : 'p-2 sm:p-4'} pb-20`}>
+            <div className="pb-20 max-w-md mx-auto" onClick={closeMenu}>
+                <div className="p-5 pb-20">
                     <div className="flex justify-between items-center mb-6">
                         <h2 className="text-2xl font-bold text-slate-800 flex items-center gap-2">
                             <ShoppingBag className="text-purple-600" />
