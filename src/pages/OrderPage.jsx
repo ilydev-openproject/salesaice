@@ -47,6 +47,7 @@ export default function OrderPage({ setActivePage, onModalChange }) {
     const [productSortBy, setProductSortBy] = useState('terlaris'); // 'terlaris', 'abjad', 'tersedia'
 
     const [viewMode, setViewMode] = useState('list'); // 'list' or 'calendar'
+    const [calendarTokoFilter, setCalendarTokoFilter] = useState(null); // null means all stores
     // Date filter state
     const [filterType, setFilterType] = useState('today'); // 'today', 'custom'
     const [customDate, setCustomDate] = useState(new Date());
@@ -434,13 +435,30 @@ export default function OrderPage({ setActivePage, onModalChange }) {
             });
     }, [produkList, productSearchTerm, productSortBy, productSales]);
 
+    // Memoized top stores by box count
+    const topStoresByBox = useMemo(() => {
+        const storeTotals = new Map();
+        orderList.forEach((order) => {
+            const totalBoxes = order.items?.reduce((sum, item) => sum + (item.qtyBox || 0), 0) || 0;
+            const currentTotal = storeTotals.get(order.tokoId) || { total: 0, name: order.tokoNama, id: order.tokoId };
+            currentTotal.total += totalBoxes;
+            storeTotals.set(order.tokoId, currentTotal);
+        });
+
+        return [...storeTotals.values()]
+            .sort((a, b) => b.total - a.total) // Sort by total boxes descending
+            .filter((store) => store.id); // Filter out any potential undefined stores
+    }, [orderList]);
+
     // Komponen untuk tampilan kalender
     const CalendarView = () => {
         const [currentMonth, setCurrentMonth] = useState(new Date());
 
         const dailyTotals = useMemo(() => {
             const totals = new Map();
-            orderList.forEach((order) => {
+            const filtered = calendarTokoFilter ? orderList.filter((o) => o.tokoId === calendarTokoFilter) : orderList;
+
+            filtered.forEach((order) => {
                 // Periksa apakah createdAt.seconds ada, bertipe number, dan bukan NaN
                 if (order.createdAt && typeof order.createdAt.seconds === 'number' && !isNaN(order.createdAt.seconds)) {
                     const date = new Date(order.createdAt.seconds * 1000);
@@ -459,7 +477,7 @@ export default function OrderPage({ setActivePage, onModalChange }) {
                 }
             });
             return totals;
-        }, [orderList]);
+        }, [orderList, calendarTokoFilter]);
 
         const monthlyTotal = useMemo(() => {
             let total = 0;
@@ -471,6 +489,13 @@ export default function OrderPage({ setActivePage, onModalChange }) {
             });
             return total;
         }, [dailyTotals, currentMonth]);
+
+        const handleDayClick = (date) => {
+            if (!date) return;
+            setCustomDate(date);
+            setFilterType('custom');
+            setViewMode('list'); // Langsung kembali ke mode list setelah memilih tanggal
+        };
 
         const DayWithRevenue = ({ day, ...tdProps }) => {
             const { date, displayMonth } = day;
@@ -489,14 +514,22 @@ export default function OrderPage({ setActivePage, onModalChange }) {
             const isCurrentMonth = date.getMonth() === displayMonth.getMonth();
             const hasOrder = total > 0;
 
+            // Fungsi untuk menentukan warna berdasarkan jumlah box
+            const getBgColor = (boxCount) => {
+                if (boxCount > 50) return 'bg-green-300 hover:bg-green-400 text-green-900 font-bold';
+                if (boxCount > 20) return 'bg-green-200 hover:bg-green-300 text-green-800 font-semibold';
+                if (boxCount > 0) return 'bg-green-100 hover:bg-green-200 text-green-800';
+                return 'bg-slate-50 hover:bg-slate-100';
+            };
+
             return (
-                <td {...tdProps}>
-                    <div className={`flex aspect-square w-full flex-col items-center justify-center rounded-lg transition-colors ${hasOrder ? 'bg-green-100 font-bold text-green-900 hover:bg-green-200' : 'bg-slate-50 hover:bg-slate-100'} ${!isCurrentMonth ? 'text-slate-300 bg-slate-50/50' : 'text-slate-700'}`}>
-                        <time dateTime={date.toISOString()} className="text-sm">
+                <td {...tdProps} className="w-[14.28%]">
+                    <button type="button" onClick={() => handleDayClick(date)} disabled={!isCurrentMonth} className={`flex aspect-square w-full flex-col items-center justify-center rounded-lg transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-1 disabled:pointer-events-none ${isCurrentMonth ? getBgColor(total) : 'text-slate-300 bg-slate-50/50'}`}>
+                        <time dateTime={date.toISOString()} className={`text-sm ${hasOrder ? '' : isCurrentMonth ? 'text-slate-600' : ''}`}>
                             {format(date, 'd')}
                         </time>
-                        {(hasOrder || isCurrentMonth) && <span className={`text-[10px] -mt-1 ${hasOrder ? 'text-blue-700' : 'text-slate-400'}`}>{`${total || 0} box`}</span>}
-                    </div>
+                        {isCurrentMonth && <span className={`text-[10px] -mt-1 truncate ${hasOrder ? 'text-blue-800' : 'text-slate-400'}`}>{`${total || 0} box`}</span>}
+                    </button>
                 </td>
             );
         };
@@ -504,24 +537,29 @@ export default function OrderPage({ setActivePage, onModalChange }) {
         return (
             <div className="bg-white p-2 sm:p-4 rounded-xl shadow-sm border border-gray-200">
                 <DayPicker
-                    mode="single"
+                    mode="single" // Tetap single, tapi kita handle kliknya secara manual
+                    onDayClick={handleDayClick}
                     month={currentMonth}
                     onMonthChange={setCurrentMonth}
+                    captionLayout="dropdown"
                     components={{
+                        // eslint-disable-next-line react/prop-types
                         Day: DayWithRevenue,
                     }}
                     showOutsideDays
                     locale={id}
-                    captionLayout="dropdown-buttons"
                     fromYear={2020}
                     toYear={new Date().getFullYear() + 1}
                     classNames={{
                         root: 'w-full',
+                        month_grid: 'w-full',
+                        months: 'w-full',
+                        caption: 'flex justify-between items-center mb-4', // Kembalikan justify-between
+                        caption_dropdowns: 'flex flex-row gap-2 items-center', // Menambahkan flex-row
                         caption_label: 'text-lg font-bold text-purple-800',
-                        head_cell: 'w-[14.28%] font-semibold text-xs text-slate-500 p-1', // Set lebar eksplisit untuk setiap kolom hari
-                        table: 'w-full border-collapse table-fixed', // table-fixed adalah kunci utama
-                        cell: 'p-0.5', // Beri sedikit padding pada sel
-                        day: 'w-full', // Pastikan konten mengisi sel
+                        table: 'w-full border-collapse table-fixed', // 3. Kunci untuk lebar kolom yang sama
+                        head_cell: 'font-semibold text-xs text-slate-500 p-1', // Lebar sekarang diatur di <td>
+                        cell: 'p-0.5',
                         day_today: 'text-purple-600 ring-2 ring-purple-300 rounded-lg',
                     }}
                     footer={<div className="text-center text-sm font-bold text-purple-800 mt-4 pt-2 border-t">Total Box Bulan Ini: {monthlyTotal.toLocaleString('id-ID')} box</div>}
@@ -582,7 +620,24 @@ export default function OrderPage({ setActivePage, onModalChange }) {
                                 </button>
                             </>
                         )}
-                        <button onClick={() => setViewMode(viewMode === 'list' ? 'calendar' : 'list')} className="p-2 bg-white text-slate-600 border border-slate-300 rounded-lg transition-all hover:bg-slate-100">
+                        {/* --- PERUBAHAN DIMULAI DI SINI --- */}
+                        {/* Area scrollable untuk filter toko (hanya di mode kalender) */}
+                        {viewMode === 'calendar' && (
+                            <div className="flex-1 overflow-hidden">
+                                <div className="flex items-center gap-2 overflow-x-auto py-1 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
+                                    <button onClick={() => setCalendarTokoFilter(null)} className={`flex-shrink-0 px-3 py-1 rounded-full text-xs font-medium transition-colors whitespace-nowrap ${!calendarTokoFilter ? 'bg-purple-600 text-white shadow' : 'bg-white text-slate-700 border border-slate-300 hover:bg-slate-50'}`}>
+                                        Semua Toko
+                                    </button>
+                                    {topStoresByBox.map((toko) => (
+                                        <button key={toko.id} onClick={() => setCalendarTokoFilter(toko.id)} className={`flex-shrink-0 flex items-center gap-2 px-3 py-1 rounded-full text-xs font-medium transition-colors whitespace-nowrap ${calendarTokoFilter === toko.id ? 'bg-purple-600 text-white shadow' : 'bg-white text-slate-700 border border-slate-300 hover:bg-slate-50'}`}>
+                                            <span>{toko.name}</span>
+                                            <span className={`px-1.5 py-0.5 rounded-full text-[10px] font-bold ${calendarTokoFilter === toko.id ? 'bg-white/20 text-white' : 'bg-slate-200 text-slate-600'}`}>{toko.total}</span>
+                                        </button>
+                                    ))}
+                                </div>
+                            </div>
+                        )}
+                        <button onClick={() => setViewMode(viewMode === 'list' ? 'calendar' : 'list')} className="p-2 bg-white text-slate-600 border border-slate-300 rounded-lg transition-all hover:bg-slate-100 ml-auto flex-shrink-0">
                             {viewMode === 'list' ? <Calendar size={16} /> : <List size={16} />}
                         </button>
 
@@ -594,7 +649,12 @@ export default function OrderPage({ setActivePage, onModalChange }) {
                     </div>
 
                     {viewMode === 'calendar' ? (
-                        <CalendarView />
+                        <CalendarView
+                        // Pass necessary props if CalendarView is refactored
+                        // topStores={topStoresByBox}
+                        // selectedTokoId={calendarTokoFilter}
+                        // onSelectToko={setCalendarTokoFilter}
+                        />
                     ) : filteredOrders.length === 0 ? (
                         <div className="text-center text-gray-500 py-10 bg-slate-50 rounded-lg">
                             <ShoppingCart size={40} className="mx-auto text-gray-400 mb-2" />
