@@ -753,7 +753,7 @@ export default function OrderPage({ setActivePage, onModalChange }) {
                             {filteredOrders.map((order) => {
                                 const totalBoxes = order.items.reduce((sum, item) => sum + item.qtyBox, 0);
                                 return (
-                                    <div key={order.id} onClick={() => handleEdit(order)} className="bg-gradient-to-r from-white via-slate-50/50 to-purple-50/30 rounded-2xl shadow-sm border border-slate-200/50 transition-all duration-300 hover:shadow-lg hover:border-purple-300 cursor-pointer relative hover-lift focus-ring group backdrop-blur-sm">
+                                    <div key={order.id} onClick={() => handleEdit(order)} className={`bg-gradient-to-r from-white via-slate-50/50 to-purple-50/30 rounded-2xl shadow-sm border border-slate-200/50 transition-all duration-300 hover:shadow-lg hover:border-purple-300 cursor-pointer relative hover-lift focus-ring group backdrop-blur-sm ${openMenuId === order.id ? 'z-20' : 'z-10'}`}>
                                         <div className="p-4 flex items-center gap-4">
                                             <div className="w-12 h-12 rounded-full bg-gradient-to-br from-purple-100 to-fuchsia-100 flex items-center justify-center text-purple-600 font-bold text-lg shadow-sm group-hover:scale-110 transition-transform">{order.tokoNama.charAt(0).toUpperCase()}</div>
                                             <div className="flex-grow min-w-0">
@@ -771,7 +771,7 @@ export default function OrderPage({ setActivePage, onModalChange }) {
                                             </button>
                                         </div>
                                         {openMenuId === order.id && (
-                                            <div className="absolute top-10 right-5 z-20 w-48 bg-gradient-to-br from-white via-slate-50/50 to-purple-50/30 rounded-2xl shadow-2xl border border-slate-200/50 backdrop-blur-md animate-slide-in-top" onClick={(e) => e.stopPropagation()}>
+                                            <div className="absolute top-10 right-5 z-30 w-48 bg-gradient-to-br from-white via-slate-50 to-purple-50 rounded-2xl shadow-2xl border border-slate-200/50 backdrop-blur-md animate-slide-in-top" onClick={(e) => e.stopPropagation()}>
                                                 <div className="py-2">
                                                     <button
                                                         onClick={() => {
@@ -1149,7 +1149,7 @@ export default function OrderPage({ setActivePage, onModalChange }) {
 
             {showDeleteConfirm && (
                 <div className="fixed inset-0 z-[100] bg-gradient-to-br from-red-900/20 via-orange-900/20 to-yellow-900/20 backdrop-blur-sm flex items-center justify-center p-4 animate-fade-in">
-                    <div className="bg-gradient-to-br from-white via-red-50/30 to-orange-50/30 rounded-3xl shadow-2xl p-6 w-full max-w-sm animate-scale-in border border-red-200/50 relative overflow-hidden">
+                    <div className="bg-gradient-to-br from-whitex via-red-50/30 to-orange-50/30 rounded-3xl shadow-2xl p-6 w-full max-w-sm animate-scale-in border border-red-200/50 relative overflow-hidden">
                         {/* Decorative elements */}
                         <div className="absolute top-0 right-0 w-24 h-24 bg-red-200/20 rounded-full -translate-y-12 translate-x-12"></div>
                         <div className="absolute bottom-0 left-0 w-20 h-20 bg-orange-200/20 rounded-full translate-y-10 -translate-x-10"></div>

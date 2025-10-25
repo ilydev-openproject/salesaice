@@ -776,7 +776,7 @@ ${padRight('No HP', 15)}: ${toko.nomorWa || '-'}
                                 const totalBoxes = relatedOrders.reduce((sum, order) => sum + (order.items?.reduce((itemSum, item) => itemSum + item.qtyBox, 0) || 0), 0);
 
                                 return (
-                                    <div key={kunjungan.id} onClick={() => handleEdit(kunjungan)} className="bg-white rounded-xl shadow-sm border border-gray-100 transition-all duration-300 hover:shadow-md hover:border-purple-200 cursor-pointer relative">
+                                    <div key={kunjungan.id} onClick={() => handleEdit(kunjungan)} className={`bg-white rounded-xl shadow-sm border border-gray-100 transition-all duration-300 hover:shadow-md hover:border-purple-200 cursor-pointer relative ${openMenuId === kunjungan.id ? 'z-20' : 'z-10'}`}>
                                         <div className="p-3 flex items-center gap-3">
                                             <div className="w-10 h-10 rounded-full bg-gradient-to-br from-purple-100 to-fuchsia-100 flex items-center justify-center text-purple-600 font-bold text-lg">{kunjungan.tokoNama.charAt(0).toUpperCase()}</div>
                                             <div className="flex-grow">
@@ -797,7 +797,7 @@ ${padRight('No HP', 15)}: ${toko.nomorWa || '-'}
 
                                         {/* Menu Dropdown */}
                                         {openMenuId === kunjungan.id && (
-                                            <div className="absolute top-10 right-5 z-20 w-48 bg-white rounded-lg shadow-xl border border-gray-100" onClick={(e) => e.stopPropagation()}>
+                                            <div className="absolute top-10 right-5 z-30 w-48 bg-white rounded-lg shadow-xl border border-gray-100" onClick={(e) => e.stopPropagation()}>
                                                 <div className="py-1">
                                                     <button
                                                         onClick={() => {
