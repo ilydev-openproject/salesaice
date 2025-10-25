@@ -853,30 +853,35 @@ ${padRight('No HP', 15)}: ${toko.nomorWa || '-'}
                 <div className="fixed -left-[9999px] top-0">{receiptKunjungan && <VisitReceipt kunjungan={receiptKunjungan} ref={receiptRef} />}</div>
 
                 {/* Form Tambah Kunjungan (Slide-in) */}
-                <div className={`fixed inset-0 z-50 transition-colors duration-300 ${showForm ? 'bg-black/40' : 'bg-transparent pointer-events-none'}`}>
-                    <div className={`absolute inset-y-0 left-0 w-full max-w-md bg-slate-50 shadow-2xl transition-transform duration-300 ease-in-out transform ${showForm ? 'translate-x-0' : '-translate-x-full'}`}>
+                <div className={`fixed inset-0 z-50 transition-all duration-500 ${showForm ? 'bg-gradient-to-br from-purple-900/20 via-blue-900/20 to-indigo-900/20 backdrop-blur-sm' : 'bg-transparent pointer-events-none'}`}>
+                    <div className={`absolute inset-y-0 left-0 w-full max-w-md bg-gradient-to-br from-white via-slate-50 to-purple-50/30 shadow-2xl transition-all duration-500 ease-out transform ${showForm ? 'translate-x-0 scale-100 opacity-100 animate-slide-in-left' : '-translate-x-full scale-95 opacity-0'}`}>
                         <div className="h-full flex flex-col">
-                            <div className="flex items-center justify-between p-4 bg-white">
-                                <button type="button" onClick={resetForm} className="p-2 rounded-full hover:bg-slate-100" aria-label="Kembali">
+                            <div className="flex items-center justify-between p-4 bg-white border-b border-slate-200">
+                                <button type="button" onClick={resetForm} className="p-2 rounded-full" aria-label="Kembali">
                                     <ArrowLeft size={20} />
                                 </button>
                                 <h2 className="text-lg font-bold text-slate-800">{editingVisitId ? 'Edit Kunjungan' : 'Tambah Kunjungan'}</h2>
                                 <div className="w-10"></div> {/* Spacer */}
                             </div>
 
-                            <form id="visit-form" onSubmit={handleSubmit} className="flex-1 overflow-y-auto p-4 space-y-4">
-                                <div>
-                                    <label className="block text-sm font-medium text-slate-700 mb-2">Tanggal Kunjungan *</label>
+                            <form id="visit-form" onSubmit={handleSubmit} className="flex-1 overflow-y-auto p-6 space-y-6">
+                                <div className="space-y-3">
+                                    <label className="flex text-sm font-semibold text-slate-800 mb-3 items-center gap-2">
+                                        <div className="w-2 h-2 bg-gradient-to-r from-purple-500 to-indigo-500 rounded-full"></div>
+                                        Tanggal Kunjungan *
+                                    </label>
                                     <div className="relative">
-                                        <button type="button" onClick={() => setShowFormCalendar(!showFormCalendar)} className="w-full p-2.5 text-left bg-white border border-gray-300 rounded-lg flex justify-between items-center focus:outline-none focus:ring-2 focus:ring-purple-500">
-                                            <span className="flex items-center gap-2">
-                                                <Calendar size={18} className="text-slate-500" />
-                                                {format(visitDate, 'EEEE, d MMMM yyyy', { locale: id })}
+                                        <button type="button" onClick={() => setShowFormCalendar(!showFormCalendar)} className="w-full p-4 text-left bg-white/80 backdrop-blur-sm border border-slate-200 rounded-2xl flex justify-between items-center focus:outline-none focus:ring-2 focus:ring-purple-500/50 focus:border-purple-300 transition-all duration-200">
+                                            <span className="flex items-center gap-3">
+                                                <div className="p-2 bg-gradient-to-br from-purple-100 to-indigo-100 rounded-xl">
+                                                    <Calendar size={18} className="text-purple-600" />
+                                                </div>
+                                                <span className="text-slate-700 font-medium">{format(visitDate, 'EEEE, d MMMM yyyy', { locale: id })}</span>
                                             </span>
-                                            <ChevronDown size={20} className={`transition-transform ${showFormCalendar ? 'rotate-180' : ''}`} />
+                                            <ChevronDown size={20} className={`text-slate-400 transition-all duration-300 ${showFormCalendar ? 'rotate-180 text-purple-600' : ''}`} />
                                         </button>
                                         {showFormCalendar && (
-                                            <div className="absolute top-full mt-2 z-30 bg-white rounded-2xl shadow-2xl border p-2" onMouseLeave={() => setShowFormCalendar(false)}>
+                                            <div className="absolute top-full mt-3 z-30 bg-white/95 backdrop-blur-md rounded-3xl shadow-2xl border border-slate-200/50 p-4 animate-in slide-in-from-top-2 fade-in" onMouseLeave={() => setShowFormCalendar(false)}>
                                                 <DayPicker
                                                     mode="single"
                                                     selected={visitDate}
@@ -885,7 +890,11 @@ ${padRight('No HP', 15)}: ${toko.nomorWa || '-'}
                                                         setShowFormCalendar(false);
                                                     }}
                                                     defaultMonth={visitDate}
-                                                    classNames={{ day_selected: 'bg-purple-600 text-white rounded-full', day_today: 'font-bold text-purple-600' }}
+                                                    classNames={{
+                                                        day_selected: 'bg-gradient-to-r from-purple-600 to-indigo-600 text-white rounded-full shadow-lg',
+                                                        day_today: 'font-bold text-purple-600 ring-2 ring-purple-200 rounded-full',
+                                                        day: 'hover:bg-purple-50 rounded-full transition-colors',
+                                                    }}
                                                     required
                                                 />
                                             </div>
@@ -893,23 +902,31 @@ ${padRight('No HP', 15)}: ${toko.nomorWa || '-'}
                                     </div>
                                 </div>
                                 {/* Pilih Toko */}
-                                <div>
-                                    <label className="block text-sm font-medium text-slate-700 mb-2">Toko yang Dikunjungi</label>
+                                <div className="space-y-3">
+                                    <label className="flex text-sm font-semibold text-slate-800 mb-3 items-center gap-2">
+                                        <div className="w-2 h-2 bg-gradient-to-r from-emerald-500 to-teal-500 rounded-full"></div>
+                                        Toko yang Dikunjungi
+                                    </label>
                                     <div className="relative" style={{ pointerEvents: editingVisitId ? 'none' : 'auto', opacity: editingVisitId ? 0.7 : 1 }}>
-                                        <button type="button" onClick={() => setIsTokoDropdownOpen(!isTokoDropdownOpen)} className="w-full p-2.5 text-left bg-white border border-gray-300 rounded-lg flex justify-between items-center focus:outline-none focus:ring-2 focus:ring-purple-500">
-                                            <span className="flex items-center gap-2">
-                                                <Store size={18} className="text-slate-500" />
-                                                {tokoList.find((t) => t.id === selectedTokoId)?.nama || 'Pilih Toko'}
+                                        <button type="button" onClick={() => setIsTokoDropdownOpen(!isTokoDropdownOpen)} className="w-full p-4 text-left bg-white/80 backdrop-blur-sm border border-slate-200 rounded-2xl flex justify-between items-center focus:outline-none focus:ring-2 focus:ring-emerald-500/50 focus:border-emerald-300 transition-all duration-200">
+                                            <span className="flex items-center gap-3">
+                                                <div className="p-2 bg-gradient-to-br from-emerald-100 to-teal-100 rounded-xl">
+                                                    <Store size={18} className="text-emerald-600" />
+                                                </div>
+                                                <span className="text-slate-700 font-medium">{tokoList.find((t) => t.id === selectedTokoId)?.nama || 'Pilih Toko'}</span>
                                             </span>
-                                            <ChevronDown size={20} className={`transition-transform ${isTokoDropdownOpen ? 'rotate-180' : ''}`} />
+                                            <ChevronDown size={20} className={`text-slate-400 transition-all duration-300 ${isTokoDropdownOpen ? 'rotate-180 text-emerald-600' : ''}`} />
                                         </button>
 
                                         {isTokoDropdownOpen && (
-                                            <div className="absolute z-10 mt-1 w-full bg-white border border-gray-200 rounded-lg shadow-lg flex flex-col">
-                                                <div className="p-2 border-b border-gray-200">
-                                                    <input type="text" placeholder="Cari toko..." value={tokoSearchTerm} onChange={(e) => setTokoSearchTerm(e.target.value)} onClick={(e) => e.stopPropagation()} className="w-full p-2 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-purple-500" />
+                                            <div className="absolute z-10 mt-3 w-full bg-white/95 backdrop-blur-md border border-slate-200/50 rounded-2xl shadow-2xl flex flex-col animate-in slide-in-from-top-2 fade-in">
+                                                <div className="p-4 border-b border-slate-200/50">
+                                                    <div className="relative">
+                                                        <input type="text" placeholder="Cari toko..." value={tokoSearchTerm} onChange={(e) => setTokoSearchTerm(e.target.value)} onClick={(e) => e.stopPropagation()} className="w-full p-3 pl-10 text-sm bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500/50 focus:border-emerald-300 transition-all" />
+                                                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={16} />
+                                                    </div>
                                                 </div>
-                                                <div className="max-h-48 overflow-y-auto">
+                                                <div className="max-h-48 overflow-y-auto p-2">
                                                     {tokoList
                                                         .filter((t) => t.nama.toLowerCase().includes(tokoSearchTerm.toLowerCase()) || (t.kode && t.kode.toLowerCase().includes(tokoSearchTerm.toLowerCase())))
                                                         .slice() // Buat salinan agar tidak mengubah state asli
@@ -918,19 +935,18 @@ ${padRight('No HP', 15)}: ${toko.nomorWa || '-'}
                                                             if (b.id === selectedTokoId) return 1; // b (selected) comes first
                                                             return a.nama.localeCompare(b.nama); // Urutkan sisanya berdasarkan abjad
                                                         })
-                                                        .map(
-                                                            (
-                                                                toko, // Perkecil padding item dropdown
-                                                            ) => (
-                                                                <div key={toko.id} onClick={() => handleSelectToko(toko.id)} className={`p-2.5 cursor-pointer hover:bg-purple-50 flex justify-between items-center ${selectedTokoId === toko.id ? 'bg-purple-100 font-semibold' : ''}`}>
-                                                                    <span>
-                                                                        {toko.nama}
+                                                        .map((toko) => (
+                                                            <div key={toko.id} onClick={() => handleSelectToko(toko.id)} className={`p-3 cursor-pointer rounded-xl transition-all duration-200 flex justify-between items-center group ${selectedTokoId === toko.id ? 'bg-gradient-to-r from-emerald-50 to-teal-50 border border-emerald-200 shadow-sm' : ''}`}>
+                                                                <div className="flex items-center gap-3">
+                                                                    <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold ${selectedTokoId === toko.id ? 'bg-gradient-to-r from-emerald-500 to-teal-500 text-white' : 'bg-slate-200 text-slate-600'}`}>{toko.nama.charAt(0).toUpperCase()}</div>
+                                                                    <div>
+                                                                        <span className="font-medium text-slate-700">{toko.nama}</span>
                                                                         {toko.kode && <span className="text-xs text-slate-500 ml-2">({toko.kode})</span>}
-                                                                    </span>
-                                                                    {selectedTokoId === toko.id && <CheckCircle2 size={16} className="text-purple-600" />}
+                                                                    </div>
                                                                 </div>
-                                                            ),
-                                                        )}
+                                                                {selectedTokoId === toko.id && <CheckCircle2 size={18} className="text-emerald-600" />}
+                                                            </div>
+                                                        ))}
                                                 </div>
                                             </div>
                                         )}
@@ -938,44 +954,75 @@ ${padRight('No HP', 15)}: ${toko.nomorWa || '-'}
                                 </div>
 
                                 {/* Rekomendasi Produk */}
-                                {productRecommendations.length > 0 && (
-                                    <div className="pt-2">
-                                        <h3 className="text-sm font-semibold text-slate-700 mb-2 flex items-center gap-1.5">
-                                            <Star size={16} className="text-yellow-500 fill-current" />
-                                            <span>Rekomendasi Untuk Toko Ini</span>
-                                        </h3>
+                                {selectedTokoId && productRecommendations.length > 0 && (
+                                    <div className="space-y-4">
+                                        <div className="flex items-center gap-3">
+                                            <div className="w-2 h-2 bg-gradient-to-r from-yellow-500 to-orange-500 rounded-full"></div>
+                                            <h3 className="text-sm font-semibold text-slate-800 flex items-center gap-2">
+                                                <div className="p-1.5 bg-gradient-to-br from-yellow-100 to-orange-100 rounded-lg">
+                                                    <Star size={14} className="text-yellow-600 fill-current" />
+                                                </div>
+                                                <span>Rekomendasi Untuk Toko Ini</span>
+                                            </h3>
+                                        </div>
                                         {loadingRecommendations ? (
-                                            <MiniLoader text="Menganalisis..." />
+                                            <div className="bg-gradient-to-r from-yellow-50 to-orange-50 rounded-2xl p-4 border border-yellow-200">
+                                                <MiniLoader text="Menganalisis..." />
+                                            </div>
                                         ) : (
-                                            <div className="flex gap-2 overflow-x-auto pb-2 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
+                                            <div className="flex gap-3 overflow-x-auto pb-2 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
                                                 {productRecommendations.map((produk) => (
-                                                    <button type="button" key={produk.id} onClick={() => updateQty(produk.id, 1)} disabled={!produk.available} className={`flex-shrink-0 w-24 text-center p-2 bg-white border border-slate-200 rounded-lg hover:bg-purple-50 hover:border-purple-300 transition disabled:opacity-50 ${justAddedProductId === produk.id ? 'animate-pop' : ''}`}>
-                                                        <img src={produk.foto || 'https://via.placeholder.com/100?text=Produk'} alt={produk.nama} className="w-12 h-12 mx-auto object-cover rounded-md" />
-                                                        <p className="text-xs font-medium text-slate-700 mt-1 truncate">{produk.nama}</p>
-                                                        {cart[produk.id] > 0 && <span className="text-xs font-bold text-green-600">({cart[produk.id]} box)</span>}
+                                                    <button type="button" key={produk.id} onClick={() => updateQty(produk.id, 1)} disabled={!produk.available} className={`flex-shrink-0 w-28 text-center p-3 bg-white/80 backdrop-blur-sm border border-slate-200 rounded-2xl transition-all duration-200 disabled:opacity-50 group focus-ring ${justAddedProductId === produk.id ? 'animate-pop' : ''}`}>
+                                                        <div className="relative">
+                                                            <img src={produk.foto || 'https://via.placeholder.com/100?text=Produk'} alt={produk.nama} className="w-14 h-14 mx-auto object-contain rounded-xl shadow-sm transition-transform" />
+                                                            {cart[produk.id] > 0 && (
+                                                                <div className="absolute -top-1 -right-1 w-6 h-6 bg-gradient-to-r from-green-500 to-emerald-500 rounded-full flex items-center justify-center animate-bounce shadow-lg">
+                                                                    <span className="text-xs font-bold text-white">{cart[produk.id]}</span>
+                                                                </div>
+                                                            )}
+                                                        </div>
+                                                        <p className="text-xs font-medium text-slate-700 mt-2 truncate">{produk.nama}</p>
+                                                        {cart[produk.id] > 0 && <span className="text-xs font-bold text-green-600 mt-1 animate-pulse">({cart[produk.id]} box)</span>}
                                                     </button>
                                                 ))}
                                             </div>
                                         )}
                                     </div>
                                 )}
-
                                 {/* Catatan */}
-                                <div>
-                                    <label className="block text-sm font-medium text-slate-700 mb-2">Catatan (Opsional)</label>
-                                    <textarea value={catatan} onChange={(e) => setCatatan(e.target.value)} placeholder="Catatan hasil kunjungan..." className="w-full p-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500" rows="3" />
+                                <div className="space-y-3">
+                                    <label className="flex text-sm font-semibold text-slate-800 mb-3 items-center gap-2">
+                                        <div className="w-2 h-2 bg-gradient-to-r from-blue-500 to-cyan-500 rounded-full"></div>
+                                        Catatan (Opsional)
+                                    </label>
+                                    <div className="relative group">
+                                        <textarea value={catatan} onChange={(e) => setCatatan(e.target.value)} placeholder="Catatan untuk order..." className="w-full p-4 bg-white/80 backdrop-blur-sm border border-slate-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-300 transition-all duration-200 resize-none" rows="3" />
+                                        <div className="absolute top-3 left-3 pointer-events-none">
+                                            <div className="p-2 bg-gradient-to-br from-blue-100 to-cyan-100 rounded-xl">
+                                                <Pencil size={16} className="text-blue-600" />
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
 
                                 {/* Daftar Produk */}
-                                <div>
-                                    <div className="flex items-center gap-2 mb-3">
-                                        <Package className="text-purple-600" size={18} />
-                                        <h3 className="text-base font-semibold text-slate-800">Pilih Produk</h3>
+                                <div className="space-y-4">
+                                    <div className="flex items-center gap-3">
+                                        <div className="w-2 h-2 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full"></div>
+                                        <div className="flex items-center gap-2">
+                                            <div className="p-2 bg-gradient-to-br from-purple-100 to-pink-100 rounded-xl">
+                                                <Package className="text-purple-600" size={18} />
+                                            </div>
+                                            <h3 className="text-base font-semibold text-slate-800">Pilih Produk</h3>
+                                        </div>
                                     </div>
-
-                                    <div className="relative mb-3">
-                                        <input type="text" placeholder="Cari produk..." value={productSearchTerm} onChange={(e) => setProductSearchTerm(e.target.value)} className="w-full p-2.5 pl-10 text-slate-700 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500" />
-                                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={20} />
+                                    <div className="relative group">
+                                        <input type="text" placeholder="Cari produk..." value={productSearchTerm} onChange={(e) => setProductSearchTerm(e.target.value)} className="w-full p-4 pl-12 text-slate-700 bg-white/80 backdrop-blur-sm border border-slate-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-purple-500/50 focus:border-purple-300 transition-all duration-200" />
+                                        <div className="absolute left-4 top-1/2 -translate-y-1/2">
+                                            <div className="p-2 bg-gradient-to-br from-purple-100 to-pink-100 rounded-xl">
+                                                <Search className="text-purple-600" size={18} />
+                                            </div>
+                                        </div>
                                     </div>
                                     {produkList.length === 0 ? (
                                         <div className="space-y-2">
@@ -1002,45 +1049,50 @@ ${padRight('No HP', 15)}: ${toko.nomorWa || '-'}
                                     ) : (
                                         <>
                                             {/* Filter Produk */}
-                                            <div className="flex items-center gap-2 mb-4 p-1 bg-slate-200 rounded-full">
+                                            <div className="flex items-center gap-2 p-1 bg-gradient-to-r from-slate-100 to-slate-200 rounded-2xl">
                                                 {['terlaris', 'abjad', 'tersedia'].map((filter) => (
-                                                    <button key={filter} type="button" onClick={() => setProductSortBy(filter)} className={`flex-1 capitalize text-xs font-semibold py-1.5 rounded-full transition-all duration-300 ${productSortBy === filter ? 'bg-white text-purple-700 shadow-sm' : 'bg-transparent text-slate-500'}`}>
+                                                    <button key={filter} type="button" onClick={() => setProductSortBy(filter)} className={`flex-1 capitalize text-xs font-semibold py-2.5 rounded-xl transition-all duration-300 ${productSortBy === filter ? 'bg-white text-purple-700 shadow-md' : 'bg-transparent text-slate-500'}`}>
                                                         {filter === 'abjad' ? 'A-Z' : filter}
                                                     </button>
                                                 ))}
                                             </div>
-                                            <div className="space-y-3">
+                                            <div className="space-y-4">
                                                 {sortedProdukList.map((produk) => {
                                                     const qty = cart[produk.id] || 0;
                                                     const isAvailable = produk.available;
                                                     return (
-                                                        <div key={produk.id} className={`rounded-xl p-2.5 border transition-all duration-300 ${qty > 0 ? 'bg-lime-400 border-lime-400' : 'bg-white border-gray-200'} ${!isAvailable ? 'bg-slate-100 border-slate-200' : ''} ${justAddedProductId === produk.id ? 'animate-pop' : ''}`}>
-                                                            <div className="flex items-center gap-3">
-                                                                <div className="relative w-14 h-14 flex-shrink-0">
+                                                        <div key={produk.id} className={`rounded-2xl p-4 border transition-all duration-300 group ${qty > 0 ? 'bg-gradient-to-r from-green-50 to-emerald-50 border-green-200 shadow-md' : 'bg-white/80 backdrop-blur-sm border-slate-200'} ${!isAvailable ? 'bg-slate-100 border-slate-200 opacity-60' : ''}`}>
+                                                            <div className={`flex items-center gap-4 ${justAddedProductId === produk.id ? 'animate-pop' : ''}`}>
+                                                                <div className="relative w-16 h-16 flex-shrink-0">
                                                                     <img
                                                                         src={produk.foto || 'https://via.placeholder.com/100?text=Produk'}
                                                                         alt={produk.nama}
-                                                                        className={`w-full h-full object-cover rounded-lg ${!isAvailable ? 'grayscale' : ''}`}
+                                                                        className={`w-full h-full object-cover rounded-xl shadow-sm transition-transform ${!isAvailable ? 'grayscale' : ''}`}
                                                                         onError={(e) => {
                                                                             e.target.src = 'https://via.placeholder.com/100?text=Produk';
                                                                         }}
                                                                     />
                                                                     {!isAvailable && (
-                                                                        <div className="absolute inset-0 bg-white/70 flex items-center justify-center rounded-lg text-center">
-                                                                            <span className="text-xs font-bold text-red-600">Habis</span>
+                                                                        <div className="absolute inset-0 bg-white/80 backdrop-blur-sm flex items-center justify-center rounded-xl">
+                                                                            <span className="text-xs font-bold text-red-600 bg-red-100 px-2 py-1 rounded-full">Habis</span>
+                                                                        </div>
+                                                                    )}
+                                                                    {qty > 0 && (
+                                                                        <div className="absolute -top-2 -right-2 w-6 h-6 bg-gradient-to-r from-green-500 to-emerald-500 rounded-full flex items-center justify-center shadow-lg">
+                                                                            <span className="text-xs font-bold text-white">{qty}</span>
                                                                         </div>
                                                                     )}
                                                                 </div>
-                                                                <div className="flex-grow">
-                                                                    <h4 className={`font-bold text-xs text-slate-800 ${!isAvailable ? 'line-through text-slate-500' : ''}`}>{produk.nama}</h4>
-                                                                    <p className="text-xs text-slate-600 mt-1">Rp{(produk.hargaPerBox || 0).toLocaleString('id-ID')} / box</p>
+                                                                <div className="flex-grow min-w-0">
+                                                                    <h4 className={`font-bold text-sm text-slate-800 truncate ${!isAvailable ? 'line-through text-slate-500' : ''}`}>{produk.nama}</h4>
+                                                                    <p className="text-sm text-slate-600 mt-1 font-medium">Rp{(produk.hargaPerBox || 0).toLocaleString('id-ID')} / box</p>
                                                                 </div>
-                                                                <div className="flex items-center gap-1 flex-shrink-0">
-                                                                    <button type="button" onClick={() => updateQty(produk.id, -1)} className="w-7 h-7 rounded-full bg-slate-200 flex items-center justify-center text-slate-700 hover:bg-slate-300 disabled:opacity-50" disabled={qty === 0 || !isAvailable}>
+                                                                <div className="flex items-center gap-2 flex-shrink-0">
+                                                                    <button type="button" onClick={() => updateQty(produk.id, -1)} className="w-8 h-8 rounded-full bg-slate-200 flex items-center justify-center text-slate-700 disabled:opacity-50 transition-all duration-200 focus-ring" disabled={qty === 0 || !isAvailable}>
                                                                         <Minus size={16} />
                                                                     </button>
-                                                                    <span className="w-7 text-center font-bold text-base text-purple-700">{qty}</span>
-                                                                    <button type="button" onClick={() => updateQty(produk.id, 1)} className="w-7 h-7 rounded-full bg-purple-600 flex items-center justify-center text-white hover:bg-purple-700 disabled:opacity-50 disabled:bg-slate-300" disabled={!isAvailable}>
+                                                                    <span className="w-8 text-center font-bold text-lg text-purple-700">{qty}</span>
+                                                                    <button type="button" onClick={() => updateQty(produk.id, 1)} className="w-8 h-8 rounded-full bg-gradient-to-r from-purple-600 to-indigo-600 flex items-center justify-center text-white disabled:opacity-50 disabled:bg-slate-300 transition-all duration-200 shadow-md focus-ring" disabled={!isAvailable}>
                                                                         <Plus size={16} />
                                                                     </button>
                                                                 </div>
@@ -1056,19 +1108,31 @@ ${padRight('No HP', 15)}: ${toko.nomorWa || '-'}
 
                             {/* Total & Submit (Sticky di bawah form) */}
                             <div className="bg-white/80 backdrop-blur-sm py-4 px-5 border-t border-gray-200">
-                                <div className="bg-purple-50 p-4 rounded-xl border border-purple-200 mb-4">
-                                    <div className="flex justify-between items-center text-sm font-medium text-purple-700 mb-2">
-                                        <span>Total Box</span>
-                                        <span>{getTotalBoxes()} box</span>
-                                    </div>
-                                    <div className="flex justify-between items-center text-lg font-bold text-purple-800">
-                                        <span>Total Belanja</span>
-                                        <span>Rp{getGrandTotal().toLocaleString('id-ID')}</span>
+                                <div className="bg-gradient-to-r from-purple-50 via-indigo-50 to-blue-50 p-5 rounded-2xl border border-purple-200/50 mb-5 shadow-sm relative overflow-hidden">
+                                    {/* Decorative background elements */}
+                                    <div className="absolute top-0 right-0 w-20 h-20 bg-purple-200/30 rounded-full -translate-y-10 translate-x-10"></div>
+                                    <div className="absolute bottom-0 left-0 w-16 h-16 bg-indigo-200/30 rounded-full translate-y-8 -translate-x-8"></div>
+
+                                    <div className="relative z-10">
+                                        <div className="flex justify-between items-center text-sm font-semibold text-purple-700 mb-3">
+                                            <span className="flex items-center gap-2">
+                                                <div className="w-2 h-2 bg-purple-500 rounded-full animate-pulse"></div>
+                                                Total Box
+                                            </span>
+                                            <span className="bg-purple-100 px-3 py-1 rounded-full font-bold animate-bounce">{getTotalBoxes()} box</span>
+                                        </div>
+                                        <div className="flex justify-between items-center text-xl font-bold text-purple-800">
+                                            <span className="flex items-center gap-2">
+                                                <div className="w-2 h-2 bg-indigo-500 rounded-full animate-pulse"></div>
+                                                Total Belanja
+                                            </span>
+                                            <span className="bg-gradient-to-r from-purple-600 to-indigo-600 text-white px-4 py-2 rounded-xl shadow-md transition-all duration-300">Rp{getGrandTotal().toLocaleString('id-ID')}</span>
+                                        </div>
                                     </div>
                                 </div>
-                                <button type="submit" form="visit-form" disabled={submitting || !selectedTokoId} className="w-full py-4 bg-purple-600 text-white rounded-lg font-bold text-lg hover:bg-purple-700 transition flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed">
+                                <button type="submit" form="visit-form" disabled={submitting || !selectedTokoId} className="w-full py-4 bg-gradient-to-r from-purple-600 to-indigo-700 text-white rounded-2xl font-bold text-lg transition-all duration-300 flex items-center justify-center gap-3 disabled:opacity-50 disabled:cursor-not-allowed shadow-lg focus-ring group">
                                     {submitting ? 'Menyimpan...' : 'Simpan Kunjungan'}
-                                    <CheckCircle2 size={20} />
+                                    {!submitting && <CheckCircle2 size={20} />}
                                 </button>
                             </div>
                         </div>
