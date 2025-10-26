@@ -14,10 +14,10 @@ import VisitReceipt from '../components/VisitReceipt'; // Re-using VisitReceipt 
 // Komponen MiniLoader dengan styling modern
 function MiniLoader({ text = 'Memuat...' }) {
     return (
-        <div className="flex items-center justify-center gap-3 text-sm text-slate-600 py-3">
+        <div className="flex items-center justify-center gap-3 text-xs text-slate-600 py-3">
             <div className="relative">
-                <div className="w-6 h-6 border-2 border-purple-200 rounded-full"></div>
-                <div className="absolute top-0 left-0 w-6 h-6 border-2 border-purple-600 rounded-full animate-spin border-t-transparent"></div>
+                <div className="w-5 h-5 border-2 border-purple-200 rounded-full"></div>
+                <div className="absolute top-0 left-0 w-5 h-5 border-2 border-purple-600 rounded-full animate-spin border-t-transparent"></div>
             </div>
             <span className="font-medium">{text}</span>
         </div>
@@ -239,6 +239,15 @@ export default function OrderPage({ setActivePage, onModalChange }) {
         });
     };
 
+    // Fungsi baru untuk menghapus item dari keranjang
+    const removeFromCart = (productId) => {
+        setCart((prev) => {
+            const newCart = { ...prev };
+            delete newCart[productId];
+            return newCart;
+        });
+    };
+
     const getTotalHarga = (produk) => (cart[produk.id] || 0) * (produk.hargaPerBox || 0);
     const getGrandTotal = () => produkList.reduce((sum, produk) => sum + getTotalHarga(produk), 0);
     const getTotalBoxes = () => Object.values(cart).reduce((sum, qty) => sum + qty, 0);
@@ -283,15 +292,14 @@ export default function OrderPage({ setActivePage, onModalChange }) {
         try {
             if (editingOrderId) {
                 const orderRef = doc(db, 'orders', editingOrderId);
-                // Saat edit, jangan ubah createdAt, hanya data lainnya
-                await updateDoc(orderRef, { ...orderData, createdAt: orderList.find((o) => o.id === editingOrderId).createdAt });
+                // Saat edit, perbarui semua data termasuk tanggal dari form
+                await updateDoc(orderRef, orderData);
                 showNotification('Order berhasil diperbarui.');
             } else {
                 // Saat buat baru, gunakan tanggal dari form
                 await addDoc(collection(db, 'orders'), {
                     ...orderData,
-                    // Gunakan serverTimestamp jika ingin waktu server, atau orderDate jika ingin waktu dari form
-                    createdAt: serverTimestamp(),
+                    createdAt: orderDate, // Gunakan tanggal dari form
                 });
                 showNotification('Order berhasil disimpan.');
             }
@@ -653,21 +661,21 @@ export default function OrderPage({ setActivePage, onModalChange }) {
 
             <div className="pb-20 max-w-md mx-auto" onClick={closeMenu}>
                 <div className="p-5 pb-20">
-                    <div className="flex justify-between items-center mb-6">
-                        <h2 className="text-2xl font-bold text-slate-800 flex items-center gap-3">
+                    <div className="flex justify-between items-center mb-5">
+                        <h2 className="text-base font-bold text-slate-800 flex items-center gap-3">
                             <div className="p-2 bg-gradient-to-br from-purple-100 to-indigo-100 rounded-xl shadow-sm">
-                                <ShoppingBag className="text-purple-600" size={24} />
+                                <ShoppingBag className="text-purple-600" size={20} />
                             </div>
                             <span className="gradient-text">Order</span>
                         </h2>
-                        <button onClick={openForm} className="bg-gradient-to-r from-purple-600 via-purple-700 to-indigo-700 text-white px-6 py-3 rounded-2xl font-bold flex items-center gap-2 hover:from-purple-700 hover:via-purple-800 hover:to-indigo-800 transition-all duration-300 shadow-lg hover:shadow-xl hover-lift hover-glow focus-ring group">
-                            <Plus size={20} className="group-hover:scale-110 transition-transform" />
-                            <span>Tambah Order</span>
+                        <button onClick={openForm} className="bg-gradient-to-r from-purple-600 via-purple-700 to-indigo-700 text-white px-4 py-2 rounded-xl font-bold text-sm flex items-center gap-2 hover:from-purple-700 hover:via-purple-800 hover:to-indigo-800 transition-all duration-300 shadow-lg hover:shadow-xl hover-lift hover-glow focus-ring group">
+                            <Plus size={16} className="group-hover:scale-110 transition-transform" />
+                            <span>Tambah</span>
                         </button>
                     </div>
 
-                    <div className="relative mb-4 group">
-                        <input type="text" placeholder="Cari nama atau kode toko..." value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} className="w-full p-4 pl-12 text-slate-700 bg-white/80 backdrop-blur-sm border border-slate-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-purple-500/50 focus:border-purple-300 hover:bg-white hover:shadow-md transition-all duration-200 focus-ring" />
+                    <div className="relative mb-3 group">
+                        <input type="text" placeholder="Cari nama atau kode toko..." value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} className="w-full p-3 pl-12 text-sm text-slate-700 bg-white/80 backdrop-blur-sm border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500/50 focus:border-purple-300 hover:bg-white hover:shadow-md transition-all duration-200 focus-ring" />
                         <div className="absolute left-4 top-1/2 -translate-y-1/2">
                             <div className="p-2 bg-gradient-to-br from-purple-100 to-indigo-100 rounded-xl group-hover:scale-110 transition-transform">
                                 <Search className="text-purple-600" size={18} />
@@ -675,20 +683,20 @@ export default function OrderPage({ setActivePage, onModalChange }) {
                         </div>
                     </div>
 
-                    <div className="relative mb-6 flex items-center gap-2">
+                    <div className="relative mb-4 flex items-center gap-2">
                         {viewMode === 'list' && (
                             <>
-                                <button onClick={() => setFilterType('today')} className={`flex-1 flex items-center justify-center gap-2 px-4 py-3 text-sm font-semibold rounded-xl transition-all duration-200 hover-lift focus-ring ${filterType === 'today' ? 'bg-gradient-to-r from-purple-600 to-indigo-600 text-white shadow-lg' : 'bg-white/80 backdrop-blur-sm text-slate-600 border border-slate-200 hover:bg-white hover:shadow-md'}`}>
+                                <button onClick={() => setFilterType('today')} className={`flex-1 flex items-center justify-center gap-2 px-3 py-2 text-xs font-semibold rounded-xl transition-all duration-200 hover-lift focus-ring ${filterType === 'today' ? 'bg-gradient-to-r from-purple-600 to-indigo-600 text-white shadow-lg' : 'bg-white/80 backdrop-blur-sm text-slate-600 border border-slate-200 hover:bg-white hover:shadow-md'}`}>
                                     <div className="p-1.5 bg-white/20 rounded-lg">
                                         <Calendar size={16} />
                                     </div>
                                     Hari Ini
                                 </button>
-                                <button onClick={() => setShowCalendar(!showCalendar)} className={`flex-1 flex items-center justify-center gap-2 px-4 py-3 text-sm font-semibold rounded-xl transition-all duration-200 hover-lift focus-ring ${filterType === 'custom' ? 'bg-gradient-to-r from-purple-600 to-indigo-600 text-white shadow-lg' : 'bg-white/80 backdrop-blur-sm text-slate-600 border border-slate-200 hover:bg-white hover:shadow-md'}`}>
+                                <button onClick={() => setShowCalendar(!showCalendar)} className={`flex-1 flex items-center justify-center gap-2 px-3 py-2 text-xs font-semibold rounded-xl transition-all duration-200 hover-lift focus-ring text-nowrap ${filterType === 'custom' ? 'bg-gradient-to-r from-purple-600 to-indigo-600 text-white shadow-lg' : 'bg-white/80 backdrop-blur-sm text-slate-600 border border-slate-200 hover:bg-white hover:shadow-md'}`}>
                                     <div className="p-1.5 bg-white/20 rounded-lg">
                                         <CalendarRange size={16} />
                                     </div>
-                                    {filterType === 'custom' ? format(customDate, 'd MMM yyyy', { locale: id }) : 'Pilih Tanggal'}
+                                    {filterType === 'custom' ? format(customDate, 'd MMM yy', { locale: id }) : 'Pilih Tanggal'}
                                 </button>
                             </>
                         )}
@@ -697,11 +705,11 @@ export default function OrderPage({ setActivePage, onModalChange }) {
                         {viewMode === 'calendar' && (
                             <div className="flex-1 overflow-hidden">
                                 <div className="flex items-center gap-2 overflow-x-auto py-1 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
-                                    <button onClick={() => setCalendarTokoFilter(null)} className={`flex-shrink-0 px-4 py-2 rounded-xl text-xs font-semibold transition-all duration-200 whitespace-nowrap hover-lift focus-ring ${!calendarTokoFilter ? 'bg-gradient-to-r from-purple-600 to-indigo-600 text-white shadow-lg' : 'bg-white/80 backdrop-blur-sm text-slate-700 border border-slate-200 hover:bg-white hover:shadow-md'}`}>
+                                    <button onClick={() => setCalendarTokoFilter(null)} className={`flex-shrink-0 px-3 py-1.5 rounded-lg text-[10px] font-semibold transition-all duration-200 whitespace-nowrap hover-lift focus-ring ${!calendarTokoFilter ? 'bg-gradient-to-r from-purple-600 to-indigo-600 text-white shadow-lg' : 'bg-white/80 backdrop-blur-sm text-slate-700 border border-slate-200 hover:bg-white hover:shadow-md'}`}>
                                         Semua Toko
                                     </button>
                                     {topStoresByBox.map((toko) => (
-                                        <button key={toko.id} onClick={() => setCalendarTokoFilter(toko.id)} className={`flex-shrink-0 px-4 py-2 rounded-xl text-xs font-semibold transition-all duration-200 whitespace-nowrap hover-lift focus-ring ${calendarTokoFilter === toko.id ? 'bg-gradient-to-r from-purple-600 to-indigo-600 text-white shadow-lg' : 'bg-white/80 backdrop-blur-sm text-slate-700 border border-slate-200 hover:bg-white hover:shadow-md'}`}>
+                                        <button key={toko.id} onClick={() => setCalendarTokoFilter(toko.id)} className={`flex-shrink-0 px-3 py-1.5 rounded-lg text-[10px] font-semibold transition-all duration-200 whitespace-nowrap hover-lift focus-ring ${calendarTokoFilter === toko.id ? 'bg-gradient-to-r from-purple-600 to-indigo-600 text-white shadow-lg' : 'bg-white/80 backdrop-blur-sm text-slate-700 border border-slate-200 hover:bg-white hover:shadow-md'}`}>
                                             {toko.name}
                                         </button>
                                     ))}
@@ -709,7 +717,7 @@ export default function OrderPage({ setActivePage, onModalChange }) {
                             </div>
                         )}
                         <button onClick={() => setViewMode(viewMode === 'list' ? 'calendar' : 'list')} className="p-3 bg-white/80 backdrop-blur-sm text-slate-600 border border-slate-200 rounded-xl transition-all duration-200 hover:bg-white hover:shadow-md hover-lift focus-ring ml-auto flex-shrink-0 group">
-                            <div className="p-1.5 bg-gradient-to-br from-purple-100 to-indigo-100 rounded-lg group-hover:scale-110 transition-transform">{viewMode === 'list' ? <Calendar size={16} className="text-purple-600" /> : <List size={16} className="text-purple-600" />}</div>
+                            <div className="p-1 bg-gradient-to-br from-purple-100 to-indigo-100 rounded-md group-hover:scale-110 transition-transform">{viewMode === 'list' ? <Calendar size={14} className="text-purple-600" /> : <List size={14} className="text-purple-600" />}</div>
                         </button>
 
                         {showCalendar && viewMode === 'list' && (
@@ -721,7 +729,7 @@ export default function OrderPage({ setActivePage, onModalChange }) {
                                     captionLayout="dropdown-buttons"
                                     fromYear={2020}
                                     toYear={new Date().getFullYear() + 1}
-                                    classNames={{ caption_label: 'text-lg font-bold text-purple-800', head_cell: 'font-semibold text-slate-600', day_selected: 'bg-gradient-to-r from-purple-600 to-indigo-600 text-white rounded-full shadow-lg', day_today: 'font-bold text-purple-600 ring-2 ring-purple-200 rounded-full', day: 'hover:bg-purple-50 rounded-full transition-colors' }}
+                                    classNames={{ caption_label: 'text-sm font-bold text-purple-800', head_cell: 'font-semibold text-xs text-slate-600', day_selected: 'bg-gradient-to-r from-purple-600 to-indigo-600 text-white rounded-full shadow-lg', day_today: 'font-bold text-purple-600 ring-2 ring-purple-200 rounded-full', day: 'hover:bg-purple-50 rounded-full transition-colors' }}
                                 />
                             </div>
                         )}
@@ -744,25 +752,25 @@ export default function OrderPage({ setActivePage, onModalChange }) {
                                 <div className="w-20 h-20 mx-auto mb-4 bg-gradient-to-br from-purple-100 to-indigo-100 rounded-full flex items-center justify-center animate-float">
                                     <ShoppingCart size={40} className="text-purple-600" />
                                 </div>
-                                <h3 className="text-lg font-semibold text-slate-700 mb-2">{searchTerm ? 'Order tidak ditemukan' : orderList.length === 0 ? 'Tidak dapat memuat data order' : 'Belum ada order yang tercatat'}</h3>
-                                <p className="text-sm text-slate-500">{searchTerm ? 'Coba gunakan kata kunci yang berbeda' : orderList.length === 0 ? 'Periksa izin akses atau koneksi internet' : 'Mulai dengan menambahkan order pertama Anda'}</p>
+                                <h3 className="text-sm font-semibold text-slate-700 mb-2">{searchTerm ? 'Order tidak ditemukan' : orderList.length === 0 ? 'Tidak dapat memuat data order' : 'Belum ada order yang tercatat'}</h3>
+                                <p className="text-xs text-slate-500">{searchTerm ? 'Coba gunakan kata kunci yang berbeda' : orderList.length === 0 ? 'Periksa izin akses atau koneksi internet' : 'Mulai dengan menambahkan order pertama Anda'}</p>
                             </div>
                         </div>
                     ) : (
-                        <div className="space-y-4">
+                        <div className="space-y-3">
                             {filteredOrders.map((order) => {
                                 const totalBoxes = order.items.reduce((sum, item) => sum + item.qtyBox, 0);
                                 return (
                                     <div key={order.id} onClick={() => handleEdit(order)} className={`bg-gradient-to-r from-white via-slate-50/50 to-purple-50/30 rounded-2xl shadow-sm border border-slate-200/50 transition-all duration-300 hover:shadow-lg hover:border-purple-300 cursor-pointer relative hover-lift focus-ring group backdrop-blur-sm ${openMenuId === order.id ? 'z-20' : 'z-10'}`}>
-                                        <div className="p-4 flex items-center gap-4">
-                                            <div className="w-12 h-12 rounded-full bg-gradient-to-br from-purple-100 to-fuchsia-100 flex items-center justify-center text-purple-600 font-bold text-lg shadow-sm group-hover:scale-110 transition-transform">{order.tokoNama.charAt(0).toUpperCase()}</div>
+                                        <div className="p-3 flex items-center gap-3">
+                                            <div className="w-10 h-10 rounded-full bg-gradient-to-br from-purple-100 to-fuchsia-100 flex items-center justify-center text-purple-600 font-bold text-sm shadow-sm group-hover:scale-110 transition-transform">{order.tokoNama.charAt(0).toUpperCase()}</div>
                                             <div className="flex-grow min-w-0">
-                                                <h3 className="font-bold text-slate-800 text-sm leading-tight truncate">{order.tokoNama}</h3>
-                                                <p className="text-xs text-slate-500 mt-1">{order.createdAt ? new Date(order.createdAt.seconds * 1000).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' }) : 'Baru saja'}</p>
+                                                <h3 className="font-bold text-slate-800 text-xs leading-tight truncate">{order.tokoNama}</h3>
+                                                <p className="text-[10px] text-slate-500 mt-0.5">{order.createdAt ? new Date(order.createdAt.seconds * 1000).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' }) : 'Baru saja'}</p>
                                             </div>
                                             <div className="text-right pr-5">
-                                                <p className={`font-bold text-sm ${order.total > 0 ? 'text-green-600' : 'text-slate-500'}`}>Rp{order.total.toLocaleString('id-ID')}</p>
-                                                <p className="text-xs text-slate-500 mt-1">{totalBoxes} box</p>
+                                                <p className={`font-bold text-xs ${order.total > 0 ? 'text-green-600' : 'text-slate-500'}`}>Rp{order.total.toLocaleString('id-ID')}</p>
+                                                <p className="text-[10px] text-slate-500 mt-0.5">{totalBoxes} box</p>
                                             </div>
                                         </div>
                                         <div className="absolute top-1/2 right-2 -translate-y-1/2">
@@ -771,17 +779,17 @@ export default function OrderPage({ setActivePage, onModalChange }) {
                                             </button>
                                         </div>
                                         {openMenuId === order.id && (
-                                            <div className="absolute top-10 right-5 z-30 w-48 bg-gradient-to-br from-white via-slate-50 to-purple-50 rounded-2xl shadow-2xl border border-slate-200/50 backdrop-blur-md animate-slide-in-top" onClick={(e) => e.stopPropagation()}>
+                                            <div className="absolute top-10 right-5 z-30 w-48 bg-gradient-to-br from-white via-slate-50/50 to-purple-50/30 rounded-2xl shadow-2xl border border-slate-200/50 backdrop-blur-md animate-slide-in-top" onClick={(e) => e.stopPropagation()}>
                                                 <div className="py-2">
                                                     <button
                                                         onClick={() => {
                                                             handleEdit(order);
                                                             closeMenu();
                                                         }}
-                                                        className="w-full text-left px-4 py-3 text-sm text-slate-700 hover:bg-gradient-to-r hover:from-purple-50 hover:to-indigo-50 flex items-center gap-3 transition-all duration-200 hover-lift rounded-xl mx-2"
+                                                        className="w-full text-left px-3 py-2 text-xs text-slate-700 hover:bg-gradient-to-r hover:from-purple-50 hover:to-indigo-50 flex items-center gap-2 transition-all duration-200 hover-lift rounded-lg mx-1"
                                                     >
-                                                        <div className="p-1.5 bg-gradient-to-br from-blue-100 to-cyan-100 rounded-lg">
-                                                            <Pencil size={16} className="text-blue-600" />
+                                                        <div className="p-1 bg-gradient-to-br from-blue-100 to-cyan-100 rounded-md">
+                                                            <Pencil size={14} className="text-blue-600" />
                                                         </div>
                                                         Edit Order
                                                     </button>
@@ -790,22 +798,22 @@ export default function OrderPage({ setActivePage, onModalChange }) {
                                                             handlePreview(order);
                                                             closeMenu();
                                                         }}
-                                                        className="w-full text-left px-4 py-3 text-sm text-slate-700 hover:bg-gradient-to-r hover:from-emerald-50 hover:to-teal-50 flex items-center gap-3 transition-all duration-200 hover-lift rounded-xl mx-2"
+                                                        className="w-full text-left px-3 py-2 text-xs text-slate-700 hover:bg-gradient-to-r hover:from-emerald-50 hover:to-teal-50 flex items-center gap-2 transition-all duration-200 hover-lift rounded-lg mx-1"
                                                     >
-                                                        <div className="p-1.5 bg-gradient-to-br from-emerald-100 to-teal-100 rounded-lg">
-                                                            <Eye size={16} className="text-emerald-600" />
+                                                        <div className="p-1 bg-gradient-to-br from-emerald-100 to-teal-100 rounded-md">
+                                                            <Eye size={14} className="text-emerald-600" />
                                                         </div>
                                                         Lihat Resi
                                                     </button>
-                                                    <div className="my-2 h-px bg-gradient-to-r from-transparent via-slate-200 to-transparent mx-4"></div>
+                                                    <div className="my-1 h-px bg-gradient-to-r from-transparent via-slate-200 to-transparent mx-2"></div>
                                                     <button
                                                         onClick={() => {
                                                             openDeleteConfirm(order);
                                                         }}
-                                                        className="w-full text-left px-4 py-3 text-sm text-red-600 hover:bg-gradient-to-r hover:from-red-50 hover:to-orange-50 flex items-center gap-3 transition-all duration-200 hover-lift rounded-xl mx-2"
+                                                        className="w-full text-left px-3 py-2 text-xs text-red-600 hover:bg-gradient-to-r hover:from-red-50 hover:to-orange-50 flex items-center gap-2 transition-all duration-200 hover-lift rounded-lg mx-1"
                                                     >
-                                                        <div className="p-1.5 bg-gradient-to-br from-red-100 to-orange-100 rounded-lg">
-                                                            <Trash2 size={16} className="text-red-600" />
+                                                        <div className="p-1 bg-gradient-to-br from-red-100 to-orange-100 rounded-md">
+                                                            <Trash2 size={14} className="text-red-600" />
                                                         </div>
                                                         Hapus Order
                                                     </button>
@@ -829,24 +837,24 @@ export default function OrderPage({ setActivePage, onModalChange }) {
                                 <button type="button" onClick={resetForm} className="p-2 rounded-full" aria-label="Kembali">
                                     <ArrowLeft size={20} />
                                 </button>
-                                <h2 className="text-lg font-bold text-slate-800">{editingOrderId ? 'Edit Order' : 'Tambah Order'}</h2>
+                                <h2 className="text-sm font-bold text-slate-800">{editingOrderId ? 'Edit Order' : 'Tambah Order'}</h2>
                                 <div className="w-10"></div> {/* Spacer */}
                             </div>
 
-                            <form id="order-form" onSubmit={handleSubmit} className="flex-1 overflow-y-auto p-6 space-y-6">
+                            <form id="order-form" onSubmit={handleSubmit} className="flex-1 overflow-y-auto p-4 space-y-4">
                                 {/* Tanggal Order dengan styling modern */}
                                 <div className="space-y-3">
-                                    <label className="flex text-sm font-semibold text-slate-800 mb-3 items-center gap-2">
+                                    <label className="flex text-xs font-semibold text-slate-800 mb-2 items-center gap-2">
                                         <div className="w-2 h-2 bg-gradient-to-r from-purple-500 to-indigo-500 rounded-full"></div>
                                         Tanggal Order *
                                     </label>
                                     <div className="relative group">
-                                        <button type="button" onClick={() => setShowFormCalendar(!showFormCalendar)} className="w-full p-4 text-left bg-white/80 backdrop-blur-sm border border-slate-200 rounded-2xl flex justify-between items-center focus:outline-none focus:ring-2 focus:ring-purple-500/50 focus:border-purple-300 hover:bg-white hover:shadow-md transition-all duration-200 group-hover:shadow-lg hover-lift focus-ring">
+                                        <button type="button" onClick={() => setShowFormCalendar(!showFormCalendar)} className="w-full p-3 text-left bg-white/80 backdrop-blur-sm border border-slate-200 rounded-xl flex justify-between items-center focus:outline-none focus:ring-2 focus:ring-purple-500/50 focus:border-purple-300 hover:bg-white hover:shadow-md transition-all duration-200 group-hover:shadow-lg hover-lift focus-ring">
                                             <span className="flex items-center gap-3">
                                                 <div className="p-2 bg-gradient-to-br from-purple-100 to-indigo-100 rounded-xl">
-                                                    <Calendar size={18} className="text-purple-600" />
+                                                    <Calendar size={16} className="text-purple-600" />
                                                 </div>
-                                                <span className="text-slate-700 font-medium">{format(orderDate, 'EEEE, d MMMM yyyy', { locale: id })}</span>
+                                                <span className="text-slate-700 font-medium text-xs">{format(orderDate, 'EEEE, d MMMM yyyy', { locale: id })}</span>
                                             </span>
                                             <ChevronDown size={20} className={`text-slate-400 transition-all duration-300 ${showFormCalendar ? 'rotate-180 text-purple-600' : ''}`} />
                                         </button>
@@ -873,29 +881,29 @@ export default function OrderPage({ setActivePage, onModalChange }) {
                                 </div>
                                 {/* Toko Selection dengan styling modern */}
                                 <div className="space-y-3">
-                                    <label className="flex text-sm font-semibold text-slate-800 mb-3 items-center gap-2">
+                                    <label className="flex text-xs font-semibold text-slate-800 mb-2 items-center gap-2">
                                         <div className="w-2 h-2 bg-gradient-to-r from-emerald-500 to-teal-500 rounded-full"></div>
                                         Toko
                                     </label>
                                     <div className="relative group" style={{ pointerEvents: editingOrderId ? 'none' : 'auto', opacity: editingOrderId ? 0.7 : 1 }}>
-                                        <button type="button" onClick={() => setIsTokoDropdownOpen(!isTokoDropdownOpen)} className="w-full p-4 text-left bg-white/80 backdrop-blur-sm border border-slate-200 rounded-2xl flex justify-between items-center focus:outline-none focus:ring-2 focus:ring-emerald-500/50 focus:border-emerald-300 hover:bg-white hover:shadow-md transition-all duration-200 group-hover:shadow-lg hover-lift focus-ring">
+                                        <button type="button" onClick={() => setIsTokoDropdownOpen(!isTokoDropdownOpen)} className="w-full p-3 text-left bg-white/80 backdrop-blur-sm border border-slate-200 rounded-xl flex justify-between items-center focus:outline-none focus:ring-2 focus:ring-emerald-500/50 focus:border-emerald-300 hover:bg-white hover:shadow-md transition-all duration-200 group-hover:shadow-lg hover-lift focus-ring">
                                             <span className="flex items-center gap-3">
                                                 <div className="p-2 bg-gradient-to-br from-emerald-100 to-teal-100 rounded-xl">
-                                                    <Store size={18} className="text-emerald-600" />
+                                                    <Store size={16} className="text-emerald-600" />
                                                 </div>
-                                                <span className="text-slate-700 font-medium">{tokoList.find((t) => t.id === selectedTokoId)?.nama || 'Pilih Toko'}</span>
+                                                <span className="text-slate-700 font-medium text-xs">{tokoList.find((t) => t.id === selectedTokoId)?.nama || 'Pilih Toko'}</span>
                                             </span>
                                             <ChevronDown size={20} className={`text-slate-400 transition-all duration-300 ${isTokoDropdownOpen ? 'rotate-180 text-emerald-600' : ''}`} />
                                         </button>
                                         {isTokoDropdownOpen && (
                                             <div className="absolute z-10 mt-3 w-full bg-white/95 backdrop-blur-md border border-slate-200/50 rounded-2xl shadow-2xl flex flex-col animate-in slide-in-from-top-2 fade-in">
-                                                <div className="p-4 border-b border-slate-200/50">
+                                                <div className="p-3 border-b border-slate-200/50">
                                                     <div className="relative">
-                                                        <input type="text" placeholder="Cari toko..." value={tokoSearchTerm} onChange={(e) => setTokoSearchTerm(e.target.value)} onClick={(e) => e.stopPropagation()} className="w-full p-3 pl-10 text-sm bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500/50 focus:border-emerald-300 transition-all" />
+                                                        <input type="text" placeholder="Cari toko..." value={tokoSearchTerm} onChange={(e) => setTokoSearchTerm(e.target.value)} onClick={(e) => e.stopPropagation()} className="w-full p-2 pl-8 text-xs bg-slate-50 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500/50 focus:border-emerald-300 transition-all" />
                                                         <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={16} />
                                                     </div>
                                                 </div>
-                                                <div className="max-h-48 overflow-y-auto p-2">
+                                                <div className="max-h-40 overflow-y-auto p-2">
                                                     {tokoList.length === 0 ? (
                                                         <div className="p-6 text-center text-slate-500">
                                                             <div className="w-12 h-12 mx-auto mb-3 bg-slate-100 rounded-full flex items-center justify-center">
@@ -910,15 +918,15 @@ export default function OrderPage({ setActivePage, onModalChange }) {
                                                             .slice()
                                                             .sort((a, b) => a.nama.localeCompare(b.nama))
                                                             .map((toko) => (
-                                                                <div key={toko.id} onClick={() => handleSelectToko(toko.id)} className={`p-3 cursor-pointer rounded-xl transition-all duration-200 flex justify-between items-center group ${selectedTokoId === toko.id ? 'bg-gradient-to-r from-emerald-50 to-teal-50 border border-emerald-200 shadow-sm' : ''}`}>
+                                                                <div key={toko.id} onClick={() => handleSelectToko(toko.id)} className={`p-2 cursor-pointer rounded-lg transition-all duration-200 flex justify-between items-center group ${selectedTokoId === toko.id ? 'bg-gradient-to-r from-emerald-50 to-teal-50 border border-emerald-200 shadow-sm' : ''}`}>
                                                                     <div className="flex items-center gap-3">
-                                                                        <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold ${selectedTokoId === toko.id ? 'bg-gradient-to-r from-emerald-500 to-teal-500 text-white' : 'bg-slate-200 text-slate-600'}`}>{toko.nama.charAt(0).toUpperCase()}</div>
+                                                                        <div className={`w-6 h-6 rounded-full flex items-center justify-center text-[10px] font-bold ${selectedTokoId === toko.id ? 'bg-gradient-to-r from-emerald-500 to-teal-500 text-white' : 'bg-slate-200 text-slate-600'}`}>{toko.nama.charAt(0).toUpperCase()}</div>
                                                                         <div>
-                                                                            <span className="font-medium text-slate-700">{toko.nama}</span>
-                                                                            {toko.kode && <span className="text-xs text-slate-500 ml-2">({toko.kode})</span>}
+                                                                            <span className="font-medium text-slate-700 text-xs">{toko.nama}</span>
+                                                                            {toko.kode && <span className="text-[10px] text-slate-500 ml-2">({toko.kode})</span>}
                                                                         </div>
                                                                     </div>
-                                                                    {selectedTokoId === toko.id && <CheckCircle2 size={18} className="text-emerald-600" />}
+                                                                    {selectedTokoId === toko.id && <CheckCircle2 size={16} className="text-emerald-600" />}
                                                                 </div>
                                                             ))
                                                     )}
@@ -932,9 +940,9 @@ export default function OrderPage({ setActivePage, onModalChange }) {
                                 {productRecommendations.length > 0 && (
                                     <div className="space-y-4">
                                         <div className="flex items-center gap-3">
-                                            <div className="w-2 h-2 bg-gradient-to-r from-yellow-500 to-orange-500 rounded-full"></div>
-                                            <h3 className="text-sm font-semibold text-slate-800 flex items-center gap-2">
-                                                <div className="p-1.5 bg-gradient-to-br from-yellow-100 to-orange-100 rounded-lg">
+                                            <div className="w-1.5 h-1.5 bg-gradient-to-r from-yellow-500 to-orange-500 rounded-full"></div>
+                                            <h3 className="text-xs font-semibold text-slate-800 flex items-center gap-2">
+                                                <div className="p-1 bg-gradient-to-br from-yellow-100 to-orange-100 rounded-md">
                                                     <Star size={14} className="text-yellow-600 fill-current" />
                                                 </div>
                                                 <span>Rekomendasi Untuk Toko Ini</span>
@@ -947,27 +955,26 @@ export default function OrderPage({ setActivePage, onModalChange }) {
                                         ) : (
                                             <div className="flex gap-3 overflow-x-auto pb-2 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
                                                 {productRecommendations.map((produk) => (
-                                                    <button type="button" key={produk.id} onClick={() => updateQty(produk.id, 1)} disabled={!produk.available} className={`flex-shrink-0 w-28 text-center p-3 bg-white/80 backdrop-blur-sm border border-slate-200 rounded-2xl transition-all duration-200 disabled:opacity-50 group focus-ring ${justAddedProductId === produk.id ? 'animate-pop' : ''}`}>
+                                                    <button type="button" key={produk.id} onClick={() => updateQty(produk.id, 1)} disabled={!produk.available} className={`flex-shrink-0 w-24 text-center p-2 bg-white/80 backdrop-blur-sm border border-slate-200 rounded-xl transition-all duration-200 disabled:opacity-50 group focus-ring ${justAddedProductId === produk.id ? 'animate-pop' : ''}`}>
                                                         <div className="relative">
-                                                            <img src={produk.foto || 'https://via.placeholder.com/100?text=Produk'} alt={produk.nama} className="w-14 h-14 mx-auto object-contain rounded-xl shadow-sm group-hover:scale-105 transition-transform" />
+                                                            <img src={produk.foto || 'https://via.placeholder.com/100?text=Produk'} alt={produk.nama} className="w-12 h-12 mx-auto object-contain rounded-lg shadow-sm group-hover:scale-105 transition-transform" />
                                                             {cart[produk.id] > 0 && (
-                                                                <div className="absolute -top-1 -right-1 w-6 h-6 bg-gradient-to-r from-green-500 to-emerald-500 rounded-full flex items-center justify-center animate-bounce shadow-lg">
-                                                                    <span className="text-xs font-bold text-white">{cart[produk.id]}</span>
+                                                                <div className="absolute -top-1 -right-1 w-5 h-5 bg-gradient-to-r from-green-500 to-emerald-500 rounded-full flex items-center justify-center animate-bounce shadow-lg">
+                                                                    <span className="text-[10px] font-bold text-white">{cart[produk.id]}</span>
                                                                 </div>
                                                             )}
                                                         </div>
-                                                        <p className="text-xs font-medium text-slate-700 mt-2 truncate">{produk.nama}</p>
-                                                        {cart[produk.id] > 0 && <span className="text-xs font-bold text-green-600 mt-1 animate-pulse">({cart[produk.id]} box)</span>}
+                                                        <p className="text-[10px] font-medium text-slate-700 mt-1.5 truncate h-7">{produk.nama}</p>
+                                                        {cart[produk.id] > 0 && <span className="text-[10px] font-bold text-green-600 mt-1 animate-pulse">({cart[produk.id]} box)</span>}
                                                     </button>
                                                 ))}
                                             </div>
                                         )}
                                     </div>
                                 )}
-
                                 {/* Catatan dengan styling modern */}
                                 <div className="space-y-3">
-                                    <label className="flex text-sm font-semibold text-slate-800 mb-3 items-center gap-2">
+                                    <label className="flex text-xs font-semibold text-slate-800 mb-2 items-center gap-2">
                                         <div className="w-2 h-2 bg-gradient-to-r from-blue-500 to-cyan-500 rounded-full"></div>
                                         Catatan (Opsional)
                                     </label>
@@ -982,20 +989,20 @@ export default function OrderPage({ setActivePage, onModalChange }) {
                                 </div>
                                 {/* Pilih Produk dengan styling modern */}
                                 <div className="space-y-4">
-                                    <div className="flex items-center gap-3">
+                                    <div className="flex items-center gap-2">
                                         <div className="w-2 h-2 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full"></div>
                                         <div className="flex items-center gap-2">
-                                            <div className="p-2 bg-gradient-to-br from-purple-100 to-pink-100 rounded-xl">
-                                                <Package className="text-purple-600" size={18} />
+                                            <div className="p-1.5 bg-gradient-to-br from-purple-100 to-pink-100 rounded-lg">
+                                                <Package className="text-purple-600" size={16} />
                                             </div>
-                                            <h3 className="text-base font-semibold text-slate-800">Pilih Produk</h3>
+                                            <h3 className="text-sm font-semibold text-slate-800">Pilih Produk</h3>
                                         </div>
                                     </div>
                                     <div className="relative group">
-                                        <input type="text" placeholder="Cari produk..." value={productSearchTerm} onChange={(e) => setProductSearchTerm(e.target.value)} className="w-full p-4 pl-12 text-slate-700 bg-white/80 backdrop-blur-sm border border-slate-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-purple-500/50 focus:border-purple-300 transition-all duration-200" />
+                                        <input type="text" placeholder="Cari produk..." value={productSearchTerm} onChange={(e) => setProductSearchTerm(e.target.value)} className="w-full p-3 pl-12 text-xs text-slate-700 bg-white/80 backdrop-blur-sm border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500/50 focus:border-purple-300 transition-all duration-200" />
                                         <div className="absolute left-4 top-1/2 -translate-y-1/2">
-                                            <div className="p-2 bg-gradient-to-br from-purple-100 to-pink-100 rounded-xl">
-                                                <Search className="text-purple-600" size={18} />
+                                            <div className="p-1.5 bg-gradient-to-br from-purple-100 to-pink-100 rounded-lg">
+                                                <Search className="text-purple-600" size={16} />
                                             </div>
                                         </div>
                                     </div>
@@ -1004,14 +1011,14 @@ export default function OrderPage({ setActivePage, onModalChange }) {
                                             <div className="w-16 h-16 mx-auto mb-3 bg-slate-100 rounded-full flex items-center justify-center">
                                                 <Package size={24} className="text-slate-400" />
                                             </div>
-                                            <p className="text-sm font-medium">Memuat produk...</p>
+                                            <p className="text-xs font-medium">Memuat produk...</p>
                                         </div>
                                     ) : sortedProdukList.length === 0 ? (
                                         <div className="text-center py-8 text-slate-500">
                                             <div className="w-16 h-16 mx-auto mb-3 bg-slate-100 rounded-full flex items-center justify-center">
                                                 <Search size={24} className="text-slate-400" />
                                             </div>
-                                            <p className="text-sm font-medium">Produk tidak ditemukan</p>
+                                            <p className="text-xs font-medium">Produk tidak ditemukan</p>
                                         </div>
                                     ) : (
                                         <>
@@ -1023,46 +1030,56 @@ export default function OrderPage({ setActivePage, onModalChange }) {
                                                     </button>
                                                 ))}
                                             </div>
-                                            <div className="space-y-4">
+                                            {/* --- PERUBAHAN TAMPILAN PRODUK: LIST MENJADI CARD GRID --- */}
+                                            <div className="grid grid-cols-3 gap-3">
                                                 {sortedProdukList.map((produk) => {
                                                     const qty = cart[produk.id] || 0;
                                                     const isAvailable = produk.available;
                                                     return (
-                                                        <div key={produk.id} className={`rounded-2xl p-4 border transition-all duration-300 group ${qty > 0 ? 'bg-gradient-to-r from-green-50 to-emerald-50 border-green-200 shadow-md' : 'bg-white/80 backdrop-blur-sm border-slate-200'} ${!isAvailable ? 'bg-slate-100 border-slate-200 opacity-60' : ''}`}>
-                                                            <div className={`flex items-center gap-4 ${justAddedProductId === produk.id ? 'animate-pop' : ''}`}>
-                                                                <div className="relative w-16 h-16 flex-shrink-0">
-                                                                    <img
-                                                                        src={produk.foto || 'https://via.placeholder.com/100?text=Produk'}
-                                                                        alt={produk.nama}
-                                                                        className={`w-full h-full object-cover rounded-xl shadow-sm transition-transform ${!isAvailable ? 'grayscale' : ''}`}
-                                                                        onError={(e) => {
-                                                                            e.target.src = 'https://via.placeholder.com/100?text=Produk';
+                                                        <div key={produk.id} onClick={() => isAvailable && updateQty(produk.id, 1)} className={`relative flex flex-col items-center justify-center p-2 border rounded-2xl transition-all duration-200 group cursor-pointer ${qty > 0 ? 'bg-green-50 border-green-300 shadow-md' : 'bg-white/80 backdrop-blur-sm border-slate-200 hover:border-purple-300 hover:shadow-lg'} ${!isAvailable ? 'bg-slate-100 border-slate-200 opacity-60 cursor-not-allowed' : ''}`}>
+                                                            {/* Tombol Hapus & Kurangi */}
+                                                            {qty > 0 && (
+                                                                <>
+                                                                    <button
+                                                                        type="button"
+                                                                        onClick={(e) => {
+                                                                            e.stopPropagation();
+                                                                            removeFromCart(produk.id);
                                                                         }}
-                                                                    />
-                                                                    {!isAvailable && (
-                                                                        <div className="absolute inset-0 bg-white/80 backdrop-blur-sm flex items-center justify-center rounded-xl">
-                                                                            <span className="text-xs font-bold text-red-600 bg-red-100 px-2 py-1 rounded-full">Habis</span>
-                                                                        </div>
-                                                                    )}
-                                                                    {qty > 0 && (
-                                                                        <div className="absolute -top-2 -right-2 w-6 h-6 bg-gradient-to-r from-green-500 to-emerald-500 rounded-full flex items-center justify-center shadow-lg">
-                                                                            <span className="text-xs font-bold text-white">{qty}</span>
-                                                                        </div>
-                                                                    )}
-                                                                </div>
-                                                                <div className="flex-grow min-w-0">
-                                                                    <h4 className={`font-bold text-sm text-slate-800 truncate ${!isAvailable ? 'line-through text-slate-500' : ''}`}>{produk.nama}</h4>
-                                                                    <p className="text-sm text-slate-600 mt-1 font-medium">Rp{(produk.hargaPerBox || 0).toLocaleString('id-ID')} / box</p>
-                                                                </div>
-                                                                <div className="flex items-center gap-2 flex-shrink-0">
-                                                                    <button type="button" onClick={() => updateQty(produk.id, -1)} className="w-8 h-8 rounded-full bg-slate-200 flex items-center justify-center text-slate-700 disabled:opacity-50 transition-all duration-200 focus-ring" disabled={qty === 0 || !isAvailable}>
-                                                                        <Minus size={16} />
+                                                                        className="absolute top-1 right-1 z-10 p-1 bg-red-100/80 text-red-600 rounded-full hover:bg-red-200 transition-all"
+                                                                    >
+                                                                        <Trash2 size={10} />
                                                                     </button>
-                                                                    <span className="w-8 text-center font-bold text-lg text-purple-700">{qty}</span>
-                                                                    <button type="button" onClick={() => updateQty(produk.id, 1)} className="w-8 h-8 rounded-full bg-gradient-to-r from-purple-600 to-indigo-600 flex items-center justify-center text-white disabled:opacity-50 disabled:bg-slate-300 transition-all duration-200 shadow-md focus-ring" disabled={!isAvailable}>
-                                                                        <Plus size={16} />
+                                                                    <button
+                                                                        type="button"
+                                                                        onClick={(e) => {
+                                                                            e.stopPropagation();
+                                                                            updateQty(produk.id, -1);
+                                                                        }}
+                                                                        className="absolute top-1 left-1 z-10 p-1 bg-slate-200/80 text-slate-700 rounded-full hover:bg-slate-300 transition-all"
+                                                                    >
+                                                                        <Minus size={10} />
                                                                     </button>
-                                                                </div>
+                                                                </>
+                                                            )}
+
+                                                            <div className="relative w-16 h-16">
+                                                                <img src={produk.foto || 'https://via.placeholder.com/100?text=Produk'} alt={produk.nama} className={`w-full h-full object-contain transition-transform group-hover:scale-105 ${!isAvailable ? 'grayscale' : ''}`} onError={(e) => (e.target.src = 'https://via.placeholder.com/100?text=Produk')} />
+                                                                {!isAvailable && (
+                                                                    <div className="absolute inset-0 bg-white/80 backdrop-blur-sm flex items-center justify-center rounded-xl">
+                                                                        <span className="text-[8px] font-bold text-red-600 bg-red-100 px-1.5 py-0.5 rounded-full">Habis</span>
+                                                                    </div>
+                                                                )}
+                                                            </div>
+
+                                                            <p className="text-[10px] font-semibold text-slate-700 text-center mt-1.5 h-7 line-clamp-2">{produk.nama}</p>
+
+                                                            <div className="mt-2 h-6 flex items-center justify-center">
+                                                                {qty > 0 && (
+                                                                    <div className="px-2 py-0.5 bg-green-500 text-white rounded-full text-[10px] font-bold flex items-center justify-center shadow-lg">
+                                                                        {qty} <span className="ml-0.5">box</span>
+                                                                    </div>
+                                                                )}
                                                             </div>
                                                         </div>
                                                     );
@@ -1074,30 +1091,30 @@ export default function OrderPage({ setActivePage, onModalChange }) {
                             </form>
 
                             {/* Footer dengan styling modern */}
-                            <div className="bg-white/80 backdrop-blur-sm py-4 px-5 border-t border-gray-200">
-                                <div className="bg-gradient-to-r from-purple-50 via-indigo-50 to-blue-50 p-5 rounded-2xl border border-purple-200/50 mb-5 shadow-sm relative overflow-hidden">
+                            <div className="bg-white/80 backdrop-blur-sm py-2 px-3 border-t border-gray-200">
+                                <div className="bg-gradient-to-r from-purple-50 via-indigo-50 to-blue-50 p-3 rounded-xl border border-purple-200/50 mb-3 shadow-sm relative overflow-hidden">
                                     {/* Decorative background elements */}
                                     <div className="absolute top-0 right-0 w-20 h-20 bg-purple-200/30 rounded-full -translate-y-10 translate-x-10"></div>
                                     <div className="absolute bottom-0 left-0 w-16 h-16 bg-indigo-200/30 rounded-full translate-y-8 -translate-x-8"></div>
 
                                     <div className="relative z-10">
-                                        <div className="flex justify-between items-center text-sm font-semibold text-purple-700 mb-3">
+                                        <div className="flex justify-between items-center text-xs font-semibold text-purple-700 mb-2">
                                             <span className="flex items-center gap-2">
                                                 <div className="w-2 h-2 bg-purple-500 rounded-full animate-pulse"></div>
                                                 Total Box
                                             </span>
-                                            <span className="bg-purple-100 px-3 py-1 rounded-full font-bold animate-bounce">{getTotalBoxes()} box</span>
+                                            <span className="bg-purple-100 px-2 py-0.5 rounded-full font-bold animate-bounce">{getTotalBoxes()} box</span>
                                         </div>
-                                        <div className="flex justify-between items-center text-xl font-bold text-purple-800">
+                                        <div className="flex justify-between items-center text-sm font-bold text-purple-800">
                                             <span className="flex items-center gap-2">
                                                 <div className="w-2 h-2 bg-indigo-500 rounded-full animate-pulse"></div>
                                                 Total Belanja
                                             </span>
-                                            <span className="bg-gradient-to-r from-purple-600 to-indigo-600 text-white px-4 py-2 rounded-xl shadow-md transition-all duration-300">Rp{getGrandTotal().toLocaleString('id-ID')}</span>
+                                            <span className="bg-gradient-to-r from-purple-600 to-indigo-600 text-white px-3 py-1.5 rounded-lg shadow-md transition-all duration-300">Rp{getGrandTotal().toLocaleString('id-ID')}</span>
                                         </div>
                                     </div>
                                 </div>
-                                <button type="submit" form="order-form" disabled={submitting || !selectedTokoId} className="w-full py-4 bg-gradient-to-r from-purple-600 to-indigo-700 text-white rounded-2xl font-bold text-lg transition-all duration-300 flex items-center justify-center gap-3 disabled:opacity-50 disabled:cursor-not-allowed shadow-lg focus-ring group">
+                                <button type="submit" form="order-form" disabled={submitting || !selectedTokoId} className="w-full py-3 bg-gradient-to-r from-purple-600 to-indigo-700 text-white rounded-xl font-bold text-sm transition-all duration-300 flex items-center justify-center gap-3 disabled:opacity-50 disabled:cursor-not-allowed shadow-lg focus-ring group">
                                     {submitting ? (
                                         <>
                                             <svg className="animate-spin h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
@@ -1109,7 +1126,7 @@ export default function OrderPage({ setActivePage, onModalChange }) {
                                     ) : (
                                         <>
                                             Simpan Order
-                                            <CheckCircle2 size={20} />
+                                            <CheckCircle2 size={16} />
                                         </>
                                     )}
                                 </button>
@@ -1122,13 +1139,13 @@ export default function OrderPage({ setActivePage, onModalChange }) {
             {showReceiptPreview && (
                 <div className="fixed inset-0 z-[60] bg-gradient-to-br from-blue-900/20 via-indigo-900/20 to-purple-900/20 backdrop-blur-sm flex flex-col items-center justify-end p-4 transition-opacity duration-300 animate-fade-in" onClick={closePreview}>
                     <div className="relative w-full max-w-sm bg-gradient-to-br from-white via-blue-50/30 to-indigo-50/30 rounded-3xl shadow-2xl p-4 transition-transform duration-300 transform translate-y-0 animate-scale-in border border-blue-200/50" onClick={(e) => e.stopPropagation()}>
-                        <button onClick={closePreview} className="absolute -top-3 -right-3 w-8 h-8 bg-gradient-to-r from-white to-slate-100 rounded-full flex items-center justify-center shadow-lg text-slate-600 hover:from-slate-100 hover:to-slate-200 transition-all duration-200 hover-scale focus-ring" aria-label="Tutup">
+                        <button onClick={closePreview} className="absolute -top-3 -right-3 w-7 h-7 bg-gradient-to-r from-white to-slate-100 rounded-full flex items-center justify-center shadow-lg text-slate-600 hover:from-slate-100 hover:to-slate-200 transition-all duration-200 hover-scale focus-ring" aria-label="Tutup">
                             <X size={20} />
                         </button>
                         <div className="bg-white rounded-2xl overflow-hidden shadow-inner min-h-[200px] flex items-center justify-center border border-slate-200">
                             {receiptLoading ? (
                                 <div className="flex flex-col items-center gap-3">
-                                    <div className="w-12 h-12 bg-gradient-to-r from-blue-100 to-indigo-100 rounded-full flex items-center justify-center animate-pulse">
+                                    <div className="w-10 h-10 bg-gradient-to-r from-blue-100 to-indigo-100 rounded-full flex items-center justify-center animate-pulse">
                                         <Download size={24} className="text-blue-600" />
                                     </div>
                                     <Loader text="Membuat resi..." />
@@ -1138,7 +1155,7 @@ export default function OrderPage({ setActivePage, onModalChange }) {
                             )}
                         </div>
                         <div className="mt-4">
-                            <button onClick={handleDownloadFromPreview} disabled={receiptLoading} className="w-full py-3 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-xl font-bold text-base hover:from-blue-700 hover:to-indigo-700 transition-all duration-300 flex items-center justify-center gap-2 shadow-lg hover:shadow-xl hover-lift hover-glow focus-ring disabled:opacity-50">
+                            <button onClick={handleDownloadFromPreview} disabled={receiptLoading} className="w-full py-2.5 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-xl font-bold text-sm hover:from-blue-700 hover:to-indigo-700 transition-all duration-300 flex items-center justify-center gap-2 shadow-lg hover:shadow-xl hover-lift hover-glow focus-ring disabled:opacity-50">
                                 <Download size={20} />
                                 Download Gambar
                             </button>
@@ -1149,25 +1166,25 @@ export default function OrderPage({ setActivePage, onModalChange }) {
 
             {showDeleteConfirm && (
                 <div className="fixed inset-0 z-[100] bg-gradient-to-br from-red-900/20 via-orange-900/20 to-yellow-900/20 backdrop-blur-sm flex items-center justify-center p-4 animate-fade-in">
-                    <div className="bg-gradient-to-br from-whitex via-red-50/30 to-orange-50/30 rounded-3xl shadow-2xl p-6 w-full max-w-sm animate-scale-in border border-red-200/50 relative overflow-hidden">
+                    <div className="bg-gradient-to-br from-white via-red-50/30 to-orange-50/30 rounded-3xl shadow-2xl p-6 w-full max-w-sm animate-scale-in border border-red-200/50 relative overflow-hidden">
                         {/* Decorative elements */}
                         <div className="absolute top-0 right-0 w-24 h-24 bg-red-200/20 rounded-full -translate-y-12 translate-x-12"></div>
                         <div className="absolute bottom-0 left-0 w-20 h-20 bg-orange-200/20 rounded-full translate-y-10 -translate-x-10"></div>
 
                         <div className="text-center relative z-10">
-                            <div className="w-20 h-20 mx-auto flex items-center justify-center bg-gradient-to-br from-red-100 to-orange-100 rounded-full shadow-lg animate-bounce">
-                                <Trash2 size={36} className="text-red-600" />
+                            <div className="w-16 h-16 mx-auto flex items-center justify-center bg-gradient-to-br from-red-100 to-orange-100 rounded-full shadow-lg animate-bounce">
+                                <Trash2 size={32} className="text-red-600" />
                             </div>
-                            <h3 className="mt-4 text-xl font-bold text-slate-800 gradient-text">Hapus Order?</h3>
-                            <p className="mt-3 text-sm text-slate-600 leading-relaxed">
-                                Anda akan menghapus order untuk <strong className="text-red-600 bg-red-100 px-2 py-1 rounded-full">{itemToDelete?.tokoNama}</strong>. Tindakan ini tidak dapat dibatalkan.
+                            <h3 className="mt-4 text-base font-bold text-slate-800 gradient-text">Hapus Order?</h3>
+                            <p className="mt-3 text-xs text-slate-600 leading-relaxed">
+                                Anda akan menghapus order untuk <strong className="text-red-600 bg-red-100 px-1.5 py-0.5 rounded-full">{itemToDelete?.tokoNama}</strong>. Tindakan ini tidak dapat dibatalkan.
                             </p>
                         </div>
                         <div className="mt-6 grid grid-cols-2 gap-3">
-                            <button onClick={() => setShowDeleteConfirm(false)} className="w-full py-3 bg-gradient-to-r from-slate-100 to-slate-200 text-slate-700 rounded-xl font-semibold hover:from-slate-200 hover:to-slate-300 transition-all duration-200 hover-lift focus-ring">
+                            <button onClick={() => setShowDeleteConfirm(false)} className="w-full py-2.5 bg-gradient-to-r from-slate-100 to-slate-200 text-slate-700 rounded-xl font-semibold text-sm hover:from-slate-200 hover:to-slate-300 transition-all duration-200 hover-lift focus-ring">
                                 Batal
                             </button>
-                            <button onClick={handleConfirmDelete} className="w-full py-3 bg-gradient-to-r from-red-600 to-red-700 text-white rounded-xl font-semibold hover:from-red-700 hover:to-red-800 transition-all duration-200 hover-lift hover-glow focus-ring shadow-lg">
+                            <button onClick={handleConfirmDelete} className="w-full py-2.5 bg-gradient-to-r from-red-600 to-red-700 text-white rounded-xl font-semibold text-sm hover:from-red-700 hover:to-red-800 transition-all duration-200 hover-lift hover-glow focus-ring shadow-lg">
                                 Ya, Hapus
                             </button>
                         </div>
