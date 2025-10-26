@@ -24,14 +24,12 @@ function MiniLoader({ text = 'Memuat...' }) {
     );
 }
 
-export default function OrderPage({ setActivePage, onModalChange }) {
-    const [orderList, setOrderList] = useState([]);
+export default function OrderPage({ setActivePage, orderList, setOrderList, tokoList, produkList, onModalChange, showNotification }) {
     const [loading, setLoading] = useState(true);
 
     // Form state
     const [showForm, setShowForm] = useState(false);
-    const [tokoList, setTokoList] = useState([]);
-    const [produkList, setProdukList] = useState([]);
+    // Hapus state lokal untuk tokoList dan produkList karena sudah dari props
     const [selectedTokoId, setSelectedTokoId] = useState('');
     const [catatan, setCatatan] = useState('');
     const [orderDate, setOrderDate] = useState(new Date()); // State untuk tanggal di form
@@ -75,13 +73,6 @@ export default function OrderPage({ setActivePage, onModalChange }) {
     const [productRecommendations, setProductRecommendations] = useState([]);
     const [loadingRecommendations, setLoadingRecommendations] = useState(false);
 
-    const showNotification = (message, type = 'success') => {
-        setNotification({ show: true, message, type });
-        setTimeout(() => {
-            setNotification({ show: false, message: '', type: 'success' });
-        }, 3000);
-    };
-
     const [openMenuId, setOpenMenuId] = useState(null);
 
     // Efek untuk memberitahu App.jsx jika ada modal yang terbuka
@@ -105,37 +96,21 @@ export default function OrderPage({ setActivePage, onModalChange }) {
     }, [showForm, showReceiptPreview, showDeleteConfirm, onModalChange]);
 
     useEffect(() => {
-        const loadInitialData = async () => {
-            setLoading(true);
-            await Promise.all([fetchOrders(), loadTokoData()]);
+        // Data sudah dimuat dari App.jsx, jadi kita hanya perlu set loading ke false
+        if (orderList && tokoList && produkList) {
             setLoading(false);
-        };
-        loadInitialData();
+            setIsDataLoaded(true); // Tandai data sudah siap
+        }
     }, []);
 
     const loadFormData = async () => {
         if (isDataLoaded) return;
-        try {
-            const produkSnap = await getDocs(collection(db, 'produk'));
-            const produkData = produkSnap.docs.map((doc) => ({ id: doc.id, ...doc.data() })).sort((a, b) => (a.available === b.available ? a.nama.localeCompare(b.nama) : a.available ? -1 : 1));
-            setProdukList(produkData);
-            setIsDataLoaded(true);
-        } catch (error) {
-            console.error('Error loading form data:', error);
-            // Set empty array sebagai fallback
-            setProdukList([]);
-            setIsDataLoaded(true);
-
-            // Tampilkan notifikasi error yang user-friendly
-            if (error.code === 'permission-denied') {
-                showNotification('Tidak memiliki izin untuk mengakses data produk. Silakan hubungi administrator.', 'error');
-            } else {
-                showNotification('Gagal memuat data produk. Periksa koneksi internet Anda.', 'error');
-            }
-        }
+        // Fungsi ini tidak lagi melakukan fetch, hanya memastikan data siap
+        setIsDataLoaded(true);
     };
 
     useEffect(() => {
+        // Cek apakah data dari props sudah siap
         if (showForm && !isDataLoaded) {
             loadFormData();
         }
@@ -187,39 +162,12 @@ export default function OrderPage({ setActivePage, onModalChange }) {
     const fetchOrders = async () => {
         try {
             const q = query(collection(db, 'orders'), orderBy('createdAt', 'asc'));
-            const snapshot = await getDocs(q);
-            const list = snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() })).reverse(); // Reverse client-side to keep newest first
-            setOrderList(list);
+            const snapshot = await getDocs(q); //
+            const list = snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() })).reverse();
+            setOrderList(list); // Update state di App.jsx
         } catch (error) {
             console.error('Error fetching orders:', error);
-            // Set empty array sebagai fallback
-            setOrderList([]);
-
-            // Tampilkan notifikasi error yang user-friendly
-            if (error.code === 'permission-denied') {
-                showNotification('Tidak memiliki izin untuk mengakses data order. Silakan hubungi administrator.', 'error');
-            } else {
-                showNotification('Gagal memuat data order. Periksa koneksi internet Anda.', 'error');
-            }
-        }
-    };
-
-    const loadTokoData = async () => {
-        try {
-            const tokoSnap = await getDocs(collection(db, 'toko'));
-            const tokoData = tokoSnap.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
-            setTokoList(tokoData);
-        } catch (error) {
-            console.error('Error loading toko data:', error);
-            // Set empty array sebagai fallback
-            setTokoList([]);
-
-            // Tampilkan notifikasi error yang user-friendly
-            if (error.code === 'permission-denied') {
-                showNotification('Tidak memiliki izin untuk mengakses data toko. Silakan hubungi administrator.', 'error');
-            } else {
-                showNotification('Gagal memuat data toko. Periksa koneksi internet Anda.', 'error');
-            }
+            showNotification('Gagal memuat ulang data order.', 'error');
         }
     };
 
@@ -641,24 +589,6 @@ export default function OrderPage({ setActivePage, onModalChange }) {
 
     return (
         <>
-            {notification.show && (
-                <div className="fixed top-4 left-1/2 -translate-x-1/2 z-[100] w-full max-w-sm px-4 transition-all duration-300 animate-slide-in-top">
-                    <div className={`flex items-center gap-3 w-full p-4 rounded-2xl shadow-2xl border backdrop-blur-md relative overflow-hidden ${notification.type === 'success' ? 'bg-gradient-to-r from-green-500 to-emerald-600 border-green-400 text-white' : 'bg-gradient-to-r from-red-500 to-orange-600 border-red-400 text-white'}`}>
-                        {/* Decorative elements */}
-                        <div className="absolute top-0 right-0 w-16 h-16 bg-white/10 rounded-full -translate-y-8 translate-x-8"></div>
-                        <div className="absolute bottom-0 left-0 w-12 h-12 bg-white/5 rounded-full translate-y-6 -translate-x-6"></div>
-
-                        <div className="relative z-10 flex items-center gap-3 w-full">
-                            <div className="p-2 bg-white/20 rounded-xl">{notification.type === 'success' ? <CheckCircle2 size={20} /> : <AlertTriangle size={20} />}</div>
-                            <p className="font-semibold text-sm flex-1">{notification.message}</p>
-                            <button onClick={() => setNotification({ ...notification, show: false })} className="p-1.5 rounded-lg bg-white/20 hover:bg-white/30 transition-all duration-200 hover-scale focus-ring">
-                                <X size={16} />
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            )}
-
             <div className="pb-20 max-w-md mx-auto" onClick={closeMenu}>
                 <div className="p-5 pb-20">
                     <div className="flex justify-between items-center mb-5">
@@ -829,7 +759,7 @@ export default function OrderPage({ setActivePage, onModalChange }) {
 
                 <div className="fixed -left-[9999px] top-0">{receiptOrder && <VisitReceipt kunjungan={receiptOrder} ref={receiptRef} />}</div>
 
-                <div className={`fixed inset-0 z-50 transition-all duration-500 ${showForm ? 'bg-gradient-to-br from-purple-900/20 via-blue-900/20 to-indigo-900/20 backdrop-blur-sm' : 'bg-transparent pointer-events-none'}`}>
+                <div className={`fixed inset-0 z-[400] transition-all duration-500 ${showForm ? 'bg-gradient-to-br from-purple-900/20 via-blue-900/20 to-indigo-900/20 backdrop-blur-sm' : 'bg-transparent pointer-events-none'}`}>
                     <div className={`absolute inset-y-0 left-0 w-full max-w-md bg-gradient-to-br from-white via-slate-50 to-purple-50/30 shadow-2xl transition-all duration-500 ease-out transform ${showForm ? 'translate-x-0 scale-100 opacity-100 animate-slide-in-left' : '-translate-x-full scale-95 opacity-0'}`}>
                         <div className="h-full flex flex-col">
                             {/* Header standar dengan latar belakang putih */}
@@ -1137,7 +1067,7 @@ export default function OrderPage({ setActivePage, onModalChange }) {
             </div>
 
             {showReceiptPreview && (
-                <div className="fixed inset-0 z-[60] bg-gradient-to-br from-blue-900/20 via-indigo-900/20 to-purple-900/20 backdrop-blur-sm flex flex-col items-center justify-end p-4 transition-opacity duration-300 animate-fade-in" onClick={closePreview}>
+                <div className="fixed inset-0 z-[400] bg-gradient-to-br from-blue-900/20 via-indigo-900/20 to-purple-900/20 backdrop-blur-sm flex flex-col items-center justify-end p-4 transition-opacity duration-300 animate-fade-in" onClick={closePreview}>
                     <div className="relative w-full max-w-sm bg-gradient-to-br from-white via-blue-50/30 to-indigo-50/30 rounded-3xl shadow-2xl p-4 transition-transform duration-300 transform translate-y-0 animate-scale-in border border-blue-200/50" onClick={(e) => e.stopPropagation()}>
                         <button onClick={closePreview} className="absolute -top-3 -right-3 w-7 h-7 bg-gradient-to-r from-white to-slate-100 rounded-full flex items-center justify-center shadow-lg text-slate-600 hover:from-slate-100 hover:to-slate-200 transition-all duration-200 hover-scale focus-ring" aria-label="Tutup">
                             <X size={20} />
@@ -1165,7 +1095,7 @@ export default function OrderPage({ setActivePage, onModalChange }) {
             )}
 
             {showDeleteConfirm && (
-                <div className="fixed inset-0 z-[100] bg-gradient-to-br from-red-900/20 via-orange-900/20 to-yellow-900/20 backdrop-blur-sm flex items-center justify-center p-4 animate-fade-in">
+                <div className="fixed inset-0 z-[400] bg-gradient-to-br from-red-900/20 via-orange-900/20 to-yellow-900/20 backdrop-blur-sm flex items-center justify-center p-4 animate-fade-in">
                     <div className="bg-gradient-to-br from-white via-red-50/30 to-orange-50/30 rounded-3xl shadow-2xl p-6 w-full max-w-sm animate-scale-in border border-red-200/50 relative overflow-hidden">
                         {/* Decorative elements */}
                         <div className="absolute top-0 right-0 w-24 h-24 bg-red-200/20 rounded-full -translate-y-12 translate-x-12"></div>

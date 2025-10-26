@@ -309,6 +309,16 @@ export default function HomePage({ daftarToko, kunjunganList = [], produkList = 
                             Produk
                         </span>
                     </button>
+                    <button onClick={() => setActivePage('analisis-grade-toko')} className="flex flex-col items-center justify-center gap-1 p-2 rounded-md hover:bg-slate-50 transition-colors w-24">
+                        <div className="w-10 h-10 flex items-center justify-center bg-orange-100 text-orange-600 rounded-lg">
+                            <Award size={20} />
+                        </div>
+                        <span className="font-semibold text-[10px] text-slate-700 text-center">
+                            Grade
+                            <br />
+                            Toko
+                        </span>
+                    </button>
                 </div>
             </div>
 

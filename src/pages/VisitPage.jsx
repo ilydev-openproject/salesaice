@@ -25,15 +25,12 @@ export function MiniLoader({ text = 'Memuat...' }) {
     );
 }
 
-export default function VisitPage({ setActivePage, orderList = [], onModalChange }) {
+export default function VisitPage({ setActivePage, orderList = [], kunjunganList, setKunjunganList, tokoList, produkList, onModalChange, showNotification }) {
     // State untuk daftar kunjungan
-    const [kunjunganList, setKunjunganList] = useState([]);
     const [loading, setLoading] = useState(true);
 
     // State untuk form
     const [showForm, setShowForm] = useState(false);
-    const [tokoList, setTokoList] = useState([]);
-    const [produkList, setProdukList] = useState([]);
     const [selectedTokoId, setSelectedTokoId] = useState('');
     const [catatan, setCatatan] = useState('');
     const [visitDate, setVisitDate] = useState(new Date()); // State untuk tanggal di form
@@ -76,13 +73,6 @@ export default function VisitPage({ setActivePage, orderList = [], onModalChange
     const [productRecommendations, setProductRecommendations] = useState([]);
     const [loadingRecommendations, setLoadingRecommendations] = useState(false);
 
-    const showNotification = (message, type = 'success') => {
-        setNotification({ show: true, message, type });
-        setTimeout(() => {
-            setNotification({ show: false, message: '', type: 'success' });
-        }, 3000); // Sembunyikan setelah 3 detik
-    };
-
     const [openMenuId, setOpenMenuId] = useState(null); // State untuk menu titik tiga
 
     // Efek untuk memberitahu App.jsx jika ada modal yang terbuka
@@ -109,32 +99,17 @@ export default function VisitPage({ setActivePage, orderList = [], onModalChange
 
     // Load daftar kunjungan
     useEffect(() => {
-        const loadInitialData = async () => {
-            setLoading(true);
-            await Promise.all([fetchKunjungan(), loadTokoData()]);
+        // Data sudah dimuat dari App.jsx, jadi kita hanya perlu set loading ke false
+        if (kunjunganList && tokoList && produkList) {
             setLoading(false);
-        };
-        loadInitialData();
+            setIsDataLoaded(true); // Tandai data sudah siap
+        }
     }, []);
 
     const loadFormData = async () => {
         if (isDataLoaded) return; // Jangan load ulang jika sudah ada
-        try {
-            // Ini hanya akan memuat data produk sekarang
-            const [tokoSnap, produkSnap] = await Promise.all([getDocs(collection(db, 'toko')), getDocs(collection(db, 'produk'))]);
-            const tokoData = tokoSnap.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
-            const produkData = produkSnap.docs
-                .map((doc) => ({ id: doc.id, ...doc.data() }))
-                // Urutkan: produk tersedia di atas, lalu berdasarkan nama
-                .sort((a, b) => (a.available === b.available ? a.nama.localeCompare(b.nama) : a.available ? -1 : 1));
-
-            setTokoList(tokoData);
-            setProdukList(produkData);
-            setIsDataLoaded(true);
-        } catch (error) {
-            console.error('Error load data:', error);
-            showNotification('Gagal memuat data toko/produk.', 'error');
-        }
+        // Fungsi ini tidak lagi melakukan fetch, hanya memastikan data siap
+        setIsDataLoaded(true);
     };
 
     // Load data untuk form (toko & produk) saat form dibuka
@@ -187,21 +162,12 @@ export default function VisitPage({ setActivePage, orderList = [], onModalChange
     const fetchKunjungan = async () => {
         try {
             const q = query(collection(db, 'kunjungan'), orderBy('createdAt', 'desc'));
-            const snapshot = await getDocs(q);
-            const list = snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
-            setKunjunganList(list);
+            const snapshot = await getDocs(q); //
+            const list = snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() })); //
+            setKunjunganList(list); // Update state di App.jsx
         } catch (error) {
             console.error('Error fetching kunjungan:', error);
-        }
-    };
-
-    const loadTokoData = async () => {
-        try {
-            const tokoSnap = await getDocs(collection(db, 'toko'));
-            const tokoData = tokoSnap.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
-            setTokoList(tokoData);
-        } catch (error) {
-            console.error('Error loading toko data:', error);
+            showNotification('Gagal memuat ulang data kunjungan.', 'error');
         }
     };
 
@@ -691,19 +657,6 @@ ${padRight('No HP', 15)}: ${toko.nomorWa || '-'}
 
     return (
         <>
-            {/* Komponen Notifikasi Modern (Hanya render jika 'show' true) */}
-            {notification.show && (
-                <div className="fixed top-4 left-1/2 -translate-x-1/2 z-[100] w-full max-w-sm px-4 transition-all duration-300 animate-in slide-in-from-top-5 fade-in">
-                    <div className={`flex items-center gap-3 w-full p-3 rounded-xl shadow-2xl border ${notification.type === 'success' ? 'bg-green-500 border-green-600 text-white' : 'bg-red-500 border-red-600 text-white'}`}>
-                        {notification.type === 'success' ? <CheckCircle2 size={20} /> : <AlertTriangle size={20} />}
-                        <p className="font-semibold text-sm flex-1">{notification.message}</p>
-                        <button onClick={() => setNotification({ ...notification, show: false })} className="opacity-70 hover:opacity-100">
-                            <X size={18} />
-                        </button>
-                    </div>
-                </div>
-            )}
-
             {/* Render Komponen Kamera */}
             {showCamera && cameraVisitData && (
                 <TimestampCamera
@@ -744,16 +697,20 @@ ${padRight('No HP', 15)}: ${toko.nomorWa || '-'}
                     {/* Filter Tanggal */}
                     <div className="relative mb-4 flex items-center gap-2">
                         <button onClick={() => setFilterType('today')} className={`flex-1 flex items-center justify-center gap-2 px-3 py-2 text-xs font-semibold rounded-xl transition-all duration-200 hover-lift focus-ring ${filterType === 'today' ? 'bg-gradient-to-r from-purple-600 to-indigo-600 text-white shadow-lg' : 'bg-white/80 backdrop-blur-sm text-slate-600 border border-slate-200 hover:bg-white hover:shadow-md'}`}>
-                            <Calendar size={16} />
+                            <div className="p-1.5 bg-white/20 rounded-lg">
+                                <Calendar size={16} />
+                            </div>
                             Hari Ini
                         </button>
                         <button onClick={() => setShowCalendar(!showCalendar)} className={`flex-1 flex items-center justify-center gap-2 px-3 py-2 text-xs font-semibold rounded-xl transition-all duration-200 hover-lift focus-ring text-nowrap ${filterType === 'custom' ? 'bg-gradient-to-r from-purple-600 to-indigo-600 text-white shadow-lg' : 'bg-white/80 backdrop-blur-sm text-slate-600 border border-slate-200 hover:bg-white hover:shadow-md'}`}>
-                            <CalendarRange size={16} />
+                            <div className="p-1.5 bg-white/20 rounded-lg">
+                                <CalendarRange size={16} />
+                            </div>
                             {filterType === 'custom' ? format(customDate, 'd MMM yy', { locale: id }) : 'Pilih Tanggal'}
                         </button>
 
                         {showCalendar && (
-                            <div className="absolute top-full mt-2 z-20 bg-white rounded-2xl shadow-2xl border p-2" onMouseLeave={() => setShowCalendar(false)}>
+                            <div className="absolute top-full mt-3 z-20 bg-white/95 backdrop-blur-md rounded-3xl shadow-2xl border border-slate-200/50 p-4 animate-slide-in-top" onMouseLeave={() => setShowCalendar(false)}>
                                 <DayPicker
                                     mode="single"
                                     selected={customDate}
@@ -893,7 +850,7 @@ ${padRight('No HP', 15)}: ${toko.nomorWa || '-'}
                 <div className="fixed -left-[9999px] top-0">{receiptKunjungan && <VisitReceipt kunjungan={receiptKunjungan} ref={receiptRef} />}</div>
 
                 {/* Form Tambah Kunjungan (Slide-in) */}
-                <div className={`fixed inset-0 z-50 transition-all duration-500 ${showForm ? 'bg-gradient-to-br from-purple-900/20 via-blue-900/20 to-indigo-900/20 backdrop-blur-sm' : 'bg-transparent pointer-events-none'}`}>
+                <div className={`fixed inset-0 z-[400] transition-all duration-500 ${showForm ? 'bg-gradient-to-br from-purple-900/20 via-blue-900/20 to-indigo-900/20 backdrop-blur-sm' : 'bg-transparent pointer-events-none'}`}>
                     <div className={`absolute inset-y-0 left-0 w-full max-w-md bg-gradient-to-br from-white via-slate-50 to-purple-50/30 shadow-2xl transition-all duration-500 ease-out transform ${showForm ? 'translate-x-0 scale-100 opacity-100 animate-slide-in-left' : '-translate-x-full scale-95 opacity-0'}`}>
                         <div className="h-full flex flex-col">
                             <div className="flex items-center justify-between p-4 bg-white border-b border-slate-200">
@@ -904,7 +861,7 @@ ${padRight('No HP', 15)}: ${toko.nomorWa || '-'}
                                 <div className="w-10"></div> {/* Spacer */}
                             </div>
 
-                            <form id="visit-form" onSubmit={handleSubmit} className="flex-1 overflow-y-auto p-4 space-y-4">
+                            <form id="visit-form" onSubmit={handleSubmit} className="flex-1 overflow-y-auto p-4 space-y-4 pb-40">
                                 <div className="space-y-3">
                                     <label className="flex text-xs font-semibold text-slate-800 mb-2 items-center gap-2">
                                         <div className="w-2 h-2 bg-gradient-to-r from-purple-500 to-indigo-500 rounded-full"></div>
@@ -1145,7 +1102,7 @@ ${padRight('No HP', 15)}: ${toko.nomorWa || '-'}
                             </form>
 
                             {/* Total & Submit (Sticky di bawah form) */}
-                            <div className="bg-white/80 backdrop-blur-sm py-2 px-3 border-t border-gray-200">
+                            <div className="absolute bottom-0 left-0 right-0 bg-white/80 backdrop-blur-sm py-2 px-3 border-t border-gray-200">
                                 <div className="bg-gradient-to-r from-purple-50 via-indigo-50 to-blue-50 p-3 rounded-xl border border-purple-200/50 mb-3 shadow-sm relative overflow-hidden">
                                     {/* Decorative background elements */}
                                     <div className="absolute top-0 right-0 w-20 h-20 bg-purple-200/30 rounded-full -translate-y-10 translate-x-10"></div>
@@ -1185,7 +1142,7 @@ ${padRight('No HP', 15)}: ${toko.nomorWa || '-'}
 
             {/* Modal Preview Resi */}
             {showReceiptPreview && (
-                <div className="fixed inset-0 z-[60] bg-gradient-to-br from-blue-900/20 via-indigo-900/20 to-purple-900/20 backdrop-blur-sm flex flex-col items-center justify-end p-4 transition-opacity duration-300 animate-fade-in" onClick={closePreview}>
+                <div className="fixed inset-0 z-[400] bg-gradient-to-br from-blue-900/20 via-indigo-900/20 to-purple-900/20 backdrop-blur-sm flex flex-col items-center justify-end p-4 transition-opacity duration-300 animate-fade-in" onClick={closePreview}>
                     <div className="relative w-full max-w-sm bg-gradient-to-br from-white via-blue-50/30 to-indigo-50/30 rounded-3xl shadow-2xl p-4 transition-transform duration-300 transform translate-y-0 animate-scale-in border border-blue-200/50" onClick={(e) => e.stopPropagation()}>
                         <button onClick={closePreview} className="absolute -top-3 -right-3 w-7 h-7 bg-gradient-to-r from-white to-slate-100 rounded-full flex items-center justify-center shadow-lg text-slate-600 hover:from-slate-100 hover:to-slate-200 transition-all duration-200 hover-scale focus-ring" aria-label="Tutup">
                             <X size={20} />
@@ -1203,7 +1160,7 @@ ${padRight('No HP', 15)}: ${toko.nomorWa || '-'}
 
             {/* Modal Konfirmasi Hapus */}
             {showDeleteConfirm && (
-                <div className="fixed inset-0 z-[100] bg-gradient-to-br from-red-900/20 via-orange-900/20 to-yellow-900/20 backdrop-blur-sm flex items-center justify-center p-4 animate-fade-in">
+                <div className="fixed inset-0 z-[400] bg-gradient-to-br from-red-900/20 via-orange-900/20 to-yellow-900/20 backdrop-blur-sm flex items-center justify-center p-4 animate-fade-in">
                     <div className="bg-gradient-to-br from-white via-red-50/30 to-orange-50/30 rounded-3xl shadow-2xl p-6 w-full max-w-sm animate-scale-in border border-red-200/50 relative overflow-hidden">
                         <div className="absolute top-0 right-0 w-24 h-24 bg-red-200/20 rounded-full -translate-y-12 translate-x-12"></div>
                         <div className="absolute bottom-0 left-0 w-20 h-20 bg-orange-200/20 rounded-full translate-y-10 -translate-x-10"></div>
