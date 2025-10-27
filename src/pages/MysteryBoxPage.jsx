@@ -1,63 +1,76 @@
 // src/pages/MysteryBoxPage.jsx
 import { useState, useEffect, useMemo } from 'react';
-import { collection, getDocs, doc, updateDoc, writeBatch } from 'firebase/firestore';
+import { doc, updateDoc, writeBatch } from 'firebase/firestore'; // Removed getDocs, collection
 import { db } from '../lib/firebase';
-import { Gift, Check, Loader2, Undo2, AlertTriangle, X } from 'lucide-react';
+import { Gift, Check, Loader2, Undo2, AlertTriangle, X, ArrowLeft, Plus, Minus } from 'lucide-react';
 import Loader from '../components/Loader';
 
-export default function MysteryBoxPage() {
-    const [tokoList, setTokoList] = useState([]);
-    const [orderList, setOrderList] = useState([]);
+export default function MysteryBoxPage({ setActivePage, tokoList: initialTokoList, orderList: initialOrderList, showNotification }) {
+    const [tokoList, setTokoList] = useState(initialTokoList);
+    const [orderList, setOrderList] = useState(initialOrderList);
     const [loading, setLoading] = useState(true);
     const [updatingId, setUpdatingId] = useState(null);
+    // State untuk modal pembatalan
     const [showUndoConfirm, setShowUndoConfirm] = useState(false);
     const [itemToUndo, setItemToUndo] = useState(null);
+    // State untuk modal pemberian hadiah
+    const [showRewardModal, setShowRewardModal] = useState(false);
+    const [rewardData, setRewardData] = useState(null); // { toko, monthKey }
+    const [rewardAmount, setRewardAmount] = useState(1);
 
     const MYSTERY_BOX_THRESHOLD = 25;
 
-    const fetchData = async () => {
-        setLoading(true);
-        try {
-            const [tokoSnapshot, orderSnapshot] = await Promise.all([getDocs(collection(db, 'toko')), getDocs(collection(db, 'orders'))]);
-            setTokoList(tokoSnapshot.docs.map((d) => ({ id: d.id, ...d.data() })));
-            setOrderList(orderSnapshot.docs.map((d) => ({ id: d.id, ...d.data() })));
-        } catch (error) {
-            console.error('Error fetching toko data:', error);
-            alert('Gagal memuat data toko.');
-        } finally {
+    // Update local state if initial props change (e.g., App.jsx fetches new data)
+    useEffect(() => {
+        setTokoList(initialTokoList);
+    }, [initialTokoList]);
+
+    useEffect(() => {
+        setOrderList(initialOrderList);
+    }, [initialOrderList]);
+
+    // Set loading to false once initial data is received
+    useEffect(() => {
+        if (initialTokoList.length > 0 || initialOrderList.length > 0) {
             setLoading(false);
+        }
+    }, [initialTokoList, initialOrderList]);
+
+    const handleInitiateGiveReward = (toko, monthKey) => {
+        if (toko.pendingRewards > 1) {
+            // Jika hadiah > 1, buka modal
+            setRewardData({ toko, monthKey });
+            setRewardAmount(1); // Reset jumlah ke 1 setiap kali modal dibuka
+            setShowRewardModal(true);
+        } else {
+            // Jika hadiah hanya 1, langsung berikan
+            handleConfirmGiveReward(toko, monthKey, 1);
         }
     };
 
-    useEffect(() => {
-        fetchData();
-    }, []);
-
-    const handleGiveReward = async (toko, monthKey) => {
+    const handleConfirmGiveReward = async (toko, monthKey, amount) => {
         if (updatingId) return; // Prevent multiple clicks
-
-        if (toko.pendingRewards <= 0) {
-            alert('Toko ini tidak berhak mendapat hadiah untuk periode ini.');
-            return;
-        }
 
         setUpdatingId(`${toko.id}-${monthKey}`);
         try {
             const tokoRef = doc(db, 'toko', toko.id);
             const currentClaimed = toko.monthlyRewardsClaimed?.[monthKey] || 0;
-            const newClaimedTotal = currentClaimed + toko.pendingRewards;
+            const newClaimedTotal = currentClaimed + amount;
 
             await updateDoc(tokoRef, {
                 [`monthlyRewardsClaimed.${monthKey}`]: newClaimedTotal,
             });
 
             // Update state locally to reflect the change immediately
+            showNotification(`${amount} hadiah berhasil diberikan!`, 'success');
             setTokoList((prevList) => prevList.map((t) => (t.id === toko.id ? { ...t, monthlyRewardsClaimed: { ...(t.monthlyRewardsClaimed || {}), [monthKey]: newClaimedTotal } } : t)));
         } catch (error) {
             console.error('Error giving reward:', error);
             alert('Gagal memberikan hadiah.');
         } finally {
             setUpdatingId(null);
+            setShowRewardModal(false); // Tutup modal setelah berhasil
+            setRewardData(null);
         }
     };
 
@@ -82,6 +95,7 @@ export default function MysteryBoxPage() {
             });
 
             // Update state lokal untuk merefleksikan perubahan
+            showNotification('Hadiah berhasil dibatalkan!', 'success');
             setTokoList((prevList) => prevList.map((t) => (t.id === toko.id ? { ...t, monthlyRewardsClaimed: { ...(t.monthlyRewardsClaimed || {}), [monthKey]: 0 } } : t)));
         } catch (error) {
             console.error('Error undoing reward:', error);
@@ -146,11 +160,20 @@ export default function MysteryBoxPage() {
 
     return (
         <div className="p-5 pb-20 max-w-md mx-auto animate-in fade-in duration-300">
-            <div className="flex items-center justify-between mb-6">
-                <div className="flex items-center gap-2">
-                    <Gift className="text-purple-600" size={20} />
-                    <h1 className="text-2xl font-bold text-slate-800">Mystery Box</h1>
+            <div className="flex items-center mb-6">
+                {/* Tombol Kembali di Kiri */}
+                <button onClick={() => setActivePage('home')} className="p-2 rounded-full hover:bg-slate-100">
+                    <ArrowLeft size={20} />
+                </button>
+                {/* Ikon dan Judul di Tengah */}
+                <div className="flex-1 flex justify-center items-center gap-3">
+                    <div className="p-2 bg-gradient-to-br from-yellow-100 to-orange-100 rounded-xl shadow-sm">
+                        <Gift className="text-yellow-600" size={20} />
+                    </div>
+                    <h1 className="text-base font-bold text-slate-800 gradient-text">Mystery Box</h1>
                 </div>
+                {/* Spacer di Kanan untuk menyeimbangkan tombol kembali */}
+                <div className="w-10"></div> {/* Sesuaikan lebar ini agar seimbang dengan tombol kembali */}
             </div>
 
             {eligibleToko.length === 0 && claimedToko.length === 0 ? (
@@ -175,7 +198,7 @@ export default function MysteryBoxPage() {
                                             </p>
                                             <p className="text-sm font-bold text-green-600 mt-1">Berhak mendapat: {toko.pendingRewards} Hadiah</p>
                                         </div>
-                                        <button onClick={() => handleGiveReward(toko, toko.monthKey)} disabled={updatingId === `${toko.id}-${toko.monthKey}`} className="bg-green-600 text-white px-4 py-2 rounded-full font-semibold flex items-center gap-2 hover:bg-green-700 transition shadow-md disabled:opacity-50">
+                                        <button onClick={() => handleInitiateGiveReward(toko, toko.monthKey)} disabled={updatingId === `${toko.id}-${toko.monthKey}`} className="bg-green-600 text-white px-4 py-2 rounded-full font-semibold flex items-center gap-2 hover:bg-green-700 transition shadow-md disabled:opacity-50">
                                             {updatingId === `${toko.id}-${toko.monthKey}` ? <Loader2 size={18} className="animate-spin" /> : <Check size={18} />}
                                             Berikan
                                         </button>
@@ -232,6 +255,54 @@ export default function MysteryBoxPage() {
                             </button>
                             <button onClick={handleConfirmUndo} className="w-full py-3 bg-yellow-500 text-white rounded-lg font-semibold hover:bg-yellow-600 transition">
                                 Ya, Batalkan
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {/* Modal Pemberian Hadiah */}
+            {showRewardModal && rewardData && (
+                <div className="fixed inset-0 z-[100] bg-black/60 flex items-center justify-center p-4 animate-in fade-in">
+                    <div className="bg-white rounded-2xl shadow-2xl p-6 w-full max-w-sm animate-in zoom-in-95 slide-in-from-bottom-5">
+                        <div className="text-center">
+                            <div className="w-16 h-16 mx-auto flex items-center justify-center bg-green-100 rounded-full">
+                                <Gift size={32} className="text-green-600" />
+                            </div>
+                            <h3 className="mt-4 text-xl font-bold text-slate-800">Beri Hadiah</h3>
+                            <p className="mt-2 text-sm text-slate-500">
+                                Berapa hadiah yang akan diberikan untuk <strong className="text-slate-700">{rewardData.toko.nama}</strong>?
+                            </p>
+                            <p className="mt-1 text-xs text-slate-500">
+                                (Berhak mendapat total <strong className="text-green-600">{rewardData.toko.pendingRewards}</strong> hadiah)
+                            </p>
+                        </div>
+                        {/* Input Jumlah Hadiah */}
+                        <div className="flex items-center justify-center gap-4 my-6">
+                            <button onClick={() => setRewardAmount(Math.max(1, rewardAmount - 1))} className="w-12 h-12 flex items-center justify-center bg-slate-100 rounded-full text-2xl font-bold text-slate-600 hover:bg-slate-200 transition">
+                                <Minus />
+                            </button>
+                            <input
+                                type="number"
+                                value={rewardAmount}
+                                onChange={(e) => {
+                                    const val = parseInt(e.target.value, 10);
+                                    if (val >= 1 && val <= rewardData.toko.pendingRewards) {
+                                        setRewardAmount(val);
+                                    }
+                                }}
+                                className="w-24 h-24 text-5xl font-bold text-center bg-transparent border-none focus:ring-0"
+                            />
+                            <button onClick={() => setRewardAmount(Math.min(rewardData.toko.pendingRewards, rewardAmount + 1))} className="w-12 h-12 flex items-center justify-center bg-slate-100 rounded-full text-2xl font-bold text-slate-600 hover:bg-slate-200 transition">
+                                <Plus />
+                            </button>
+                        </div>
+                        <div className="grid grid-cols-1 gap-3">
+                            <button onClick={() => handleConfirmGiveReward(rewardData.toko, rewardData.monthKey, rewardAmount)} className="w-full py-3 bg-green-600 text-white rounded-lg font-semibold hover:bg-green-700 transition">
+                                Berikan {rewardAmount} Hadiah
+                            </button>
+                            <button onClick={() => setShowRewardModal(false)} className="w-full py-2 bg-slate-100 text-slate-700 rounded-lg font-semibold hover:bg-slate-200 transition text-sm">
+                                Batal
                             </button>
                         </div>
                     </div>

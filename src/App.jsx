@@ -12,6 +12,7 @@ import AnalisisTokoPage from './pages/AnalisisTokoPage';
 import VisitPage from './pages/VisitPage'; //
 import ProductVelocityPage from './pages/ProductVelocityPage'; // Impor halaman baru
 import TokoGradePage from './pages/TokoGradePage'; // Impor halaman grade
+import MysteryBoxPage from './pages/MysteryBoxPage'; // Impor halaman MysteryBoxPage
 import { Home, Package, Store, MapPin, ShoppingBag, CheckCircle2, AlertTriangle, X, Award } from 'lucide-react';
 import Loader from './components/Loader';
 
@@ -178,6 +179,7 @@ export default function App() {
                 {activePage === 'visit' && <VisitPage setActivePage={setActivePage} orderList={orderList} kunjunganList={kunjunganList} setKunjunganList={setKunjunganList} tokoList={daftarToko} produkList={produkList} onModalChange={handleSetModalOpen} showNotification={showNotification} />}
                 {activePage === 'product-velocity' && <ProductVelocityPage tokoList={daftarToko} orderList={orderList} setActivePage={setActivePage} />}
                 {activePage === 'analisis-grade-toko' && <TokoGradePage setActivePage={setActivePage} tokoList={daftarToko} orderList={orderList} onModalChange={handleSetModalOpen} showNotification={showNotification} />}
+                {activePage === 'mystery-box' && <MysteryBoxPage setActivePage={setActivePage} tokoList={daftarToko} orderList={orderList} showNotification={showNotification} />}
             </div>
 
             {/* Bottom Navigation */}
