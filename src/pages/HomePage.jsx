@@ -1,13 +1,17 @@
 import { MapPin, Package, Wallet, Plus, TrendingUp, Target, Award, BarChart2, Gift, X, Zap } from 'lucide-react';
 import { useMemo, useState } from 'react';
 
+import { isWithinInterval, addDays, isSameDay, startOfMonth, endOfMonth } from 'date-fns';
+
 export default function HomePage({ daftarToko, kunjunganList = [], produkList = [], orderList = [], setActivePage, targets }) {
     // --- Hitung data HARI INI dari 'kunjunganList' & 'orderList' ---
     const todayStart = new Date();
-    todayStart.setHours(0, 0, 0, 0);
-    const now = new Date();
+    todayStart.setHours(0, 0, 0, 0); // Untuk filter "Hari Ini" yang sebenarnya
 
-    const todayEnd = new Date();
+    // Tanggal acuan untuk perhitungan bulanan, dimajukan 1 hari untuk sinkronisasi dengan logika H+1.
+    const now = addDays(new Date(), 1);
+
+    const todayEnd = new Date(); // Untuk filter "Hari Ini" yang sebenarnya
     todayEnd.setHours(23, 59, 59, 999);
 
     const filterToday = (item) => {
@@ -17,39 +21,42 @@ export default function HomePage({ daftarToko, kunjunganList = [], produkList = 
     };
 
     const kunjunganHariIni = kunjunganList.filter(filterToday);
-    const orderHariIni = orderList.filter(filterToday);
+
+    // Logika filter order untuk ringkasan "Hari Ini"
+    // Order yang dibuat hari ini memiliki createdAt = besok (H+1)
+    const tomorrow = addDays(new Date(), 1); // Gunakan tanggal asli untuk 'tomorrow'
+    const orderHariIni = orderList.filter((order) => {
+        if (!order.createdAt?.seconds) return false;
+        const orderDate = new Date(order.createdAt.seconds * 1000);
+        // Cari order yang tanggal createdAt-nya adalah besok
+        return isSameDay(orderDate, tomorrow);
+    });
 
     const totalKunjungan = kunjunganHariIni.length;
     const totalPendapatan = [...kunjunganHariIni, ...orderHariIni].reduce((sum, item) => sum + item.total, 0);
     const totalBoxTerjual = [...kunjunganHariIni, ...orderHariIni].reduce((sum, item) => sum + (item.items?.reduce((qty, subItem) => qty + subItem.qtyBox, 0) || 0), 0);
 
     // --- Hitung data BULAN INI dari 'kunjunganList' & 'orderList' ---
-    const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
-    monthStart.setHours(0, 0, 0, 0);
-
-    const monthEnd = new Date(now.getFullYear(), now.getMonth() + 1, 0);
-    monthEnd.setHours(23, 59, 59, 999);
-
-    const filterThisMonth = (item) => {
-        if (!item.createdAt?.seconds) return false;
-        const itemDate = new Date(item.createdAt.seconds * 1000);
-        return itemDate >= monthStart && itemDate <= monthEnd;
-    };
+    // Dengan logika H+1, periode bulanan menjadi standar (tanggal 1 s/d akhir bulan).
+    const monthStart = startOfMonth(now);
+    const monthEnd = endOfMonth(now);
 
     const kunjunganBulanIni = kunjunganList.filter((kunjungan) => {
         if (!kunjungan.createdAt?.seconds) return false;
         const visitDate = new Date(kunjungan.createdAt.seconds * 1000);
-        return visitDate >= monthStart && visitDate <= monthEnd;
+        return isWithinInterval(visitDate, { start: monthStart, end: monthEnd });
     });
+
     const orderBulanIni = orderList.filter((order) => {
         if (!order.createdAt?.seconds) return false;
         const orderDate = new Date(order.createdAt.seconds * 1000);
-        return orderDate >= monthStart && orderDate <= monthEnd;
+        return isWithinInterval(orderDate, { start: monthStart, end: monthEnd });
     });
 
+    // Kalkulasi bulanan hanya berdasarkan `orderBulanIni` karena kunjungan tidak lagi menyimpan data order.
     const totalKunjunganBulanIni = kunjunganBulanIni.length;
-    const totalBoxTerjualBulanIni = [...kunjunganBulanIni, ...orderBulanIni].reduce((sum, item) => sum + (item.items?.reduce((qty, subItem) => qty + subItem.qtyBox, 0) || 0), 0);
-    const totalPendapatanBulanIni = [...kunjunganBulanIni, ...orderBulanIni].reduce((sum, item) => sum + item.total, 0);
+    const totalBoxTerjualBulanIni = orderBulanIni.reduce((sum, item) => sum + (item.items?.reduce((qty, subItem) => qty + subItem.qtyBox, 0) || 0), 0);
+    const totalPendapatanBulanIni = orderBulanIni.reduce((sum, item) => sum + item.total, 0);
 
     // --- Target Penjualan (Contoh) ---
     const TARGET_BOX_BULANAN = targets.TARGET_BOX_BULANAN || 1000; // Gunakan target dari props, fallback ke 1000
@@ -59,11 +66,16 @@ export default function HomePage({ daftarToko, kunjunganList = [], produkList = 
     // --- Hitung sisa hari kerja & target harian ---
     const getSisaHariKerja = () => {
         const today = new Date();
-        const lastDayOfMonth = new Date(today.getFullYear(), today.getMonth() + 1, 0).getDate();
+        // Batas akhir hari kerja efektif adalah 1 hari sebelum akhir bulan, karena order di hari terakhir masuk ke bulan berikutnya.
+        const lastWorkingDayOfMonth = new Date(monthEnd.getFullYear(), monthEnd.getMonth(), monthEnd.getDate() - 1);
+
+        if (today >= lastWorkingDayOfMonth) return 0;
+
         let sisaHari = 0;
-        for (let d = today.getDate(); d <= lastDayOfMonth; d++) {
-            const currentDate = new Date(today.getFullYear(), today.getMonth(), d);
-            if (currentDate.getDay() !== 0) {
+        const tomorrow = addDays(today, 1);
+        // Loop dari besok hingga hari kerja efektif terakhir di bulan ini.
+        for (let d = new Date(tomorrow.getTime()); d <= lastWorkingDayOfMonth; d.setDate(d.getDate() + 1)) {
+            if (d.getDay() !== 0) {
                 // 0 = Minggu, asumsikan libur
                 sisaHari++;
             }
@@ -76,20 +88,11 @@ export default function HomePage({ daftarToko, kunjunganList = [], produkList = 
     // --- Hitung Produk Terlaris Bulan Ini (Top 5) ---
     const productSalesMap = new Map(); // Map: productId -> totalQtyBox
 
-    kunjunganBulanIni.forEach((kunjungan) => {
-        if (kunjungan.items) {
-            kunjungan.items.forEach((item) => {
-                const currentQty = productSalesMap.get(item.productId) || 0;
-                productSalesMap.set(item.productId, currentQty + item.qtyBox);
-            });
-        }
-    });
-
     orderBulanIni.forEach((order) => {
         if (order.items) {
             order.items.forEach((item) => {
                 const currentQty = productSalesMap.get(item.productId) || 0;
-                productSalesMap.set(item.productId, currentQty + item.qtyBox);
+                productSalesMap.set(item.productId, currentQty + (item.qtyBox || 0));
             });
         }
     });
@@ -108,23 +111,25 @@ export default function HomePage({ daftarToko, kunjunganList = [], produkList = 
     const [showRewardNotification, setShowRewardNotification] = useState(true);
 
     const eligibleForLastMonthReward = useMemo(() => {
-        const today = new Date();
+        const today = new Date(); // Gunakan tanggal asli untuk logika notifikasi
         // Notifikasi hanya tampil sampai tanggal 15 bulan ini
         if (today.getDate() > 15) {
             return [];
         }
 
-        const lastMonth = new Date(today.getFullYear(), today.getMonth() - 1, 1);
-        const lastMonthYear = lastMonth.getFullYear();
-        const lastMonthMonth = lastMonth.getMonth();
-        const lastMonthKey = `${lastMonthYear}-${String(lastMonthMonth + 1).padStart(2, '0')}`;
+        // Dapatkan periode penjualan bulan lalu menggunakan logika baru
+        // Periode bulan lalu adalah dari tanggal 1 hingga akhir bulan lalu.
+        const lastMonthDateRef = new Date(today.getFullYear(), today.getMonth() - 1, 15);
+        const lastMonthStart = startOfMonth(lastMonthDateRef);
+        const lastMonthEnd = endOfMonth(lastMonthDateRef);
+        const lastMonthKey = `${lastMonthStart.getFullYear()}-${String(lastMonthStart.getMonth() + 1).padStart(2, '0')}`;
 
         const eligibleToko = daftarToko
             .map((toko) => {
                 const ordersLastMonth = orderList.filter((order) => {
                     if (!order.createdAt?.seconds) return false;
                     const orderDate = new Date(order.createdAt.seconds * 1000);
-                    return order.tokoId === toko.id && orderDate.getFullYear() === lastMonthYear && orderDate.getMonth() === lastMonthMonth;
+                    return order.tokoId === toko.id && isWithinInterval(orderDate, { start: lastMonthStart, end: lastMonthEnd });
                 });
 
                 const totalBoxesLastMonth = ordersLastMonth.reduce((sum, order) => sum + (order.items?.reduce((itemSum, item) => itemSum + item.qtyBox, 0) || 0), 0);
@@ -143,7 +148,7 @@ export default function HomePage({ daftarToko, kunjunganList = [], produkList = 
             .filter(Boolean);
 
         return eligibleToko;
-    }, [daftarToko, orderList]);
+    }, [daftarToko, orderList, now]);
 
     const salesPerson = { name: 'Sales App', initial: 'S' }; // Placeholder
 
@@ -337,11 +342,14 @@ export default function HomePage({ daftarToko, kunjunganList = [], produkList = 
                     <div className="space-y-2">
                         {kunjunganList.slice(0, 5).map((kunjungan) => {
                             // Cari SEMUA order yang cocok berdasarkan tokoId dan tanggal yang sama
-                            const visitDate = new Date(kunjungan.createdAt.seconds * 1000);
+                            const visitDate = new Date(kunjungan.createdAt.seconds * 1000); // Tanggal Kunjungan (Hari H)
+                            const orderEffectiveDate = addDays(visitDate, 1); // Tanggal Order terkait adalah H+1
+
                             const relatedOrders = orderList.filter((order) => {
                                 if (!order.createdAt?.seconds) return false;
                                 const orderDate = new Date(order.createdAt.seconds * 1000);
-                                return order.tokoId === kunjungan.tokoId && visitDate.toDateString() === orderDate.toDateString();
+                                // Hubungkan kunjungan dengan order yang tanggalnya H+1
+                                return order.tokoId === kunjungan.tokoId && isSameDay(orderDate, orderEffectiveDate);
                             });
 
                             const displayTotal = relatedOrders.reduce((sum, order) => sum + (order.total || 0), 0);

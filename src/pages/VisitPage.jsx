@@ -2,7 +2,7 @@
 import { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import { collection, getDocs, addDoc, query, orderBy, doc, updateDoc, deleteDoc, writeBatch, where } from 'firebase/firestore';
 import { DayPicker } from 'react-day-picker';
-import { format, isSameDay, isSameMonth, startOfMonth, endOfMonth } from 'date-fns';
+import { format, isSameDay, isSameMonth, startOfMonth, endOfMonth, addDays } from 'date-fns';
 import { id } from 'date-fns/locale';
 import { toPng } from 'html-to-image';
 import 'react-day-picker/dist/style.css';
@@ -227,6 +227,9 @@ export default function VisitPage({ setActivePage, orderList = [], kunjunganList
             return;
         }
 
+        // Logika Next Day untuk Order: Tambahkan 1 hari dari tanggal kunjungan.
+        const deliveryDate = addDays(visitDate, 1);
+
         const items = produkList
             .filter((produk) => cart[produk.id] > 0)
             .map((produk) => ({
@@ -265,26 +268,20 @@ export default function VisitPage({ setActivePage, orderList = [], kunjunganList
                     tokoNama: kunjunganData.tokoNama,
                     kodeToko: kunjunganData.kodeToko,
                     catatan: kunjunganData.catatan,
-                    createdAt: visitDate, // Gunakan tanggal dari form saat edit
+                    createdAt: visitDate, // Kunjungan tetap dicatat pada Hari H
                 });
 
                 // 2. Cari dan update order terkait
                 const originalVisit = kunjunganList.find((v) => v.id === editingVisitId);
-                const originalVisitDate = new Date(originalVisit.createdAt.seconds * 1000);
+                const originalVisitDate = new Date(originalVisit.createdAt.seconds * 1000); // Tanggal kunjungan asli (Hari H)
+                const orderEffectiveDate = addDays(originalVisitDate, 1); // Tanggal order terkait adalah H+1
 
-                // Buat salinan tanggal agar tidak mengubah state asli
-                const startOfDay = new Date(originalVisitDate);
-                startOfDay.setHours(0, 0, 0, 0);
-                const endOfDay = new Date(originalVisitDate);
-                endOfDay.setHours(23, 59, 59, 999);
-
-                // --- PERUBAHAN LOGIKA ---
-                // Ambil semua order yang relevan dari state (orderList) yang sudah di-fetch sebelumnya.
-                // Ini menghindari query kompleks ke Firestore yang butuh index.
+                // Cari order yang terkait dengan kunjungan yang sedang diedit
                 const relatedOrders = orderList.filter((order) => {
                     if (!order.createdAt?.seconds) return false;
                     const orderDate = new Date(order.createdAt.seconds * 1000);
-                    return order.tokoId === originalVisit.tokoId && orderDate >= startOfDay && orderDate <= endOfDay;
+                    // Cocokkan tokoId dan tanggal order (H+1 dari tanggal kunjungan)
+                    return order.tokoId === originalVisit.tokoId && isSameDay(orderDate, orderEffectiveDate);
                 });
 
                 if (relatedOrders.length > 0) {
@@ -298,7 +295,7 @@ export default function VisitPage({ setActivePage, orderList = [], kunjunganList
                             items: kunjunganData.items,
                             total: kunjunganData.total,
                             catatan: `Order dari kunjungan: ${kunjunganData.catatan}`,
-                            createdAt: visitDate, // Update tanggal order juga
+                            createdAt: deliveryDate, // Order diupdate dengan tanggal H+1
                         });
                     } else {
                         // Jika sekarang tidak ada item, hapus order tersebut
@@ -307,7 +304,7 @@ export default function VisitPage({ setActivePage, orderList = [], kunjunganList
                 } else if (hasOrder) {
                     // Jika tidak ada order terkait tapi sekarang ada item, buat order baru
                     const newOrderRef = doc(collection(db, 'orders'));
-                    batch.set(newOrderRef, { ...kunjunganData, createdAt: visitDate }); // Gunakan tanggal dari form
+                    batch.set(newOrderRef, { ...kunjunganData, createdAt: deliveryDate }); // Order baru dicatat dengan tanggal H+1
                 }
 
                 await batch.commit();
@@ -321,7 +318,7 @@ export default function VisitPage({ setActivePage, orderList = [], kunjunganList
                     catatan: kunjunganData.catatan,
                     items: [],
                     total: 0,
-                    createdAt: visitDate, // Gunakan tanggal dari form
+                    createdAt: visitDate, // Kunjungan dicatat pada Hari H
                 });
                 showNotification('Kunjungan berhasil dicatat.');
 
@@ -334,7 +331,7 @@ export default function VisitPage({ setActivePage, orderList = [], kunjunganList
                         items: kunjunganData.items,
                         catatan: `Order dari kunjungan: ${kunjunganData.catatan}`,
                         total: kunjunganData.total,
-                        createdAt: visitDate, // Gunakan tanggal yang sama dengan kunjungan
+                        createdAt: deliveryDate, // Order dicatat dengan tanggal H+1
                     });
                     showNotification('Order dari kunjungan berhasil disimpan.', 'success');
                 }
@@ -377,11 +374,14 @@ export default function VisitPage({ setActivePage, orderList = [], kunjunganList
         setVisitDate(kunjungan.createdAt?.seconds ? new Date(kunjungan.createdAt.seconds * 1000) : new Date());
 
         // Saat edit, cart diisi dari data 'order' yang terkait, bukan dari 'kunjungan'
-        const visitDate = new Date(kunjungan.createdAt.seconds * 1000);
+        const visitDate = new Date(kunjungan.createdAt.seconds * 1000); // Ini adalah tanggal kunjungan (Hari H)
+        const orderEffectiveDate = addDays(visitDate, 1); // Order terkait disimpan pada Hari H+1
+
         const relatedOrder = orderList.find((order) => {
             if (!order.createdAt?.seconds) return false;
             const orderDate = new Date(order.createdAt.seconds * 1000);
-            return order.tokoId === kunjungan.tokoId && isSameDay(orderDate, visitDate);
+            // Cari order yang cocok dengan tokoId dan tanggalnya adalah H+1 dari tanggal kunjungan
+            return order.tokoId === kunjungan.tokoId && isSameDay(orderDate, orderEffectiveDate);
         });
 
         let initialCart = {};
@@ -746,11 +746,16 @@ ${padRight('No HP', 15)}: ${toko.nomorWa || '-'}
                         <div className="space-y-3">
                             {filteredKunjungan.map((kunjungan) => {
                                 // Cari SEMUA order yang cocok berdasarkan tokoId dan tanggal yang sama
-                                const visitDate = new Date(kunjungan.createdAt.seconds * 1000);
+                                const visitDate = new Date(kunjungan.createdAt.seconds * 1000); // Tanggal Kunjungan (Hari H)
+                                const orderDateForStandaloneOrder = addDays(visitDate, 1); // Tanggal Order dari OrderPage (Hari H+1)
+
                                 const relatedOrders = orderList.filter((order) => {
                                     if (!order.createdAt?.seconds) return false;
                                     const orderDate = new Date(order.createdAt.seconds * 1000);
-                                    return order.tokoId === kunjungan.tokoId && isSameDay(orderDate, visitDate);
+                                    // Cek order di hari yang sama (dari VisitPage) ATAU di hari berikutnya (dari OrderPage)
+                                    const isFromVisit = isSameDay(orderDate, visitDate);
+                                    const isFromOrderPage = isSameDay(orderDate, orderDateForStandaloneOrder);
+                                    return order.tokoId === kunjungan.tokoId && (isFromVisit || isFromOrderPage);
                                 });
 
                                 // Akumulasi total dari semua order terkait
@@ -1102,7 +1107,7 @@ ${padRight('No HP', 15)}: ${toko.nomorWa || '-'}
                             </form>
 
                             {/* Total & Submit (Sticky di bawah form) */}
-                            <div className="absolute bottom-0 left-0 right-0 bg-white/80 backdrop-blur-sm py-2 px-3 border-t border-gray-200">
+                            <div className="absolute bottom-0 left-0 right-0 bg-white/80 backdrop-blur-sm py-2 px-3 border-t border-gray-200 z-20">
                                 <div className="bg-gradient-to-r from-purple-50 via-indigo-50 to-blue-50 p-3 rounded-xl border border-purple-200/50 mb-3 shadow-sm relative overflow-hidden">
                                     {/* Decorative background elements */}
                                     <div className="absolute top-0 right-0 w-20 h-20 bg-purple-200/30 rounded-full -translate-y-10 translate-x-10"></div>

@@ -2,8 +2,8 @@
 import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import { collection, getDocs, addDoc, serverTimestamp, query, orderBy, doc, updateDoc, deleteDoc, writeBatch } from 'firebase/firestore';
 import { DayPicker } from 'react-day-picker'; // Pastikan ini ada
-import 'react-day-picker/dist/style.css';
-import { format } from 'date-fns';
+import 'react-day-picker/dist/style.css'; //
+import { format, addDays } from 'date-fns';
 import { id } from 'date-fns/locale';
 import { toPng } from 'html-to-image'; //
 import { db } from '../lib/firebase';
@@ -213,6 +213,9 @@ export default function OrderPage({ setActivePage, orderList, setOrderList, toko
             return;
         }
 
+        // Logika Next Day: Tambahkan 1 hari dari tanggal order untuk tanggal pencatatan (delivery)
+        const deliveryDate = addDays(orderDate, 1);
+
         const items = produkList
             .filter((produk) => cart[produk.id] > 0)
             .map((produk) => ({
@@ -231,7 +234,7 @@ export default function OrderPage({ setActivePage, orderList, setOrderList, toko
             tokoNama: selectedToko?.nama || 'Toko Tidak Diketahui',
             kodeToko: selectedToko?.kode || '',
             items,
-            createdAt: orderDate, // Gunakan tanggal dari form
+            createdAt: deliveryDate, // Gunakan tanggal pengiriman sebagai tanggal pencatatan
             catatan: catatan.trim(),
             total: getGrandTotal(),
         };
@@ -246,8 +249,7 @@ export default function OrderPage({ setActivePage, orderList, setOrderList, toko
             } else {
                 // Saat buat baru, gunakan tanggal dari form
                 await addDoc(collection(db, 'orders'), {
-                    ...orderData,
-                    createdAt: orderDate, // Gunakan tanggal dari form
+                    ...orderData, // orderData sudah berisi createdAt yang telah disesuaikan
                 });
                 showNotification('Order berhasil disimpan.');
             }
@@ -334,8 +336,10 @@ export default function OrderPage({ setActivePage, orderList, setOrderList, toko
             if (!order.createdAt?.seconds) return false;
             const orderDate = new Date(order.createdAt.seconds * 1000);
             if (filterType === 'today') {
-                const today = new Date();
-                return orderDate.getDate() === today.getDate() && orderDate.getMonth() === today.getMonth() && orderDate.getFullYear() === today.getFullYear();
+                // Logika Next Day: Filter "Hari Ini" di halaman Order menampilkan data untuk BESOK.
+                const tomorrow = addDays(new Date(), 1);
+                // Menggunakan isSameDay untuk perbandingan yang lebih aman
+                return orderDate.getDate() === tomorrow.getDate() && orderDate.getMonth() === tomorrow.getMonth() && orderDate.getFullYear() === tomorrow.getFullYear();
             }
             if (filterType === 'custom') {
                 return orderDate.getDate() === customDate.getDate() && orderDate.getMonth() === customDate.getMonth() && orderDate.getFullYear() === customDate.getFullYear();

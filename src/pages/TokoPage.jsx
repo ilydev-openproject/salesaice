@@ -3,12 +3,13 @@ import { useState, useEffect, useRef } from 'react';
 import { collection, getDocs, addDoc, updateDoc, deleteDoc, doc, serverTimestamp, writeBatch } from 'firebase/firestore';
 import { db } from '../lib/firebase';
 import Loader from '../components/Loader';
-import { Store, Plus, Trash2, Pencil, CheckCircle2, Calendar, Filter, ArrowLeft, Package, MapPin, AlertTriangle, ArrowDownUp, FileUp, FileDown, Send, LocateFixed, Loader2 } from 'lucide-react';
+import { Store, Plus, Trash2, Pencil, CheckCircle2, Calendar, Filter, ArrowLeft, Package, MapPin, AlertTriangle, ArrowDownUp, FileUp, FileDown, Send, LocateFixed, Loader2, Camera } from 'lucide-react';
 import { MessageSquare } from 'lucide-react'; // Import MessageSquare
 import * as XLSX from 'xlsx'; // Import xlsx library
 
 import VisitDetailPage from './VisitDetailPage'; // Import halaman detail kunjungan
 import OrderDetailPage from './OrderDetailPage'; // Import halaman detail order
+import ImageUploaderCamera from './ImageUploaderCamera'; // Impor komponen kamera baru
 const HARI = ['senin', 'selasa', 'rabu', 'kamis', 'jumat', 'sabtu'];
 
 const HARI_LABEL = {
@@ -30,6 +31,7 @@ export default function TokoPage({ orderList = [], kunjunganList = [], onModalCh
     const [nama, setNama] = useState('');
     const [kode, setKode] = useState('');
     const [jadwalKunjungan, setJadwalKunjungan] = useState([]);
+    const [fotoToko, setFotoToko] = useState(''); // State baru untuk foto toko
     const [kodeFreezer, setKodeFreezer] = useState(''); // New state for kodeFreezer
     const [latitude, setLatitude] = useState('');
     const [longitude, setLongitude] = useState('');
@@ -56,12 +58,15 @@ export default function TokoPage({ orderList = [], kunjunganList = [], onModalCh
     // State untuk menampilkan halaman detail
     const [viewingDetail, setViewingDetail] = useState({ type: null, toko: null });
 
+    // State untuk kamera
+    const [showCamera, setShowCamera] = useState(false);
+
     // Ref untuk file input
     const fileInputRef = useRef(null);
 
     // Efek untuk memberitahu App.jsx jika ada modal yang terbuka
     useEffect(() => {
-        const isAnyModalOpen = showForm || showDeleteConfirm || showUpdateConfirm || showBroadcastModal;
+        const isAnyModalOpen = showForm || showDeleteConfirm || showUpdateConfirm || showBroadcastModal || showCamera;
         onModalChange(isAnyModalOpen);
 
         const handlePopState = (event) => {
@@ -72,6 +77,7 @@ export default function TokoPage({ orderList = [], kunjunganList = [], onModalCh
                 else if (showDeleteConfirm) setShowDeleteConfirm(false);
                 else if (showUpdateConfirm) setShowUpdateConfirm(false);
                 else if (showBroadcastModal) setShowBroadcastModal(false);
+                else if (showCamera) setShowCamera(false);
             }
         };
 
@@ -79,7 +85,7 @@ export default function TokoPage({ orderList = [], kunjunganList = [], onModalCh
         if (isAnyModalOpen) window.history.pushState({ modal: 'toko' }, '');
         window.addEventListener('popstate', handlePopState);
         return () => window.removeEventListener('popstate', handlePopState);
-    }, [showForm, showDeleteConfirm, showUpdateConfirm, showBroadcastModal, onModalChange]);
+    }, [showForm, showDeleteConfirm, showUpdateConfirm, showBroadcastModal, showCamera, onModalChange]);
 
     // Load data
     useEffect(() => {
@@ -114,6 +120,7 @@ export default function TokoPage({ orderList = [], kunjunganList = [], onModalCh
         setNama('');
         setKode('');
         setJadwalKunjungan([]);
+        setFotoToko(''); // Reset foto toko
         setKodeFreezer(''); // Reset kodeFreezer
         setNomorWa('');
         setLatitude('');
@@ -131,6 +138,7 @@ export default function TokoPage({ orderList = [], kunjunganList = [], onModalCh
         setEditingId(toko.id);
         setNama(toko.nama || '');
         setKode(toko.kode || '');
+        setFotoToko(toko.fotoToko || ''); // Set foto toko untuk edit
         setKodeFreezer(toko.kodeFreezer || ''); // Set kodeFreezer for editing
         setJadwalKunjungan(Array.isArray(toko.jadwalKunjungan) ? toko.jadwalKunjungan : []);
         setNomorWa(toko.nomorWa || '');
@@ -184,6 +192,7 @@ export default function TokoPage({ orderList = [], kunjunganList = [], onModalCh
             nama: nama.trim(),
             kode: kode.trim() || '-',
             jadwalKunjungan: jadwalKunjungan, // Ensure this is an array of strings
+            fotoToko: fotoToko.trim(), // Simpan URL foto toko
             kodeFreezer: kodeFreezer.trim(), // Include kodeFreezer
             nomorWa: nomorWa.trim(),
             latitude: latitude,
@@ -571,6 +580,16 @@ export default function TokoPage({ orderList = [], kunjunganList = [], onModalCh
                                 <div>
                                     <label className="block text-sm font-medium text-slate-700 mb-1">Nama Toko *</label>
                                     <input type="text" value={nama} onChange={(e) => setNama(e.target.value)} placeholder="Contoh: Toko Jaya Abadi" className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500" required />
+                                </div>
+                                <div>
+                                    <label className="block text-sm font-medium text-slate-700 mb-1">URL Foto Toko (Opsional)</label>
+                                    <div className="flex items-center gap-2">
+                                        <input type="text" value={fotoToko} onChange={(e) => setFotoToko(e.target.value)} placeholder="https://example.com/foto.jpg" className="flex-grow p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500" />
+                                        <button type="button" onClick={() => setShowCamera(true)} className="p-3 bg-purple-100 text-purple-700 rounded-lg hover:bg-purple-200 transition-colors">
+                                            <Camera size={20} />
+                                        </button>
+                                    </div>
+                                    {fotoToko && <img src={fotoToko} alt="Preview" className="mt-2 w-24 h-24 object-cover rounded-lg border" />}
                                 </div>
                                 <div>
                                     <label className="block text-sm font-medium text-slate-700 mb-1">Kode Toko (Opsional)</label>
