@@ -268,7 +268,7 @@ export default function VisitPage({ setActivePage, orderList = [], kunjunganList
                     tokoNama: kunjunganData.tokoNama,
                     kodeToko: kunjunganData.kodeToko,
                     catatan: kunjunganData.catatan,
-                    createdAt: visitDate, // Kunjungan tetap dicatat pada Hari H
+                    createdAt: visitDate, // Kunjungan dicatat pada Hari H (tanggal di form)
                 });
 
                 // 2. Cari dan update order terkait
@@ -316,9 +316,9 @@ export default function VisitPage({ setActivePage, orderList = [], kunjunganList
                     tokoNama: kunjunganData.tokoNama,
                     kodeToko: kunjunganData.kodeToko,
                     catatan: kunjunganData.catatan,
-                    items: [],
+                    items: [], // Kunjungan tidak menyimpan item
                     total: 0,
-                    createdAt: visitDate, // Kunjungan dicatat pada Hari H
+                    createdAt: visitDate, // Kunjungan dicatat pada Hari H (tanggal di form)
                 });
                 showNotification('Kunjungan berhasil dicatat.');
 
@@ -370,18 +370,17 @@ export default function VisitPage({ setActivePage, orderList = [], kunjunganList
         await loadFormData();
         setEditingVisitId(kunjungan.id);
         setSelectedTokoId(kunjungan.tokoId);
-        setCatatan(kunjungan.catatan || '');
-        setVisitDate(kunjungan.createdAt?.seconds ? new Date(kunjungan.createdAt.seconds * 1000) : new Date());
+        setCatatan(kunjungan.catatan || ''); // Ambil catatan dari kunjungan
+        // Tanggal form diisi dari tanggal kunjungan itu sendiri (Hari H)
+        setVisitDate(new Date(kunjungan.createdAt.seconds * 1000));
 
         // Saat edit, cart diisi dari data 'order' yang terkait, bukan dari 'kunjungan'
-        const visitDate = new Date(kunjungan.createdAt.seconds * 1000); // Ini adalah tanggal kunjungan (Hari H)
-        const orderEffectiveDate = addDays(visitDate, 1); // Order terkait disimpan pada Hari H+1
-
+        const visitDateFromKunjungan = new Date(kunjungan.createdAt.seconds * 1000);
         const relatedOrder = orderList.find((order) => {
             if (!order.createdAt?.seconds) return false;
             const orderDate = new Date(order.createdAt.seconds * 1000);
             // Cari order yang cocok dengan tokoId dan tanggalnya adalah H+1 dari tanggal kunjungan
-            return order.tokoId === kunjungan.tokoId && isSameDay(orderDate, orderEffectiveDate);
+            return order.tokoId === kunjungan.tokoId && isSameDay(orderDate, addDays(visitDateFromKunjungan, 1));
         });
 
         let initialCart = {};
@@ -544,76 +543,61 @@ export default function VisitPage({ setActivePage, orderList = [], kunjunganList
         console.log('Visit Date (from kunjungan.createdAt or fallback):', visitDate);
 
         // 1. No Urut Kunjungan Hari Ini
-        const visitsToday = kunjunganList
-            .filter((v) => {
-                if (!v.createdAt?.seconds || typeof v.createdAt.seconds !== 'number') {
-                    console.warn('Skipping visit due to invalid createdAt for daily stats:', v.id, v.createdAt);
-                    return false;
-                }
-                const d = new Date(v.createdAt.seconds * 1000);
-                return isSameDay(d, visitDate); // Use isSameDay from date-fns
-            })
-            .sort((a, b) => a.createdAt.seconds - b.createdAt.seconds);
+        const visitsToday = kunjunganList.filter((v) => v.createdAt?.seconds && isSameDay(new Date(v.createdAt.seconds * 1000), visitDate)).sort((a, b) => a.createdAt.seconds - b.createdAt.seconds);
         const visitOrderToday = visitsToday.findIndex((v) => v.id === kunjungan.id) + 1;
-        console.log(
-            'Visits Today (for ordering):',
-            visitsToday.map((v) => ({ id: v.id, tokoNama: v.tokoNama, createdAt: new Date(v.createdAt.seconds * 1000) })),
-        );
-        console.log('Visit Order Today:', visitOrderToday);
 
-        // 2. Statistik Bulan Ini
-        const currentMonthStart = startOfMonth(visitDate);
-        const currentMonthEnd = endOfMonth(visitDate);
-        console.log('Start of Month:', currentMonthStart);
-        console.log('End of Month:', currentMonthEnd);
+        // --- PERBAIKAN LOGIKA BULANAN ---
+        // Jika hari ini adalah hari terakhir bulan, geser acuan tanggal ke bulan berikutnya untuk statistik.
+        const todayCalendarDate = new Date();
+        const isLastDayOfCalendarMonth = isSameDay(todayCalendarDate, endOfMonth(todayCalendarDate));
+        const dateForMonthlyStats = isLastDayOfCalendarMonth ? addDays(todayCalendarDate, 1) : todayCalendarDate;
 
-        // Gunakan orderList untuk statistik bulanan yang lebih akurat
+        // --- PERBAIKAN LOGIKA ---
+        // 2. Kunjungan ke (bulan ini)
+        // Karena kunjungan ini baru saja dibuat, kita mulai hitungan dari 1.
+        // Lalu tambahkan kunjungan lain yang sudah ada di bulan yang relevan.
+        const otherVisitsThisMonth = kunjunganList.filter((v) => {
+            if (!v.createdAt?.seconds || v.id === kunjungan.id) return false;
+            const d = new Date(v.createdAt.seconds * 1000);
+            return v.tokoId === kunjungan.tokoId && isSameMonth(d, dateForMonthlyStats);
+        });
+        const totalVisitsThisMonth = 1 + otherVisitsThisMonth.length;
+
+        // --- PERBAIKAN LOGIKA ---
+        // 3. Total Order (kunjungan ini): Cari order terkait di orderList
+        // Order terkait memiliki tanggal H+1 dari tanggal kunjungan.
+        const orderEffectiveDate = addDays(visitDate, 1);
+        const relatedOrder = orderList.find((o) => o.createdAt?.seconds && o.tokoId === kunjungan.tokoId && isSameDay(new Date(o.createdAt.seconds * 1000), orderEffectiveDate));
+
+        // Hitung total box dari order yang ditemukan.
+        const totalOrderBox = relatedOrder ? relatedOrder.items?.reduce((sum, item) => sum + (item.qtyBox || 0), 0) || 0 : 0;
+
+        // 4. Total Box (bulan ini)
+        // Gabungkan total box dari kunjungan ini dengan order lain yang sudah ada di bulan yang relevan.
         const ordersThisMonthForToko = orderList.filter((o) => {
-            if (!o.createdAt?.seconds || typeof o.createdAt.seconds !== 'number') {
-                console.warn('Skipping order for month stats due to invalid createdAt:', o.id, o.createdAt);
-                return false;
-            }
+            if (!o.createdAt?.seconds) return false;
             const d = new Date(o.createdAt.seconds * 1000);
-            const isSameToko = o.tokoId === kunjungan.tokoId;
-            const isInMonth = isSameMonth(d, visitDate);
-            return isSameToko && isInMonth;
+            return o.tokoId === kunjungan.tokoId && isSameMonth(d, dateForMonthlyStats);
         });
 
-        // Hitung total kunjungan unik pada bulan ini
-        const uniqueVisitDaysThisMonth = new Set(kunjunganList.filter((v) => v.tokoId === kunjungan.tokoId && isSameMonth(new Date(v.createdAt.seconds * 1000), visitDate)).map((v) => format(new Date(v.createdAt.seconds * 1000), 'yyyy-MM-dd')));
-        const totalVisitsThisMonth = uniqueVisitDaysThisMonth.size;
+        // Hitung total box bulan ini LANGSUNG dari semua order yang relevan.
+        // Ini mencegah penghitungan ganda.
         const totalBoxesThisMonth = ordersThisMonthForToko.reduce((sum, o) => sum + (o.items?.reduce((itemSum, item) => itemSum + item.qtyBox, 0) || 0), 0);
-        console.log('Total Boxes This Month (for this toko):', totalBoxesThisMonth);
 
-        // Hitung total box dari semua order pada hari kunjungan
-        const relatedOrdersToday = orderList.filter((order) => {
-            if (!order.createdAt?.seconds) return false;
-            const orderDate = new Date(order.createdAt.seconds * 1000);
-            return order.tokoId === kunjungan.tokoId && isSameDay(orderDate, visitDate);
-        });
-        const totalOrderBox = relatedOrdersToday.reduce((sum, order) => sum + (order.items?.reduce((itemSum, item) => itemSum + item.qtyBox, 0) || 0), 0);
+        const message = `*LAPORAN KUNJUNGAN*
 
-        console.log('Total Order Box (current visit):', totalOrderBox);
+*No Urut Kunjungan:* ${visitOrderToday}
+*Nama Toko:* ${kunjungan.tokoNama}
+*Kode Toko:* ${kunjungan.kodeToko || '-'}
 
-        const padRight = (str, len) => str.padEnd(len, ' ');
+*Kunjungan ke (bulan ini):* ${totalVisitsThisMonth}
+*Total Order (kunjungan ini):* ${totalOrderBox} box
+*Total Box (bulan ini):* ${totalBoxesThisMonth} box
 
-        const message = `LAPORAN KUNJUNGAN 
+*Nomor WA Toko:* ${toko.nomorWa || '-'}
 
-${padRight('No Urut', 15)}: ${visitOrderToday}
-${padRight('Nama Toko', 15)}: ${kunjungan.tokoNama}
-${padRight('Kode Toko', 15)}: ${kunjungan.kodeToko || '-'}
-
-${padRight('Kunjungan ke', 15)}: ${totalVisitsThisMonth} (bln ini)
-${padRight('Total order', 15)}: ${totalOrderBox} box
-${padRight('Total bln ini', 15)}: ${totalBoxesThisMonth} box
-
-${padRight('No HP', 15)}: ${toko.nomorWa || '-'}
-
-`
-            .trim() // Trim leading/trailing whitespace from the whole string
-            .split('\n') // Split into lines
-            .map((line) => line.trimEnd()) // Trim trailing spaces from each line
-            .join('\n');
+*Tanggal Laporan:* ${format(new Date(), 'd MMMM yyyy, HH:mm', { locale: id })}
+`.trim();
 
         const whatsappUrl = `https://wa.me/?text=${encodeURIComponent(message)}`;
         window.open(whatsappUrl, '_blank');
@@ -745,18 +729,10 @@ ${padRight('No HP', 15)}: ${toko.nomorWa || '-'}
                     ) : (
                         <div className="space-y-3">
                             {filteredKunjungan.map((kunjungan) => {
-                                // Cari SEMUA order yang cocok berdasarkan tokoId dan tanggal yang sama
                                 const visitDate = new Date(kunjungan.createdAt.seconds * 1000); // Tanggal Kunjungan (Hari H)
-                                const orderDateForStandaloneOrder = addDays(visitDate, 1); // Tanggal Order dari OrderPage (Hari H+1)
+                                const orderEffectiveDate = addDays(visitDate, 1); // Tanggal Order terkait adalah H+1
 
-                                const relatedOrders = orderList.filter((order) => {
-                                    if (!order.createdAt?.seconds) return false;
-                                    const orderDate = new Date(order.createdAt.seconds * 1000);
-                                    // Cek order di hari yang sama (dari VisitPage) ATAU di hari berikutnya (dari OrderPage)
-                                    const isFromVisit = isSameDay(orderDate, visitDate);
-                                    const isFromOrderPage = isSameDay(orderDate, orderDateForStandaloneOrder);
-                                    return order.tokoId === kunjungan.tokoId && (isFromVisit || isFromOrderPage);
-                                });
+                                const relatedOrders = orderList.filter((order) => order.createdAt?.seconds && order.tokoId === kunjungan.tokoId && isSameDay(new Date(order.createdAt.seconds * 1000), orderEffectiveDate));
 
                                 // Akumulasi total dari semua order terkait
                                 const displayTotal = relatedOrders.reduce((sum, order) => sum + (order.total || 0), 0);

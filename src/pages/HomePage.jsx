@@ -1,60 +1,80 @@
-import { MapPin, Package, Wallet, Plus, TrendingUp, Target, Award, BarChart2, Gift, X, Zap } from 'lucide-react';
-import { useMemo, useState } from 'react';
+import { MapPin, Package, Wallet, Plus, TrendingUp, Target, Award, BarChart2, Gift, X, Zap, ChevronsRight, Info, Users } from 'lucide-react';
+import { useMemo, useState, useEffect } from 'react';
 
-import { isWithinInterval, addDays, isSameDay, startOfMonth, endOfMonth } from 'date-fns';
+import { getSalesPeriod } from '../lib/dateUtils'; // Impor fungsi getSalesPeriod
+import { isWithinInterval, addDays, isSameDay, startOfMonth, endOfMonth, subMonths, format } from 'date-fns';
 
 export default function HomePage({ daftarToko, kunjunganList = [], produkList = [], orderList = [], setActivePage, targets }) {
     // --- Hitung data HARI INI dari 'kunjunganList' & 'orderList' ---
     const todayStart = new Date();
-    todayStart.setHours(0, 0, 0, 0); // Untuk filter "Hari Ini" yang sebenarnya
+    todayStart.setHours(0, 0, 0, 0);
 
-    // Tanggal acuan untuk perhitungan bulanan, dimajukan 1 hari untuk sinkronisasi dengan logika H+1.
-    const now = addDays(new Date(), 1);
-
-    const todayEnd = new Date(); // Untuk filter "Hari Ini" yang sebenarnya
+    const todayEnd = new Date();
     todayEnd.setHours(23, 59, 59, 999);
 
-    const filterToday = (item) => {
-        if (!item.createdAt?.seconds) return false;
-        const itemDate = new Date(item.createdAt.seconds * 1000);
-        return itemDate >= todayStart && itemDate <= todayEnd;
-    };
+    const kunjunganHariIni = kunjunganList.filter((kunjungan) => {
+        if (!kunjungan.createdAt?.seconds) return false;
+        const visitDate = new Date(kunjungan.createdAt.seconds * 1000);
+        // Kunjungan hari ini dihitung berdasarkan tanggal kalender HARI INI
+        return isSameDay(visitDate, new Date());
+    });
 
-    const kunjunganHariIni = kunjunganList.filter(filterToday);
-
-    // Logika filter order untuk ringkasan "Hari Ini"
-    // Order yang dibuat hari ini memiliki createdAt = besok (H+1)
-    const tomorrow = addDays(new Date(), 1); // Gunakan tanggal asli untuk 'tomorrow'
     const orderHariIni = orderList.filter((order) => {
         if (!order.createdAt?.seconds) return false;
         const orderDate = new Date(order.createdAt.seconds * 1000);
-        // Cari order yang tanggal createdAt-nya adalah besok
-        return isSameDay(orderDate, tomorrow);
+        // Order hari ini dihitung berdasarkan tanggal kalender BESOK (karena H+1)
+        return isSameDay(orderDate, addDays(new Date(), 1));
     });
 
+    // --- LOGIKA FINAL UNTUK KUNJUNGAN HARI INI ---
+    // "Kunjungan" dihitung dari setiap entri di `kunjunganList` yang dibuat hari ini.
+    // Ini mencerminkan berapa kali tombol "Simpan Kunjungan" ditekan.
     const totalKunjungan = kunjunganHariIni.length;
+
+    // "Box Terjual" dan "Pendapatan" dihitung dari gabungan `kunjunganHariIni` dan `orderHariIni`.
+    // Karena "Kunjungan dengan Order" membuat entri di kedua list, kita perlu memastikan tidak ada duplikasi.
+    // Namun, karena `kunjunganHariIni` tidak memiliki `items` atau `total`, penggabungan ini aman dan akan mengambil data dari `orderHariIni`.
     const totalPendapatan = [...kunjunganHariIni, ...orderHariIni].reduce((sum, item) => sum + item.total, 0);
     const totalBoxTerjual = [...kunjunganHariIni, ...orderHariIni].reduce((sum, item) => sum + (item.items?.reduce((qty, subItem) => qty + subItem.qtyBox, 0) || 0), 0);
 
     // --- Hitung data BULAN INI dari 'kunjunganList' & 'orderList' ---
-    // Dengan logika H+1, periode bulanan menjadi standar (tanggal 1 s/d akhir bulan).
-    const monthStart = startOfMonth(now);
-    const monthEnd = endOfMonth(now);
+    // Jika hari ini adalah hari terakhir bulan, geser acuan tanggal ke bulan berikutnya untuk insight bulanan.
+    const todayCalendarDate = new Date();
+    const isLastDayOfCalendarMonth = isSameDay(todayCalendarDate, endOfMonth(todayCalendarDate));
+    const nowForMonthlyInsights = isLastDayOfCalendarMonth ? addDays(todayCalendarDate, 1) : todayCalendarDate;
+    const { startDate: monthStart, endDate: monthEnd } = getSalesPeriod(nowForMonthlyInsights);
+    const today = new Date();
+    const isLastDayOfMonth = isSameDay(today, endOfMonth(today));
 
     const kunjunganBulanIni = kunjunganList.filter((kunjungan) => {
         if (!kunjungan.createdAt?.seconds) return false;
         const visitDate = new Date(kunjungan.createdAt.seconds * 1000);
-        return isWithinInterval(visitDate, { start: monthStart, end: monthEnd });
+        // Kunjungan (Hari H) dihitung berdasarkan periode penjualan yang sudah disesuaikan.
+        // `getSalesPeriod` sudah menangani logika H+1, jadi kita hanya perlu membandingkan.
+        // Contoh: Untuk Oktober, periode adalah 30 Sep - 30 Okt. Kunjungan pada 31 Okt tidak masuk.
+        // Ini BENAR, karena kunjungan 31 Okt omzetnya masuk November.
+        return visitDate >= monthStart && visitDate <= monthEnd;
     });
 
     const orderBulanIni = orderList.filter((order) => {
         if (!order.createdAt?.seconds) return false;
         const orderDate = new Date(order.createdAt.seconds * 1000);
-        return isWithinInterval(orderDate, { start: monthStart, end: monthEnd });
+        // Order (Hari H+1) dihitung berdasarkan periode penjualan yang sudah disesuaikan.
+        // Jika hari ini 31 Okt, `nowForMonthlyInsights` menjadi 1 Nov, `monthStart` menjadi 31 Okt.
+        // Order yang dibuat pada 30 Okt (dicatat 31 Okt) akan masuk.
+        // Order yang dibuat pada 31 Okt (dicatat 1 Nov) juga akan masuk karena `isLastDayOfMonth`
+        if (isLastDayOfMonth) {
+            const nextMonthFirstDay = addDays(monthEnd, 1);
+            return (orderDate >= monthStart && orderDate <= monthEnd) || isSameDay(orderDate, nextMonthFirstDay);
+        } // Untuk hari biasa, periode adalah dari startDate hingga endDate.
+        return orderDate >= monthStart && orderDate <= monthEnd;
     });
 
-    // Kalkulasi bulanan hanya berdasarkan `orderBulanIni` karena kunjungan tidak lagi menyimpan data order.
+    // Kalkulasi bulanan berdasarkan gabungan `kunjunganBulanIni` dan `orderBulanIni` karena keduanya sekarang mengikuti logika H+1.
     const totalKunjunganBulanIni = kunjunganBulanIni.length;
+
+    // Data penjualan (box & pendapatan) bulanan dihitung dari `orderBulanIni`
+    // karena `kunjunganBulanIni` tidak berisi data item/total.
     const totalBoxTerjualBulanIni = orderBulanIni.reduce((sum, item) => sum + (item.items?.reduce((qty, subItem) => qty + subItem.qtyBox, 0) || 0), 0);
     const totalPendapatanBulanIni = orderBulanIni.reduce((sum, item) => sum + item.total, 0);
 
@@ -65,16 +85,16 @@ export default function HomePage({ daftarToko, kunjunganList = [], produkList = 
 
     // --- Hitung sisa hari kerja & target harian ---
     const getSisaHariKerja = () => {
-        const today = new Date();
-        // Batas akhir hari kerja efektif adalah 1 hari sebelum akhir bulan, karena order di hari terakhir masuk ke bulan berikutnya.
-        const lastWorkingDayOfMonth = new Date(monthEnd.getFullYear(), monthEnd.getMonth(), monthEnd.getDate() - 1);
+        const currentDate = new Date();
+        // Batas akhir hari kerja efektif adalah `endDate` dari `getSalesPeriod`.
+        const lastWorkingDayOfSalesPeriod = monthEnd;
 
-        if (today >= lastWorkingDayOfMonth) return 0;
+        if (currentDate > lastWorkingDayOfSalesPeriod) return 0;
 
         let sisaHari = 0;
-        const tomorrow = addDays(today, 1);
-        // Loop dari besok hingga hari kerja efektif terakhir di bulan ini.
-        for (let d = new Date(tomorrow.getTime()); d <= lastWorkingDayOfMonth; d.setDate(d.getDate() + 1)) {
+        const tomorrow = addDays(currentDate, 1);
+        // Loop dari BESOK hingga hari kerja efektif terakhir dalam periode penjualan.
+        for (let d = new Date(tomorrow.getTime()); d <= lastWorkingDayOfSalesPeriod; d.setDate(d.getDate() + 1)) {
             if (d.getDay() !== 0) {
                 // 0 = Minggu, asumsikan libur
                 sisaHari++;
@@ -88,6 +108,7 @@ export default function HomePage({ daftarToko, kunjunganList = [], produkList = 
     // --- Hitung Produk Terlaris Bulan Ini (Top 5) ---
     const productSalesMap = new Map(); // Map: productId -> totalQtyBox
 
+    // Produk terlaris juga dihitung HANYA dari `orderBulanIni`.
     orderBulanIni.forEach((order) => {
         if (order.items) {
             order.items.forEach((item) => {
@@ -97,29 +118,19 @@ export default function HomePage({ daftarToko, kunjunganList = [], produkList = 
         }
     });
 
-    const sortedProductSales = Array.from(productSalesMap.entries())
-        .map(([productId, totalQtyBox]) => {
-            const product = produkList.find((p) => p.id === productId);
-            if (!product) return null; // Skip if product not found (e.g., deleted)
-            return { ...product, totalQtyBox };
-        })
-        .filter(Boolean) // Remove null entries
-        .sort((a, b) => b.totalQtyBox - a.totalQtyBox) // Sort descending by totalQtyBox
-        .slice(0, 5); // Take top 5
-
     // --- Logika Notifikasi Mystery Box ---
     const [showRewardNotification, setShowRewardNotification] = useState(true);
 
     const eligibleForLastMonthReward = useMemo(() => {
-        const today = new Date(); // Gunakan tanggal asli untuk logika notifikasi
         // Notifikasi hanya tampil sampai tanggal 15 bulan ini
-        if (today.getDate() > 15) {
+        if (todayCalendarDate.getDate() > 15) {
             return [];
         }
 
         // Dapatkan periode penjualan bulan lalu menggunakan logika baru
-        // Periode bulan lalu adalah dari tanggal 1 hingga akhir bulan lalu.
-        const lastMonthDateRef = new Date(today.getFullYear(), today.getMonth() - 1, 15);
+        // Acuannya adalah `nowForMonthlyInsights` agar konsisten di hari terakhir bulan.
+        const lastMonthDateRef = subMonths(nowForMonthlyInsights, 1);
+        // Periode omzet bulan lalu adalah dari tanggal 1 hingga akhir bulan kalender.
         const lastMonthStart = startOfMonth(lastMonthDateRef);
         const lastMonthEnd = endOfMonth(lastMonthDateRef);
         const lastMonthKey = `${lastMonthStart.getFullYear()}-${String(lastMonthStart.getMonth() + 1).padStart(2, '0')}`;
@@ -128,6 +139,7 @@ export default function HomePage({ daftarToko, kunjunganList = [], produkList = 
             .map((toko) => {
                 const ordersLastMonth = orderList.filter((order) => {
                     if (!order.createdAt?.seconds) return false;
+                    // Filter order (Hari H+1) berdasarkan rentang bulan lalu.
                     const orderDate = new Date(order.createdAt.seconds * 1000);
                     return order.tokoId === toko.id && isWithinInterval(orderDate, { start: lastMonthStart, end: lastMonthEnd });
                 });
@@ -146,15 +158,101 @@ export default function HomePage({ daftarToko, kunjunganList = [], produkList = 
                 return null;
             })
             .filter(Boolean);
-
         return eligibleToko;
-    }, [daftarToko, orderList, now]);
+    }, [daftarToko, orderList, nowForMonthlyInsights]); // Tambahkan nowForMonthlyInsights sebagai dependensi
+
+    // --- Insight Bulan Lalu ---
+    const lastMonthInsights = useMemo(() => {
+        // Acuannya adalah `nowForMonthlyInsights` agar konsisten di hari terakhir bulan.
+        const lastMonthDateRef = subMonths(nowForMonthlyInsights, 1);
+        // Periode omzet bulan lalu adalah dari tanggal 1 hingga akhir bulan kalender.
+        const lastMonthStart = startOfMonth(lastMonthDateRef);
+        const lastMonthEnd = endOfMonth(lastMonthDateRef);
+
+        const ordersLastMonth = orderList.filter((order) => {
+            if (!order.createdAt?.seconds) return false;
+            // Filter order (Hari H+1) berdasarkan rentang bulan lalu.
+            const orderDate = new Date(order.createdAt.seconds * 1000);
+            return isWithinInterval(orderDate, { start: lastMonthStart, end: lastMonthEnd });
+        });
+
+        const visitsLastMonth = kunjunganList.filter((visit) => {
+            if (!visit.createdAt?.seconds) return false;
+            // Filter kunjungan (Hari H) berdasarkan rentang bulan lalu.
+            const visitDate = new Date(visit.createdAt.seconds * 1000);
+            return isWithinInterval(visitDate, { start: lastMonthStart, end: lastMonthEnd });
+        });
+
+        const totalBox = ordersLastMonth.reduce((sum, order) => sum + (order.items?.reduce((itemSum, item) => itemSum + item.qtyBox, 0) || 0), 0);
+        const totalRevenue = ordersLastMonth.reduce((sum, order) => sum + order.total, 0);
+        const totalVisits = visitsLastMonth.length;
+
+        return { totalBox, totalRevenue, totalVisits, monthName: format(lastMonthStart, 'MMMM') };
+    }, [orderList, kunjunganList, nowForMonthlyInsights]); // Tambahkan nowForMonthlyInsights sebagai dependensi
 
     const salesPerson = { name: 'Sales App', initial: 'S' }; // Placeholder
 
     return (
         <div className="p-4 max-w-md mx-auto">
-            {/* Notifikasi Mystery Box */}
+            {/* Header */}
+            <header className="flex justify-between items-center mb-4">
+                <div>
+                    <h1 className="text-xl font-bold text-purple-800">{salesPerson.name}</h1>
+                    <p className="text-sm text-slate-500">{new Date().toLocaleDateString('id-ID', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}</p>
+                </div>
+                <div className="w-12 h-12 flex items-center justify-center">
+                    <img src="/logo.png" alt="Logo" className="h-full w-auto object-contain" />
+                </div>
+            </header>
+
+            {/* Insight Bulan Lalu */}
+            <div className="mb-4">
+                <h2 className="text-base font-semibold text-slate-700 mb-2 flex items-center gap-2">
+                    <Info size={18} className="text-blue-600" />
+                    Insight Bulan {lastMonthInsights.monthName}
+                </h2>
+                <div className="bg-white p-4 rounded-xl shadow-sm border border-gray-100 space-y-3">
+                    {/* Ringkasan Performa */}
+                    <div className="grid grid-cols-3 gap-3 text-center">
+                        <div className="bg-purple-50 p-2 rounded-lg border border-purple-100">
+                            <p className="text-xl font-bold text-purple-700">{lastMonthInsights.totalVisits.toLocaleString('id-ID')}</p>
+                            <p className="text-xs text-purple-600 flex items-center justify-center gap-1">
+                                <Users size={12} /> Kunjungan
+                            </p>
+                        </div>
+                        <div className="bg-blue-50 p-2 rounded-lg border border-blue-100">
+                            <p className="text-xl font-bold text-blue-700">{lastMonthInsights.totalBox.toLocaleString('id-ID')}</p>
+                            <p className="text-xs text-blue-600 flex items-center justify-center gap-1">
+                                <Package size={12} /> Box Terjual
+                            </p>
+                        </div>
+                        <div className="bg-green-50 p-2 rounded-lg border border-green-100">
+                            <p className="text-xl font-bold text-green-700">{(lastMonthInsights.totalRevenue / 1000000).toFixed(1)}jt</p>
+                            <p className="text-xs text-green-600 flex items-center justify-center gap-1">
+                                <Wallet size={12} /> Pendapatan
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            {/* Card Ringkasan Bulan Ini */}
+            <div className="bg-gradient-to-br from-purple-600 to-fuchsia-500 text-white p-4 rounded-xl shadow-lg mb-4">
+                <h2 className="text-base font-semibold text-purple-100 mb-3">Performa Bulan Ini</h2>
+                <div className="flex justify-around items-center">
+                    <div className="text-center">
+                        <p className="text-3xl font-bold">{totalKunjunganBulanIni}</p>
+                        <p className="text-xs text-purple-200 mt-1">Total Kunjungan</p>
+                    </div>
+                    <div className="h-12 w-px bg-purple-400/50"></div> {/* Divider */}
+                    <div className="text-center">
+                        <p className="text-3xl font-bold">{totalBoxTerjualBulanIni}</p>
+                        <p className="text-xs text-purple-200 mt-1">Total Box</p>
+                    </div>
+                </div>
+            </div>
+
+            {/* Notifikasi Mystery Box (Dipindahkan ke sini) */}
             {showRewardNotification && eligibleForLastMonthReward.length > 0 && (
                 <div className="bg-purple-100 border-l-4 border-purple-500 text-purple-700 p-4 rounded-r-lg mb-4 shadow-md animate-in fade-in duration-300" role="alert">
                     <div className="flex justify-between items-start">
@@ -172,32 +270,24 @@ export default function HomePage({ daftarToko, kunjunganList = [], produkList = 
                 </div>
             )}
 
-            {/* Header */}
-            <header className="flex justify-between items-center mb-4">
-                <div>
-                    <h1 className="text-xl font-bold text-purple-800">{salesPerson.name}</h1>
-                    <p className="text-sm text-slate-500">{new Date().toLocaleDateString('id-ID', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}</p>
+            {/* Hadiah Belum Diberikan (Dipindahkan ke sini) */}
+            {eligibleForLastMonthReward.length > 0 && (
+                <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-3 mb-4">
+                    <p className="text-xs font-semibold text-yellow-800 mb-1">Hadiah Belum Diberikan:</p>
+                    <ul className="text-xs text-yellow-900 list-disc list-inside space-y-1">
+                        {eligibleForLastMonthReward.slice(0, 2).map((toko) => (
+                            <li key={toko.id}>
+                                {toko.nama} ({toko.pendingRewards} hadiah)
+                            </li>
+                        ))}
+                    </ul>
+                    {eligibleForLastMonthReward.length > 2 && (
+                        <button onClick={() => setActivePage('mystery-box')} className="text-xs font-bold text-yellow-900 mt-2 flex items-center gap-1 hover:underline">
+                            Lihat Semua <ChevronsRight size={14} />
+                        </button>
+                    )}
                 </div>
-                <div className="w-12 h-12 flex items-center justify-center">
-                    <img src="/logo.png" alt="Logo" className="h-full w-auto object-contain" />
-                </div>
-            </header>
-
-            {/* Card Ringkasan Bulan Ini */}
-            <div className="bg-gradient-to-br from-purple-600 to-fuchsia-500 text-white p-4 rounded-xl shadow-lg mb-4">
-                <h2 className="text-base font-semibold text-purple-100 mb-3">Performa Bulan Ini</h2>
-                <div className="flex justify-around items-center">
-                    <div className="text-center">
-                        <p className="text-3xl font-bold">{totalKunjunganBulanIni}</p>
-                        <p className="text-xs text-purple-200 mt-1">Total Kunjungan</p>
-                    </div>
-                    <div className="h-12 w-px bg-purple-400/50"></div> {/* Divider */}
-                    <div className="text-center">
-                        <p className="text-3xl font-bold">{totalBoxTerjualBulanIni}</p>
-                        <p className="text-xs text-purple-200 mt-1">Total Box</p>
-                    </div>
-                </div>
-            </div>
+            )}
 
             {/* Kartu Target Kinerja */}
             <div className="mb-4">
@@ -341,16 +431,10 @@ export default function HomePage({ daftarToko, kunjunganList = [], produkList = 
                 ) : (
                     <div className="space-y-2">
                         {kunjunganList.slice(0, 5).map((kunjungan) => {
-                            // Cari SEMUA order yang cocok berdasarkan tokoId dan tanggal yang sama
                             const visitDate = new Date(kunjungan.createdAt.seconds * 1000); // Tanggal Kunjungan (Hari H)
                             const orderEffectiveDate = addDays(visitDate, 1); // Tanggal Order terkait adalah H+1
 
-                            const relatedOrders = orderList.filter((order) => {
-                                if (!order.createdAt?.seconds) return false;
-                                const orderDate = new Date(order.createdAt.seconds * 1000);
-                                // Hubungkan kunjungan dengan order yang tanggalnya H+1
-                                return order.tokoId === kunjungan.tokoId && isSameDay(orderDate, orderEffectiveDate);
-                            });
+                            const relatedOrders = orderList.filter((order) => order.createdAt?.seconds && order.tokoId === kunjungan.tokoId && isSameDay(new Date(order.createdAt.seconds * 1000), orderEffectiveDate));
 
                             const displayTotal = relatedOrders.reduce((sum, order) => sum + (order.total || 0), 0);
                             const totalBoxes = relatedOrders.reduce((sum, order) => sum + (order.items?.reduce((itemSum, item) => itemSum + item.qtyBox, 0) || 0), 0);

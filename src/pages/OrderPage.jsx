@@ -3,7 +3,7 @@ import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react'
 import { collection, getDocs, addDoc, serverTimestamp, query, orderBy, doc, updateDoc, deleteDoc, writeBatch } from 'firebase/firestore';
 import { DayPicker } from 'react-day-picker'; // Pastikan ini ada
 import 'react-day-picker/dist/style.css'; //
-import { format, addDays } from 'date-fns';
+import { format, addDays, subDays } from 'date-fns';
 import { id } from 'date-fns/locale';
 import { toPng } from 'html-to-image'; //
 import { db } from '../lib/firebase';
@@ -294,7 +294,10 @@ export default function OrderPage({ setActivePage, orderList, setOrderList, toko
         setSelectedTokoId(order.tokoId);
         setCatatan(order.catatan || '');
         // Pastikan orderDate selalu objek Date yang valid
-        setOrderDate(order.createdAt?.seconds && typeof order.createdAt.seconds === 'number' && !isNaN(order.createdAt.seconds) ? new Date(order.createdAt.seconds * 1000) : new Date());
+        // PENTING: Saat edit, kita set tanggal form ke H-1 dari tanggal yang tersimpan (createdAt)
+        // Ini agar saat disimpan lagi, H+1 akan menghasilkan tanggal yang sama, bukan tanggal baru.
+        const deliveryDate = order.createdAt?.seconds ? new Date(order.createdAt.seconds * 1000) : new Date();
+        setOrderDate(subDays(deliveryDate, 1));
         const initialCart = order.items.reduce((acc, item) => {
             acc[item.productId] = item.qtyBox;
             return acc;

@@ -1,33 +1,52 @@
-// src/pages/ProdukTerlarisPage.jsx
-import { useState } from 'react';
-import { ArrowLeft, TrendingUp } from 'lucide-react';
+import { useState, useMemo } from 'react';
+import { ArrowLeft, TrendingUp, Calendar, ChevronDown } from 'lucide-react';
+import { format, setMonth, getMonth, setYear, getYear, isSameDay, endOfMonth, addDays } from 'date-fns';
+import { getSalesPeriod } from '../lib/dateUtils'; // Impor fungsi getSalesPeriod
+import { id } from 'date-fns/locale';
 
 export default function ProdukTerlarisPage({ produkList, kunjunganList, orderList, setActivePage }) {
     const [showAll, setShowAll] = useState(false);
 
-    // --- Hitung Produk Terlaris (Semua Waktu) ---
-    const productSalesMap = new Map(); // Map: productId -> totalQtyBox
+    // --- PERBAIKAN LOGIKA: Samakan dengan HomePage ---
+    // Jika hari ini adalah hari terakhir bulan, geser acuan tanggal ke bulan berikutnya.
+    const todayCalendarDate = new Date();
+    const isLastDayOfCalendarMonth = isSameDay(todayCalendarDate, endOfMonth(todayCalendarDate));
+    const initialMonth = isLastDayOfCalendarMonth ? addDays(todayCalendarDate, 1) : todayCalendarDate;
+    const [selectedMonth, setSelectedMonth] = useState(initialMonth);
+    const [showMonthPicker, setShowMonthPicker] = useState(false);
+    const [showMonthDropdown, setShowMonthDropdown] = useState(false);
+    const [showYearDropdown, setShowYearDropdown] = useState(false);
 
-    // Gabungkan kunjungan dan order
-    const allTransactions = [...kunjunganList, ...orderList];
+    const filteredTransactions = useMemo(() => {
+        // Gunakan getSalesPeriod untuk mendapatkan rentang tanggal yang sesuai dengan logika H+1
+        const { startDate, endDate } = getSalesPeriod(selectedMonth);
 
-    allTransactions.forEach((transaction) => {
-        if (transaction.items) {
-            transaction.items.forEach((item) => {
-                const currentQty = productSalesMap.get(item.productId) || 0;
-                productSalesMap.set(item.productId, currentQty + (item.qtyBox || 0));
-            });
-        }
-    });
+        return [...kunjunganList, ...orderList].filter((transaction) => {
+            if (!transaction.createdAt?.seconds) return false;
+            const transactionDate = new Date(transaction.createdAt.seconds * 1000);
+            return transactionDate >= startDate && transactionDate <= endDate;
+        });
+    }, [selectedMonth, kunjunganList, orderList]);
 
-    const sortedProductSales = Array.from(productSalesMap.entries())
-        .map(([productId, totalQtyBox]) => {
-            const product = produkList.find((p) => p.id === productId);
-            if (!product) return null; // Lewati jika produk tidak ditemukan (misal: sudah dihapus)
-            return { ...product, totalQtyBox };
-        })
-        .filter(Boolean) // Hapus entri null
-        .sort((a, b) => b.totalQtyBox - a.totalQtyBox); // Urutkan dari terlaris
+    const sortedProductSales = useMemo(() => {
+        const productSalesMap = new Map();
+        filteredTransactions.forEach((transaction) => {
+            if (transaction.items) {
+                transaction.items.forEach((item) => {
+                    const currentQty = productSalesMap.get(item.productId) || 0;
+                    productSalesMap.set(item.productId, currentQty + (item.qtyBox || 0));
+                });
+            }
+        });
+
+        return Array.from(productSalesMap.entries())
+            .map(([productId, totalQtyBox]) => {
+                const product = produkList.find((p) => p.id === productId);
+                return product ? { ...product, totalQtyBox } : null;
+            })
+            .filter(Boolean)
+            .sort((a, b) => b.totalQtyBox - a.totalQtyBox);
+    }, [filteredTransactions, produkList]);
 
     const displayedProducts = showAll ? sortedProductSales : sortedProductSales.slice(0, 20);
 
@@ -43,8 +62,86 @@ export default function ProdukTerlarisPage({ produkList, kunjunganList, orderLis
                 </h2>
             </div>
 
+            {/* Filter Bulan dan Tahun */}
+            <div className="relative mb-5">
+                <button onClick={() => setShowMonthPicker(!showMonthPicker)} className="w-full p-3 text-left bg-white border border-slate-200 rounded-xl flex justify-between items-center focus:outline-none focus:ring-2 focus:ring-purple-500/50 focus:border-purple-300 transition-all duration-200">
+                    <span className="flex items-center gap-3">
+                        <div className="p-2 bg-gradient-to-br from-purple-100 to-indigo-100 rounded-xl">
+                            <Calendar size={16} className="text-purple-600" />
+                        </div>
+                        <span className="text-slate-700 font-medium text-sm">{format(selectedMonth, 'MMMM yyyy', { locale: id })}</span>
+                    </span>
+                    <ChevronDown size={20} className={`text-slate-400 transition-all duration-300 ${showMonthPicker ? 'rotate-180 text-purple-600' : ''}`} />
+                </button>
+                {showMonthPicker && (
+                    <div className="absolute top-full mt-2 z-20 w-full bg-white/95 backdrop-blur-md rounded-2xl shadow-2xl border border-slate-200/50 p-4 animate-slide-in-top" onMouseLeave={() => setShowMonthPicker(false)} onClick={(e) => e.stopPropagation()}>
+                        <div className="flex gap-4" onClick={(e) => e.stopPropagation()}>
+                            {/* Dropdown Bulan */}
+                            <div className="flex-1">
+                                <label className="text-xs font-semibold text-slate-600">Bulan</label>
+                                <div className="relative mt-1">
+                                    <button onClick={() => setShowMonthDropdown(!showMonthDropdown)} className="w-full p-2.5 text-left bg-white border border-slate-300 rounded-xl flex justify-between items-center text-sm">
+                                        {format(selectedMonth, 'MMMM', { locale: id })}
+                                        <ChevronDown size={16} className={`transition-transform ${showMonthDropdown ? 'rotate-180' : ''}`} />
+                                    </button>
+                                    {showMonthDropdown && (
+                                        <ul className="absolute z-10 mt-1 w-full bg-white border border-slate-200 rounded-xl shadow-lg max-h-48 overflow-y-auto">
+                                            {Array.from({ length: 12 }).map((_, i) => (
+                                                <li
+                                                    key={i}
+                                                    onClick={() => {
+                                                        setSelectedMonth(setMonth(selectedMonth, i));
+                                                        setShowMonthDropdown(false);
+                                                    }}
+                                                    className={`p-2 text-sm cursor-pointer hover:bg-purple-50 ${getMonth(selectedMonth) === i ? 'bg-purple-100 font-bold' : ''}`}
+                                                >
+                                                    {format(new Date(0, i), 'MMMM', { locale: id })}
+                                                </li>
+                                            ))}
+                                        </ul>
+                                    )}
+                                </div>
+                            </div>
+                            {/* Dropdown Tahun */}
+                            <div className="flex-1">
+                                <label className="text-xs font-semibold text-slate-600">Tahun</label>
+                                <div className="relative mt-1">
+                                    <button onClick={() => setShowYearDropdown(!showYearDropdown)} className="w-full p-2.5 text-left bg-white border border-slate-300 rounded-xl flex justify-between items-center text-sm">
+                                        {getYear(selectedMonth)}
+                                        <ChevronDown size={16} className={`transition-transform ${showYearDropdown ? 'rotate-180' : ''}`} />
+                                    </button>
+                                    {showYearDropdown && (
+                                        <ul className="absolute z-10 mt-1 w-full bg-white border border-slate-200 rounded-xl shadow-lg max-h-48 overflow-y-auto">
+                                            {Array.from({ length: new Date().getFullYear() - 2020 + 2 }).map((_, i) => {
+                                                const year = 2020 + i;
+                                                return (
+                                                    <li
+                                                        key={year}
+                                                        onClick={() => {
+                                                            setSelectedMonth(setYear(selectedMonth, year));
+                                                            setShowYearDropdown(false);
+                                                        }}
+                                                        className={`p-2 text-sm cursor-pointer hover:bg-purple-50 ${getYear(selectedMonth) === year ? 'bg-purple-100 font-bold' : ''}`}
+                                                    >
+                                                        {year}
+                                                    </li>
+                                                );
+                                            })}
+                                        </ul>
+                                    )}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                )}
+            </div>
+
             {sortedProductSales.length === 0 ? (
-                <div className="bg-white rounded-lg p-4 text-center text-slate-500 shadow-sm">Belum ada penjualan produk.</div>
+                <div className="bg-white rounded-lg p-6 text-center text-slate-500 shadow-sm">
+                    <TrendingUp size={32} className="mx-auto text-slate-400 mb-3" />
+                    <p className="font-semibold">Belum ada penjualan produk</p>
+                    <p className="text-xs">untuk periode yang dipilih.</p>
+                </div>
             ) : (
                 <div className="space-y-2">
                     {displayedProducts.map((produk, index) => (
