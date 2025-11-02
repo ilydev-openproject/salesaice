@@ -1031,8 +1031,16 @@ export default function VisitPage({ setActivePage, orderList = [], kunjunganList
                                                     const qty = cart[produk.id] || 0;
                                                     const isAvailable = produk.available;
                                                     return (
-                                                        // This was returning two divs, now wrapped in a fragment
-                                                        <div key={produk.id} onClick={() => isAvailable && updateQty(produk.id, 1)} className={`relative flex flex-col items-center justify-center p-2 border rounded-2xl transition-all duration-200 group cursor-pointer ${qty > 0 ? 'bg-green-50 border-green-300 shadow-md' : 'bg-white/80 backdrop-blur-sm border-slate-200 hover:border-purple-300 hover:shadow-lg'} ${!isAvailable ? 'bg-slate-100 border-slate-200 opacity-60 cursor-not-allowed' : ''}`}>
+                                                        <div
+                                                            key={produk.id}
+                                                            onClick={() => isAvailable && updateQty(produk.id, 1)}
+                                                            className={`relative flex flex-col items-center justify-center p-2 border rounded-2xl transition-all duration-200 group cursor-pointer ${qty > 0 ? 'bg-green-50 border-green-300 shadow-md' : 'bg-white/80 backdrop-blur-sm border-slate-200 hover:border-purple-300 hover:shadow-lg'} ${!isAvailable ? 'bg-slate-100 border-slate-200 opacity-60 cursor-not-allowed' : ''} ${produk.isWajib ? 'border-yellow-400 border-2' : ''}`}
+                                                        >
+                                                            {produk.isWajib && (
+                                                                <div className="absolute -top-2 -left-2 bg-yellow-400 text-white p-1 rounded-full shadow-md z-10">
+                                                                    <Star size={10} className="fill-white" />
+                                                                </div>
+                                                            )}
                                                             {qty > 0 && (
                                                                 <>
                                                                     <button

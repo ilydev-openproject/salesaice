@@ -13,7 +13,9 @@ import VisitPage from './pages/VisitPage'; //
 import ProductVelocityPage from './pages/ProductVelocityPage'; // Impor halaman baru
 import TokoGradePage from './pages/TokoGradePage'; // Impor halaman grade
 import MysteryBoxPage from './pages/MysteryBoxPage'; // Impor halaman MysteryBoxPage
-import { Home, Package, Store, MapPin, ShoppingBag, CheckCircle2, AlertTriangle, X, Award } from 'lucide-react';
+import VariantWajibPage from './pages/VariantWajibPage';
+import VariantWajibSettingsPage from './pages/VariantWajibSettingsPage'; // Impor halaman pengaturan baru
+import { Home, Package, Store, MapPin, ShoppingBag, CheckCircle2, AlertTriangle, X, Award, ClipboardCheck } from 'lucide-react';
 import Loader from './components/Loader';
 
 export default function App() {
@@ -180,6 +182,8 @@ export default function App() {
                 {activePage === 'product-velocity' && <ProductVelocityPage tokoList={daftarToko} orderList={orderList} setActivePage={setActivePage} />}
                 {activePage === 'analisis-grade-toko' && <TokoGradePage setActivePage={setActivePage} tokoList={daftarToko} orderList={orderList} onModalChange={handleSetModalOpen} showNotification={showNotification} />}
                 {activePage === 'mystery-box' && <MysteryBoxPage setActivePage={setActivePage} tokoList={daftarToko} orderList={orderList} showNotification={showNotification} />}
+                {activePage === 'variant-wajib' && <VariantWajibPage setActivePage={setActivePage} produkList={produkList} orderList={orderList} />}
+                {activePage === 'variant-wajib-settings' && <VariantWajibSettingsPage setActivePage={setActivePage} produkList={produkList} setProdukList={setProdukList} showNotification={showNotification} />}
             </div>
 
             {/* Bottom Navigation */}

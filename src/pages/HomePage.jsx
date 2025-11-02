@@ -1,4 +1,4 @@
-import { MapPin, Package, Wallet, Plus, TrendingUp, Target, Award, BarChart2, Gift, X, Zap, ChevronsRight, Info, Users } from 'lucide-react';
+import { MapPin, Package, Wallet, Plus, TrendingUp, Target, Award, BarChart2, Gift, X, Zap, ChevronsRight, Info, Users, ClipboardCheck } from 'lucide-react';
 import { useMemo, useState, useEffect } from 'react';
 
 import { getSalesPeriod } from '../lib/dateUtils'; // Impor fungsi getSalesPeriod
@@ -353,7 +353,7 @@ export default function HomePage({ daftarToko, kunjunganList = [], produkList = 
             {/* Menu Laporan */}
             <div className="mb-4">
                 <h2 className="text-base font-semibold text-slate-700 mb-2">Menu Laporan</h2>
-                <div className="bg-white p-3 rounded-xl shadow-sm border border-gray-100 grid grid-cols-5 gap-1 justify-items-center">
+                <div className="bg-white p-3 rounded-xl shadow-sm border border-gray-100 grid grid-cols-4 gap-1 justify-items-center">
                     <button onClick={() => setActivePage('produk-terlaris')} className="flex flex-col items-center justify-center gap-1 p-2 rounded-md hover:bg-slate-50 transition-colors w-24">
                         <div className="w-10 h-10 flex items-center justify-center bg-purple-100 text-purple-600 rounded-lg">
                             <TrendingUp size={20} />
@@ -412,6 +412,16 @@ export default function HomePage({ daftarToko, kunjunganList = [], produkList = 
                             Grade
                             <br />
                             Toko
+                        </span>
+                    </button>
+                    <button onClick={() => setActivePage('variant-wajib')} className="flex flex-col items-center justify-center gap-1 p-2 rounded-md hover:bg-slate-50 transition-colors w-24">
+                        <div className="w-10 h-10 flex items-center justify-center bg-red-100 text-red-600 rounded-lg">
+                            <ClipboardCheck size={20} />
+                        </div>
+                        <span className="font-semibold text-[10px] text-slate-700 text-center">
+                            Variant
+                            <br />
+                            Wajib
                         </span>
                     </button>
                 </div>
