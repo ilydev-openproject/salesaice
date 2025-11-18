@@ -12,8 +12,8 @@ export default function VariantWajibPage({ setActivePage, produkList, orderList 
 
     const orderBulanIni = useMemo(() => {
         return orderList.filter((order) => {
-            if (!order.createdAt?.seconds) return false;
-            const orderDate = new Date(order.createdAt.seconds * 1000);
+            if (!order.createdAt) return false;
+            const orderDate = new Date(order.createdAt);
             if (isLastDayOfCalendarMonth) {
                 const nextMonthFirstDay = addDays(monthEnd, 1);
                 return (orderDate >= monthStart && orderDate <= monthEnd) || isSameDay(orderDate, nextMonthFirstDay);
@@ -34,7 +34,7 @@ export default function VariantWajibPage({ setActivePage, produkList, orderList 
 
     const wajibProdukList = useMemo(() => {
         return produkList
-            .filter((p) => p.isWajib)
+            .filter((p) => (p.targetWajib || 0) > 0) // Perubahan: Cek jika targetWajib > 0
             .map((p) => {
                 const terjual = productSalesMap.get(p.id) || 0;
                 const target = p.targetWajib || 0;

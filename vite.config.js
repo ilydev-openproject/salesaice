@@ -14,8 +14,8 @@ export default defineConfig({
                 enabled: true,
             },
             manifest: {
-                name: 'SalesApp',
-                short_name: 'SalesApp',
+                name: 'Ilyas Sales App',
+                short_name: 'IlyasSales',
                 description: 'Aplikasi sales untuk kunjungan toko',
                 theme_color: '#402566',
                 background_color: '#f8f6fc',

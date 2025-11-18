@@ -1,10 +1,11 @@
 import { MapPin, Package, Wallet, Plus, TrendingUp, Target, Award, BarChart2, Gift, X, Zap, ChevronsRight, Info, Users, ClipboardCheck } from 'lucide-react';
-import { useMemo, useState, useEffect } from 'react';
+import { useMemo, useState } from 'react';
 
+import { findProduct } from '../lib/utils'; // Impor helper findProduct
 import { getSalesPeriod } from '../lib/dateUtils'; // Impor fungsi getSalesPeriod
 import { isWithinInterval, addDays, isSameDay, startOfMonth, endOfMonth, subMonths, format } from 'date-fns';
 
-export default function HomePage({ daftarToko, kunjunganList = [], produkList = [], orderList = [], setActivePage, targets }) {
+export default function HomePage({ daftarToko, kunjunganList = [], orderList = [], produkList = [], setActivePage, targets }) {
     // --- Hitung data HARI INI dari 'kunjunganList' & 'orderList' ---
     const todayStart = new Date();
     todayStart.setHours(0, 0, 0, 0);
@@ -13,15 +14,15 @@ export default function HomePage({ daftarToko, kunjunganList = [], produkList = 
     todayEnd.setHours(23, 59, 59, 999);
 
     const kunjunganHariIni = kunjunganList.filter((kunjungan) => {
-        if (!kunjungan.createdAt?.seconds) return false;
-        const visitDate = new Date(kunjungan.createdAt.seconds * 1000);
+        if (!kunjungan.createdAt) return false;
+        const visitDate = new Date(kunjungan.createdAt);
         // Kunjungan hari ini dihitung berdasarkan tanggal kalender HARI INI
         return isSameDay(visitDate, new Date());
     });
 
     const orderHariIni = orderList.filter((order) => {
-        if (!order.createdAt?.seconds) return false;
-        const orderDate = new Date(order.createdAt.seconds * 1000);
+        if (!order.createdAt) return false;
+        const orderDate = new Date(order.createdAt);
         // Order hari ini dihitung berdasarkan tanggal kalender BESOK (karena H+1)
         return isSameDay(orderDate, addDays(new Date(), 1));
     });
@@ -31,11 +32,11 @@ export default function HomePage({ daftarToko, kunjunganList = [], produkList = 
     // Ini mencerminkan berapa kali tombol "Simpan Kunjungan" ditekan.
     const totalKunjungan = kunjunganHariIni.length;
 
-    // "Box Terjual" dan "Pendapatan" dihitung dari gabungan `kunjunganHariIni` dan `orderHariIni`.
-    // Karena "Kunjungan dengan Order" membuat entri di kedua list, kita perlu memastikan tidak ada duplikasi.
-    // Namun, karena `kunjunganHariIni` tidak memiliki `items` atau `total`, penggabungan ini aman dan akan mengambil data dari `orderHariIni`.
-    const totalPendapatan = [...kunjunganHariIni, ...orderHariIni].reduce((sum, item) => sum + item.total, 0);
-    const totalBoxTerjual = [...kunjunganHariIni, ...orderHariIni].reduce((sum, item) => sum + (item.items?.reduce((qty, subItem) => qty + subItem.qtyBox, 0) || 0), 0);
+    // --- PERBAIKAN LOGIKA PENDAPATAN HARI INI ---
+    // "Box Terjual" dan "Pendapatan" hari ini hanya dihitung dari `orderHariIni`
+    // karena `kunjunganHariIni` tidak berisi data item/total.
+    const totalPendapatan = orderHariIni.reduce((sum, item) => sum + Number(item.total || 0), 0);
+    const totalBoxTerjual = orderHariIni.reduce((sum, item) => sum + (item.items?.reduce((qty, subItem) => qty + subItem.qtyBox, 0) || 0), 0);
 
     // --- Hitung data BULAN INI dari 'kunjunganList' & 'orderList' ---
     // Jika hari ini adalah hari terakhir bulan, geser acuan tanggal ke bulan berikutnya untuk insight bulanan.
@@ -43,12 +44,10 @@ export default function HomePage({ daftarToko, kunjunganList = [], produkList = 
     const isLastDayOfCalendarMonth = isSameDay(todayCalendarDate, endOfMonth(todayCalendarDate));
     const nowForMonthlyInsights = isLastDayOfCalendarMonth ? addDays(todayCalendarDate, 1) : todayCalendarDate;
     const { startDate: monthStart, endDate: monthEnd } = getSalesPeriod(nowForMonthlyInsights);
-    const today = new Date();
-    const isLastDayOfMonth = isSameDay(today, endOfMonth(today));
 
     const kunjunganBulanIni = kunjunganList.filter((kunjungan) => {
-        if (!kunjungan.createdAt?.seconds) return false;
-        const visitDate = new Date(kunjungan.createdAt.seconds * 1000);
+        if (!kunjungan.createdAt) return false;
+        const visitDate = new Date(kunjungan.createdAt);
         // Kunjungan (Hari H) dihitung berdasarkan periode penjualan yang sudah disesuaikan.
         // `getSalesPeriod` sudah menangani logika H+1, jadi kita hanya perlu membandingkan.
         // Contoh: Untuk Oktober, periode adalah 30 Sep - 30 Okt. Kunjungan pada 31 Okt tidak masuk.
@@ -57,13 +56,13 @@ export default function HomePage({ daftarToko, kunjunganList = [], produkList = 
     });
 
     const orderBulanIni = orderList.filter((order) => {
-        if (!order.createdAt?.seconds) return false;
-        const orderDate = new Date(order.createdAt.seconds * 1000);
+        if (!order.createdAt) return false;
+        const orderDate = new Date(order.createdAt);
         // Order (Hari H+1) dihitung berdasarkan periode penjualan yang sudah disesuaikan.
         // Jika hari ini 31 Okt, `nowForMonthlyInsights` menjadi 1 Nov, `monthStart` menjadi 31 Okt.
         // Order yang dibuat pada 30 Okt (dicatat 31 Okt) akan masuk.
-        // Order yang dibuat pada 31 Okt (dicatat 1 Nov) juga akan masuk karena `isLastDayOfMonth`
-        if (isLastDayOfMonth) {
+        // Order yang dibuat pada 31 Okt (dicatat 1 Nov) juga akan masuk karena `isLastDayOfCalendarMonth`
+        if (isLastDayOfCalendarMonth) {
             const nextMonthFirstDay = addDays(monthEnd, 1);
             return (orderDate >= monthStart && orderDate <= monthEnd) || isSameDay(orderDate, nextMonthFirstDay);
         } // Untuk hari biasa, periode adalah dari startDate hingga endDate.
@@ -76,7 +75,7 @@ export default function HomePage({ daftarToko, kunjunganList = [], produkList = 
     // Data penjualan (box & pendapatan) bulanan dihitung dari `orderBulanIni`
     // karena `kunjunganBulanIni` tidak berisi data item/total.
     const totalBoxTerjualBulanIni = orderBulanIni.reduce((sum, item) => sum + (item.items?.reduce((qty, subItem) => qty + subItem.qtyBox, 0) || 0), 0);
-    const totalPendapatanBulanIni = orderBulanIni.reduce((sum, item) => sum + item.total, 0);
+    const totalPendapatanBulanIni = orderBulanIni.reduce((sum, item) => sum + Number(item.total || 0), 0);
 
     // --- Target Penjualan (Contoh) ---
     const TARGET_BOX_BULANAN = targets.TARGET_BOX_BULANAN || 1000; // Gunakan target dari props, fallback ke 1000
@@ -110,12 +109,12 @@ export default function HomePage({ daftarToko, kunjunganList = [], produkList = 
 
     // Produk terlaris juga dihitung HANYA dari `orderBulanIni`.
     orderBulanIni.forEach((order) => {
-        if (order.items) {
-            order.items.forEach((item) => {
-                const currentQty = productSalesMap.get(item.productId) || 0;
-                productSalesMap.set(item.productId, currentQty + (item.qtyBox || 0));
-            });
-        }
+        order.items.forEach((item) => {
+            const product = findProduct(produkList, item.productId);
+            if (!product) return; // Skip if product not found
+            const currentQty = productSalesMap.get(product.id) || 0;
+            productSalesMap.set(product.id, currentQty + (item.qtyBox || 0));
+        });
     });
 
     // --- Logika Notifikasi Mystery Box ---
@@ -138,15 +137,15 @@ export default function HomePage({ daftarToko, kunjunganList = [], produkList = 
         const eligibleToko = daftarToko
             .map((toko) => {
                 const ordersLastMonth = orderList.filter((order) => {
-                    if (!order.createdAt?.seconds) return false;
+                    if (!order.createdAt) return false;
                     // Filter order (Hari H+1) berdasarkan rentang bulan lalu.
-                    const orderDate = new Date(order.createdAt.seconds * 1000);
+                    const orderDate = new Date(order.createdAt);
                     return order.tokoId === toko.id && isWithinInterval(orderDate, { start: lastMonthStart, end: lastMonthEnd });
                 });
 
                 const totalBoxesLastMonth = ordersLastMonth.reduce((sum, order) => sum + (order.items?.reduce((itemSum, item) => itemSum + item.qtyBox, 0) || 0), 0);
 
-                const eligibleRewards = Math.floor(totalBoxesLastMonth / 25);
+                const eligibleRewards = Math.floor(totalBoxesLastMonth / (targets.MYSTERY_BOX_THRESHOLD || 25));
                 const claimedRewards = toko.monthlyRewardsClaimed?.[lastMonthKey] || 0;
 
                 if (eligibleRewards > claimedRewards) {
@@ -159,7 +158,7 @@ export default function HomePage({ daftarToko, kunjunganList = [], produkList = 
             })
             .filter(Boolean);
         return eligibleToko;
-    }, [daftarToko, orderList, nowForMonthlyInsights]); // Tambahkan nowForMonthlyInsights sebagai dependensi
+    }, [daftarToko, orderList, nowForMonthlyInsights, todayCalendarDate]); // Tambahkan nowForMonthlyInsights sebagai dependensi
 
     // --- Insight Bulan Lalu ---
     const lastMonthInsights = useMemo(() => {
@@ -170,21 +169,21 @@ export default function HomePage({ daftarToko, kunjunganList = [], produkList = 
         const lastMonthEnd = endOfMonth(lastMonthDateRef);
 
         const ordersLastMonth = orderList.filter((order) => {
-            if (!order.createdAt?.seconds) return false;
+            if (!order.createdAt) return false;
             // Filter order (Hari H+1) berdasarkan rentang bulan lalu.
-            const orderDate = new Date(order.createdAt.seconds * 1000);
+            const orderDate = new Date(order.createdAt);
             return isWithinInterval(orderDate, { start: lastMonthStart, end: lastMonthEnd });
         });
 
         const visitsLastMonth = kunjunganList.filter((visit) => {
-            if (!visit.createdAt?.seconds) return false;
+            if (!visit.createdAt) return false;
             // Filter kunjungan (Hari H) berdasarkan rentang bulan lalu.
-            const visitDate = new Date(visit.createdAt.seconds * 1000);
+            const visitDate = new Date(visit.createdAt);
             return isWithinInterval(visitDate, { start: lastMonthStart, end: lastMonthEnd });
         });
 
         const totalBox = ordersLastMonth.reduce((sum, order) => sum + (order.items?.reduce((itemSum, item) => itemSum + item.qtyBox, 0) || 0), 0);
-        const totalRevenue = ordersLastMonth.reduce((sum, order) => sum + order.total, 0);
+        const totalRevenue = ordersLastMonth.reduce((sum, order) => sum + Number(order.total || 0), 0);
         const totalVisits = visitsLastMonth.length;
 
         return { totalBox, totalRevenue, totalVisits, monthName: format(lastMonthStart, 'MMMM') };
@@ -239,16 +238,20 @@ export default function HomePage({ daftarToko, kunjunganList = [], produkList = 
             {/* Card Ringkasan Bulan Ini */}
             <div className="bg-gradient-to-br from-purple-600 to-fuchsia-500 text-white p-4 rounded-xl shadow-lg mb-4">
                 <h2 className="text-base font-semibold text-purple-100 mb-3">Performa Bulan Ini</h2>
-                <div className="flex justify-around items-center">
+                <div className="grid grid-cols-3 gap-2 items-center text-center">
                     <div className="text-center">
-                        <p className="text-3xl font-bold">{totalKunjunganBulanIni}</p>
+                        <p className="text-2xl font-bold">{totalKunjunganBulanIni}</p>
                         <p className="text-xs text-purple-200 mt-1">Total Kunjungan</p>
                     </div>
                     <div className="h-12 w-px bg-purple-400/50"></div> {/* Divider */}
                     <div className="text-center">
-                        <p className="text-3xl font-bold">{totalBoxTerjualBulanIni}</p>
+                        <p className="text-2xl font-bold">{totalBoxTerjualBulanIni}</p>
                         <p className="text-xs text-purple-200 mt-1">Total Box</p>
                     </div>
+                </div>
+                <div className="mt-4 pt-3 border-t border-purple-400/30 text-center">
+                    <p className="text-xs text-purple-200">Total Pendapatan</p>
+                    <p className="text-2xl font-bold mt-1">Rp{totalPendapatanBulanIni.toLocaleString('id-ID')}</p>
                 </div>
             </div>
 
@@ -441,12 +444,12 @@ export default function HomePage({ daftarToko, kunjunganList = [], produkList = 
                 ) : (
                     <div className="space-y-2">
                         {kunjunganList.slice(0, 5).map((kunjungan) => {
-                            const visitDate = new Date(kunjungan.createdAt.seconds * 1000); // Tanggal Kunjungan (Hari H)
+                            const visitDate = new Date(kunjungan.createdAt); // Tanggal Kunjungan (Hari H)
                             const orderEffectiveDate = addDays(visitDate, 1); // Tanggal Order terkait adalah H+1
 
-                            const relatedOrders = orderList.filter((order) => order.createdAt?.seconds && order.tokoId === kunjungan.tokoId && isSameDay(new Date(order.createdAt.seconds * 1000), orderEffectiveDate));
+                            const relatedOrders = orderList.filter((order) => order.createdAt && order.tokoId === kunjungan.tokoId && isSameDay(new Date(order.createdAt), orderEffectiveDate));
 
-                            const displayTotal = relatedOrders.reduce((sum, order) => sum + (order.total || 0), 0);
+                            const displayTotal = relatedOrders.reduce((sum, order) => sum + Number(order.total || 0), 0);
                             const totalBoxes = relatedOrders.reduce((sum, order) => sum + (order.items?.reduce((itemSum, item) => itemSum + item.qtyBox, 0) || 0), 0);
 
                             return (
@@ -454,7 +457,7 @@ export default function HomePage({ daftarToko, kunjunganList = [], produkList = 
                                     <div className="w-8 h-8 rounded-full bg-purple-100 flex items-center justify-center text-purple-600 font-bold text-sm">{kunjungan.tokoNama.charAt(0).toUpperCase()}</div>
                                     <div className="flex-grow">
                                         <p className="font-semibold text-slate-800 text-sm">{kunjungan.tokoNama}</p>
-                                        <p className="text-xs text-slate-500">{new Date(kunjungan.createdAt.seconds * 1000).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' })}</p>
+                                        <p className="text-xs text-slate-500">{new Date(kunjungan.createdAt).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' })}</p>
                                     </div>
                                     <div className="text-right">
                                         <p className={`font-bold text-sm ${displayTotal > 0 ? 'text-green-600' : 'text-slate-500'}`}>Rp{displayTotal.toLocaleString('id-ID')}</p>

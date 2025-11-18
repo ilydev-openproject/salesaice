@@ -1,7 +1,6 @@
 // src/pages/MysteryBoxPage.jsx
 import { useState, useEffect, useMemo } from 'react';
-import { doc, updateDoc, writeBatch } from 'firebase/firestore'; // Removed getDocs, collection
-import { db } from '../lib/firebase';
+import { supabase } from '../lib/supabase';
 import { Gift, Check, Loader2, Undo2, AlertTriangle, X, ArrowLeft, Plus, Minus } from 'lucide-react';
 import Loader from '../components/Loader';
 
@@ -53,20 +52,26 @@ export default function MysteryBoxPage({ setActivePage, tokoList: initialTokoLis
 
         setUpdatingId(`${toko.id}-${monthKey}`);
         try {
-            const tokoRef = doc(db, 'toko', toko.id);
             const currentClaimed = toko.monthlyRewardsClaimed?.[monthKey] || 0;
             const newClaimedTotal = currentClaimed + amount;
 
-            await updateDoc(tokoRef, {
-                [`monthlyRewardsClaimed.${monthKey}`]: newClaimedTotal,
-            });
+            // Perbaikan: Buat objek monthlyRewardsClaimed yang baru dengan nilai yang diperbarui.
+            const updatedRewards = { ...(toko.monthlyRewardsClaimed || {}), [monthKey]: newClaimedTotal };
+
+            const { error } = await supabase
+                .from('toko')
+                // Kirim seluruh objek yang sudah diperbarui, bukan hanya key spesifik.
+                .update({ monthlyRewardsClaimed: updatedRewards })
+                .eq('id', toko.id);
+
+            if (error) throw error;
 
             // Update state locally to reflect the change immediately
             showNotification(`${amount} hadiah berhasil diberikan!`, 'success');
-            setTokoList((prevList) => prevList.map((t) => (t.id === toko.id ? { ...t, monthlyRewardsClaimed: { ...(t.monthlyRewardsClaimed || {}), [monthKey]: newClaimedTotal } } : t)));
+            setTokoList((prevList) => prevList.map((t) => (t.id === toko.id ? { ...t, monthlyRewardsClaimed: updatedRewards } : t)));
         } catch (error) {
             console.error('Error giving reward:', error);
-            alert('Gagal memberikan hadiah.');
+            showNotification('Gagal memberikan hadiah.', 'error');
         } finally {
             setUpdatingId(null);
             setShowRewardModal(false); // Tutup modal setelah berhasil
@@ -87,19 +92,19 @@ export default function MysteryBoxPage({ setActivePage, tokoList: initialTokoLis
 
         setUpdatingId(`${toko.id}-${monthKey}`);
         try {
-            const tokoRef = doc(db, 'toko', toko.id);
+            // Perbaikan: Buat objek baru dengan nilai yang diperbarui, sama seperti di fungsi 'give reward'.
+            const updatedRewards = { ...(toko.monthlyRewardsClaimed || {}), [monthKey]: 0 };
 
-            // Set jumlah yang diklaim menjadi 0 untuk bulan tersebut
-            await updateDoc(tokoRef, {
-                [`monthlyRewardsClaimed.${monthKey}`]: 0,
-            });
+            const { error } = await supabase.from('toko').update({ monthlyRewardsClaimed: updatedRewards }).eq('id', toko.id);
+
+            if (error) throw error;
 
             // Update state lokal untuk merefleksikan perubahan
             showNotification('Hadiah berhasil dibatalkan!', 'success');
-            setTokoList((prevList) => prevList.map((t) => (t.id === toko.id ? { ...t, monthlyRewardsClaimed: { ...(t.monthlyRewardsClaimed || {}), [monthKey]: 0 } } : t)));
+            setTokoList((prevList) => prevList.map((t) => (t.id === toko.id ? { ...t, monthlyRewardsClaimed: updatedRewards } : t)));
         } catch (error) {
             console.error('Error undoing reward:', error);
-            alert('Gagal membatalkan hadiah.');
+            showNotification('Gagal membatalkan hadiah.', 'error');
         } finally {
             setUpdatingId(null);
             setShowUndoConfirm(false);
@@ -127,8 +132,8 @@ export default function MysteryBoxPage({ setActivePage, tokoList: initialTokoLis
         periods.forEach((period) => {
             tokoList.forEach((toko) => {
                 const ordersInMonth = orderList.filter((order) => {
-                    if (!order.createdAt?.seconds) return false;
-                    const orderDate = new Date(order.createdAt.seconds * 1000);
+                    if (!order.createdAt) return false;
+                    const orderDate = new Date(order.createdAt);
                     return order.tokoId === toko.id && orderDate.getFullYear() === period.date.getFullYear() && orderDate.getMonth() === period.date.getMonth();
                 });
 

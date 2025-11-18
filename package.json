@@ -10,9 +10,12 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@react-native-async-storage/async-storage": "^1.24.0",
+    "@supabase/supabase-js": "^2.81.0",
     "@tailwindcss/vite": "^4.1.13",
     "date-fns": "^4.1.0",
-    "firebase": "^12.3.0",
+    "firebase": "^12.5.0",
+    "firebase-admin": "^13.6.0",
     "html-to-image": "^1.11.13",
     "leaflet": "^1.9.4",
     "leaflet-routing-machine": "^3.2.12",
@@ -21,8 +24,10 @@
     "react-day-picker": "^9.11.0",
     "react-dom": "^19.1.1",
     "react-leaflet": "^5.0.0",
+    "react-native-vector-icons": "^10.3.0",
     "react-router-dom": "^7.9.1",
     "recharts": "^3.2.1",
+    "uuid": "^13.0.0",
     "xlsx": "^0.18.5"
   },
   "devDependencies": {

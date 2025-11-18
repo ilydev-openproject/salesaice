@@ -1,12 +1,12 @@
 // src/pages/OrderPage.jsx
 import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react';
-import { collection, getDocs, addDoc, serverTimestamp, query, orderBy, doc, updateDoc, deleteDoc, writeBatch } from 'firebase/firestore';
 import { DayPicker } from 'react-day-picker'; // Pastikan ini ada
 import 'react-day-picker/dist/style.css'; //
 import { format, addDays, subDays } from 'date-fns';
 import { id } from 'date-fns/locale';
+import { findToko } from '../lib/utils';
 import { toPng } from 'html-to-image'; //
-import { db } from '../lib/firebase';
+import { supabase } from '../lib/supabase';
 import { Store, Package, Plus, Minus, CheckCircle2, XCircle, ChevronDown, ArrowLeft, ShoppingCart, Calendar, Pencil, Trash2, Search, CalendarRange, Download, MoreVertical, Eye, X, AlertTriangle, ShoppingBag, Star, List } from 'lucide-react';
 import Loader from '../components/Loader';
 import VisitReceipt from '../components/VisitReceipt'; // Re-using VisitReceipt for orders
@@ -24,13 +24,14 @@ function MiniLoader({ text = 'Memuat...' }) {
     );
 }
 
-export default function OrderPage({ setActivePage, orderList, setOrderList, tokoList, produkList, onModalChange, showNotification }) {
+export default function OrderPage({ setActivePage, orderList, tokoList, produkList, onSaveOrder, onDeleteOrder, onModalChange, showNotification, setOrderList }) {
     const [loading, setLoading] = useState(true);
 
     // Form state
     const [showForm, setShowForm] = useState(false);
     // Hapus state lokal untuk tokoList dan produkList karena sudah dari props
     const [selectedTokoId, setSelectedTokoId] = useState('');
+    const [selectedToko, setSelectedToko] = useState(null); // State baru untuk objek toko
     const [catatan, setCatatan] = useState('');
     const [orderDate, setOrderDate] = useState(new Date()); // State untuk tanggal di form
     const [submitting, setSubmitting] = useState(false);
@@ -101,7 +102,7 @@ export default function OrderPage({ setActivePage, orderList, setOrderList, toko
             setLoading(false);
             setIsDataLoaded(true); // Tandai data sudah siap
         }
-    }, []);
+    }, [orderList, tokoList, produkList]);
 
     const loadFormData = async () => {
         if (isDataLoaded) return;
@@ -161,10 +162,9 @@ export default function OrderPage({ setActivePage, orderList, setOrderList, toko
 
     const fetchOrders = async () => {
         try {
-            const q = query(collection(db, 'orders'), orderBy('createdAt', 'asc'));
-            const snapshot = await getDocs(q); //
-            const list = snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() })).reverse();
-            setOrderList(list); // Update state di App.jsx
+            const { data, error } = await supabase.from('orders').select('*').order('createdAt', { ascending: false });
+            if (error) throw error;
+            setOrderList(data || []); // Update state di App.jsx
         } catch (error) {
             console.error('Error fetching orders:', error);
             showNotification('Gagal memuat ulang data order.', 'error');
@@ -172,7 +172,9 @@ export default function OrderPage({ setActivePage, orderList, setOrderList, toko
     };
 
     const handleSelectToko = (tokoId) => {
+        const toko = tokoList.find((t) => t.id === tokoId);
         setSelectedTokoId(tokoId);
+        setSelectedToko(toko);
         setIsTokoDropdownOpen(false);
         setTokoSearchTerm('');
     };
@@ -236,36 +238,16 @@ export default function OrderPage({ setActivePage, orderList, setOrderList, toko
             items,
             createdAt: deliveryDate, // Gunakan tanggal pengiriman sebagai tanggal pencatatan
             catatan: catatan.trim(),
-            total: getGrandTotal(),
+            total: Number(getGrandTotal() || 0),
         };
 
         setSubmitting(true);
         try {
-            if (editingOrderId) {
-                const orderRef = doc(db, 'orders', editingOrderId);
-                // Saat edit, perbarui semua data termasuk tanggal dari form
-                await updateDoc(orderRef, orderData);
-                showNotification('Order berhasil diperbarui.');
-            } else {
-                // Saat buat baru, gunakan tanggal dari form
-                await addDoc(collection(db, 'orders'), {
-                    ...orderData, // orderData sudah berisi createdAt yang telah disesuaikan
-                });
-                showNotification('Order berhasil disimpan.');
-            }
+            await onSaveOrder(orderData, editingOrderId);
             resetForm();
-            fetchOrders();
         } catch (error) {
-            console.error('Error saving order:', error);
-
-            // Tampilkan notifikasi error yang lebih spesifik
-            if (error.code === 'permission-denied') {
-                showNotification('Tidak memiliki izin untuk menyimpan order. Silakan hubungi administrator.', 'error');
-            } else if (error.code === 'unavailable') {
-                showNotification('Layanan tidak tersedia. Periksa koneksi internet Anda.', 'error');
-            } else {
-                showNotification('Gagal menyimpan order. Silakan coba lagi.', 'error');
-            }
+            // Error sudah ditangani di App.jsx, tidak perlu notifikasi ganda
+            console.log('Submit failed, error handled by App.jsx');
         } finally {
             setSubmitting(false);
         }
@@ -281,6 +263,7 @@ export default function OrderPage({ setActivePage, orderList, setOrderList, toko
         setEditingOrderId(null);
         setCart({});
         setCatatan('');
+        setSelectedToko(null);
         setSelectedTokoId('');
         setOrderDate(new Date()); // Reset tanggal ke hari ini
         setTokoSearchTerm('');
@@ -291,14 +274,21 @@ export default function OrderPage({ setActivePage, orderList, setOrderList, toko
     const handleEdit = async (order) => {
         await loadFormData();
         setEditingOrderId(order.id);
+
+        // Perbaikan: Cari objek toko dan set kedua state
+        const tokoToEdit = findToko(tokoList, order.tokoId);
         setSelectedTokoId(order.tokoId);
+        setSelectedToko(tokoToEdit);
+
         setCatatan(order.catatan || '');
         // Pastikan orderDate selalu objek Date yang valid
         // PENTING: Saat edit, kita set tanggal form ke H-1 dari tanggal yang tersimpan (createdAt)
         // Ini agar saat disimpan lagi, H+1 akan menghasilkan tanggal yang sama, bukan tanggal baru.
-        const deliveryDate = order.createdAt?.seconds ? new Date(order.createdAt.seconds * 1000) : new Date();
-        setOrderDate(subDays(deliveryDate, 1));
-        const initialCart = order.items.reduce((acc, item) => {
+        const deliveryDate = order.createdAt ? new Date(order.createdAt) : new Date();
+        setOrderDate(subDays(deliveryDate, 1)); // Set tanggal form ke H-1
+
+        const items = typeof order.items === 'string' ? JSON.parse(order.items) : order.items || [];
+        const initialCart = items.reduce((acc, item) => {
             acc[item.productId] = item.qtyBox;
             return acc;
         }, {});
@@ -315,29 +305,28 @@ export default function OrderPage({ setActivePage, orderList, setOrderList, toko
     const handleConfirmDelete = async () => {
         if (!itemToDelete) return;
         try {
-            await deleteDoc(doc(db, 'orders', itemToDelete.id));
-            showNotification('Order berhasil dihapus.');
-            fetchOrders();
+            await onDeleteOrder(itemToDelete.id);
             setShowDeleteConfirm(false);
             setItemToDelete(null);
         } catch (error) {
-            console.error('Error deleting order:', error);
-
-            // Tampilkan notifikasi error yang lebih spesifik
-            if (error.code === 'permission-denied') {
-                showNotification('Tidak memiliki izin untuk menghapus order. Silakan hubungi administrator.', 'error');
-            } else if (error.code === 'unavailable') {
-                showNotification('Layanan tidak tersedia. Periksa koneksi internet Anda.', 'error');
-            } else {
-                showNotification('Gagal menghapus order. Silakan coba lagi.', 'error');
-            }
+            // Error sudah ditangani di App.jsx
+            console.log('Delete failed, error handled by App.jsx');
         }
     };
 
     const filteredOrders = orderList
         .filter((order) => {
-            if (!order.createdAt?.seconds) return false;
-            const orderDate = new Date(order.createdAt.seconds * 1000);
+            // Pengecekan yang lebih kuat: pastikan createdAt adalah string yang valid
+            if (!order.createdAt || typeof order.createdAt !== 'string') return false;
+
+            // Ganti spasi dengan 'T' untuk memastikan kompatibilitas parsing tanggal
+            const orderDate = new Date(order.createdAt.replace(' ', 'T'));
+            // Pengecekan tambahan untuk memastikan objek Date valid
+            if (isNaN(orderDate.getTime())) {
+                console.warn('Invalid date format for order:', order.id, order.createdAt);
+                return false;
+            }
+
             if (filterType === 'today') {
                 // Logika Next Day: Filter "Hari Ini" di halaman Order menampilkan data untuk BESOK.
                 const tomorrow = addDays(new Date(), 1);
@@ -462,16 +451,16 @@ export default function OrderPage({ setActivePage, orderList, setOrderList, toko
             const filtered = calendarTokoFilter ? orderList.filter((o) => o.tokoId === calendarTokoFilter) : orderList;
 
             filtered.forEach((order) => {
-                // Periksa apakah createdAt.seconds ada, bertipe number, dan bukan NaN
-                if (order.createdAt && typeof order.createdAt.seconds === 'number' && !isNaN(order.createdAt.seconds)) {
-                    const date = new Date(order.createdAt.seconds * 1000);
+                // Periksa apakah createdAt ada dan merupakan string yang valid
+                if (order.createdAt && typeof order.createdAt === 'string') {
+                    const date = new Date(order.createdAt.replace(' ', 'T'));
                     // Pastikan objek Date yang dibuat juga valid
                     if (!isNaN(date.getTime())) {
                         const dateString = format(date, 'yyyy-MM-dd');
                         const orderBoxes = order.items.reduce((sum, item) => sum + (item.qtyBox || 0), 0);
                         totals.set(dateString, (totals.get(dateString) || 0) + orderBoxes);
                     } else {
-                        // Log peringatan jika objek Date tidak valid setelah dibuat
+                        // Log peringatan jika objek Date tidak valid
                         console.warn('Order with invalid Date object created from timestamp:', order.id, order.createdAt);
                     }
                 } else {
@@ -703,7 +692,7 @@ export default function OrderPage({ setActivePage, orderList, setOrderList, toko
                                             <div className="w-10 h-10 rounded-full bg-gradient-to-br from-purple-100 to-fuchsia-100 flex items-center justify-center text-purple-600 font-bold text-sm shadow-sm group-hover:scale-110 transition-transform">{order.tokoNama.charAt(0).toUpperCase()}</div>
                                             <div className="flex-grow min-w-0">
                                                 <h3 className="font-bold text-slate-800 text-xs leading-tight truncate">{order.tokoNama}</h3>
-                                                <p className="text-[10px] text-slate-500 mt-0.5">{order.createdAt ? new Date(order.createdAt.seconds * 1000).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' }) : 'Baru saja'}</p>
+                                                <p className="text-[10px] text-slate-500 mt-0.5">{order.createdAt && !isNaN(new Date(order.createdAt.replace(' ', 'T'))) ? new Date(order.createdAt.replace(' ', 'T')).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' }) : 'Waktu Invalid'}</p>
                                             </div>
                                             <div className="text-right pr-5">
                                                 <p className={`font-bold text-xs ${order.total > 0 ? 'text-green-600' : 'text-slate-500'}`}>Rp{order.total.toLocaleString('id-ID')}</p>
@@ -828,7 +817,7 @@ export default function OrderPage({ setActivePage, orderList, setOrderList, toko
                                                 <div className="p-2 bg-gradient-to-br from-emerald-100 to-teal-100 rounded-xl">
                                                     <Store size={16} className="text-emerald-600" />
                                                 </div>
-                                                <span className="text-slate-700 font-medium text-xs">{tokoList.find((t) => t.id === selectedTokoId)?.nama || 'Pilih Toko'}</span>
+                                                <span className="text-slate-700 font-medium text-xs">{selectedToko?.nama || 'Pilih Toko'}</span>
                                             </span>
                                             <ChevronDown size={20} className={`text-slate-400 transition-all duration-300 ${isTokoDropdownOpen ? 'rotate-180 text-emerald-600' : ''}`} />
                                         </button>
@@ -976,7 +965,7 @@ export default function OrderPage({ setActivePage, orderList, setOrderList, toko
                                                         <div
                                                             key={produk.id}
                                                             onClick={() => isAvailable && updateQty(produk.id, 1)}
-                                                            className={`relative flex flex-col items-center justify-center p-2 border rounded-2xl transition-all duration-200 group cursor-pointer ${qty > 0 ? 'bg-green-50 border-green-300 shadow-md' : 'bg-white/80 backdrop-blur-sm border-slate-200 hover:border-purple-300 hover:shadow-lg'} ${!isAvailable ? 'bg-slate-100 border-slate-200 opacity-60 cursor-not-allowed' : ''} ${produk.isWajib ? 'border-yellow-400 border-2' : ''}`}
+                                                            className={`relative flex flex-col items-center justify-center p-2 border rounded-2xl transition-all duration-200 group cursor-pointer ${qty > 0 ? 'bg-lime-300 border-lime-300 shadow-md' : 'bg-white/80 backdrop-blur-sm border-slate-200 hover:border-purple-300 hover:shadow-lg'} ${!isAvailable ? 'bg-slate-100 border-slate-200 opacity-60 cursor-not-allowed' : ''} ${produk.isWajib ? 'border-yellow-400 border-2' : ''}`}
                                                         >
                                                             {produk.isWajib && (
                                                                 <div className="absolute -top-2 -left-2 bg-yellow-400 text-white p-1 rounded-full shadow-md z-10">

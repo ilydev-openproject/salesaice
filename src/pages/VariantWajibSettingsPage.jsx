@@ -1,12 +1,9 @@
 import { useState, useEffect } from 'react';
 import { ArrowLeft, ClipboardCheck, Save, Star, Target, X } from 'lucide-react';
-import { doc, writeBatch } from 'firebase/firestore';
-import { db } from '../lib/firebase';
+import { supabase } from '../lib/supabase';
 
 export default function VariantWajibSettingsPage({ setActivePage, produkList, setProdukList, showNotification }) {
-    const [wajibStatus, setWajibStatus] = useState({});
     const [saving, setSaving] = useState(false);
-    const [localProdukList, setLocalProdukList] = useState([]); // State lokal untuk produk
 
     // State untuk modal target
     const [showTargetModal, setShowTargetModal] = useState(false);
@@ -14,18 +11,18 @@ export default function VariantWajibSettingsPage({ setActivePage, produkList, se
     const [targetBox, setTargetBox] = useState('');
 
     // Inisialisasi state lokal saat komponen dimuat
+    // State lokal untuk menampung perubahan sebelum disimpan
+    const [localProdukList, setLocalProdukList] = useState([]);
+
     useEffect(() => {
-        setLocalProdukList(JSON.parse(JSON.stringify(produkList))); // Buat salinan deep copy
-        const initialStatus = produkList.reduce((acc, produk) => {
-            acc[produk.id] = !!produk.isWajib; // Pastikan nilainya boolean
-            return acc;
-        }, {});
-        setWajibStatus(initialStatus);
-    }, [produkList]); // Hanya dijalankan saat produkList dari props berubah
+        // Buat salinan deep copy untuk diedit secara lokal
+        setLocalProdukList(JSON.parse(JSON.stringify(produkList)));
+    }, [produkList]);
 
     const handleToggleWajib = (produk) => {
         const productId = produk.id;
-        const isCurrentlyWajib = wajibStatus[productId];
+        const localProduk = localProdukList.find((p) => p.id === productId);
+        const isCurrentlyWajib = localProduk && (localProduk.targetWajib || 0) > 0;
 
         if (!isCurrentlyWajib) {
             // Jika akan diaktifkan, buka modal
@@ -33,25 +30,26 @@ export default function VariantWajibSettingsPage({ setActivePage, produkList, se
             setTargetBox(produk.targetWajib || ''); // Isi dengan target yang sudah ada jika ada
             setShowTargetModal(true);
         } else {
-            // Jika akan dinonaktifkan, langsung update state
-            setWajibStatus((prev) => ({
-                ...prev,
-                [productId]: false,
-            }));
+            // Jika akan dinonaktifkan, langsung set targetWajib ke 0 di state lokal
+            const updatedList = localProdukList.map((p) => (p.id === productId ? { ...p, targetWajib: 0 } : p));
+            setLocalProdukList(updatedList);
         }
     };
 
     const handleSetTarget = () => {
         if (!currentTargetProduct) return;
         const productId = currentTargetProduct.id;
+        const newTarget = Number(targetBox) || 0;
 
-        // Update state lokal untuk status wajib dan targetnya
-        setWajibStatus((prev) => ({ ...prev, [productId]: true }));
-        // Simpan target di state produkList sementara
-        const updatedList = localProdukList.map((p) => (p.id === productId ? { ...p, targetWajib: Number(targetBox) || 0 } : p));
+        // Jika target diatur ke 0 atau kurang, anggap saja dinonaktifkan
+        if (newTarget <= 0) {
+            showNotification('Target harus lebih dari 0 untuk mengaktifkan variant wajib.', 'info');
+        }
+
+        // Update targetWajib di state lokal
+        const updatedList = localProdukList.map((p) => (p.id === productId ? { ...p, targetWajib: newTarget } : p));
         setLocalProdukList(updatedList);
 
-        // Tutup modal
         setShowTargetModal(false);
         setCurrentTargetProduct(null);
         setTargetBox('');
@@ -59,33 +57,34 @@ export default function VariantWajibSettingsPage({ setActivePage, produkList, se
 
     const handleSave = async () => {
         setSaving(true);
-        const batch = writeBatch(db);
-        let changesCount = 0;
 
-        localProdukList.forEach((localProduk) => {
-            const originalProduk = produkList.find((p) => p.id === localProduk.id);
-            const originalStatus = !!originalProduk?.isWajib;
-            const newStatus = wajibStatus[localProduk.id];
-            const originalTarget = originalProduk?.targetWajib || 0;
-            const newTarget = newStatus ? localProduk.targetWajib || 0 : 0; // Ambil target dari state lokal
+        // Bandingkan state lokal dengan props asli untuk menemukan perubahan
+        const updates = localProdukList
+            .map((localProduk) => {
+                const originalProduk = produkList.find((p) => p.id === localProduk.id);
+                const newTarget = localProduk.targetWajib || 0;
+                const oldTarget = originalProduk?.targetWajib || 0;
+                if (newTarget !== oldTarget) {
+                    // Perbaikan: Kembalikan sebuah promise `update` dari Supabase, bukan objek biasa.
+                    return supabase.from('produk').update({ targetWajib: newTarget }).eq('id', localProduk.id);
+                }
+                return null;
+            })
+            .filter(Boolean); // Hapus item null dari array
 
-            if (originalStatus !== newStatus || (newStatus && originalTarget !== newTarget)) {
-                const produkRef = doc(db, 'produk', localProduk.id);
-                batch.update(produkRef, { isWajib: newStatus, targetWajib: newTarget });
-                changesCount++;
-            }
-        });
-
-        if (changesCount === 0) {
+        if (updates.length === 0) {
             showNotification('Tidak ada perubahan untuk disimpan.', 'info');
             setSaving(false);
             return;
         }
-
         try {
-            await batch.commit();
-            // Update state global di App.jsx
-            setProdukList(localProdukList); // Update state global dengan state lokal yang sudah diperbarui
+            // Jalankan semua promise update secara paralel
+            const results = await Promise.all(updates);
+            // Cek apakah ada error di salah satu hasil promise
+            const errorResult = results.find((res) => res.error);
+            if (errorResult) throw errorResult.error;
+
+            setProdukList(localProdukList); // Perbaikan: Gunakan setProdukList untuk update state global
             showNotification('Pengaturan variant wajib berhasil disimpan.', 'success');
             setActivePage('variant-wajib'); // Kembali ke halaman display variant wajib
         } catch (error) {
@@ -115,7 +114,7 @@ export default function VariantWajibSettingsPage({ setActivePage, produkList, se
                     {localProdukList
                         .sort((a, b) => a.nama.localeCompare(b.nama))
                         .map((produk) => {
-                            const isWajib = wajibStatus[produk.id];
+                            const isWajib = (produk.targetWajib || 0) > 0;
                             return (
                                 <div key={produk.id} onClick={() => handleToggleWajib(produk)} className={`bg-white rounded-xl p-3 flex items-center gap-3 shadow-sm border transition-all duration-200 cursor-pointer ${isWajib ? 'border-yellow-400 bg-yellow-50' : 'border-slate-200'}`}>
                                     <img src={produk.foto || 'https://via.placeholder.com/64?text=Produk'} alt={produk.nama} className="w-10 h-10 object-cover rounded-md border border-gray-200" />
@@ -142,7 +141,7 @@ export default function VariantWajibSettingsPage({ setActivePage, produkList, se
                                     <div className="w-2 h-2 bg-indigo-500 rounded-full animate-pulse"></div>
                                     Total Variant Wajib
                                 </span>
-                                <span className="bg-gradient-to-r from-purple-600 to-indigo-600 text-white px-3 py-1.5 rounded-lg shadow-md transition-all duration-300">{Object.values(wajibStatus).filter(Boolean).length} Produk</span>
+                                <span className="bg-gradient-to-r from-purple-600 to-indigo-600 text-white px-3 py-1.5 rounded-lg shadow-md transition-all duration-300">{localProdukList.filter((p) => (p.targetWajib || 0) > 0).length} Produk</span>
                             </div>
                         </div>
                     </div>

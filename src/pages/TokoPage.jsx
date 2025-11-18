@@ -1,9 +1,8 @@
 // src/pages/TokoPage.jsx
 import { useState, useEffect, useRef } from 'react';
-import { collection, getDocs, addDoc, updateDoc, deleteDoc, doc, serverTimestamp, writeBatch } from 'firebase/firestore';
-import { db } from '../lib/firebase';
+import { supabase } from '../lib/supabase';
 import Loader from '../components/Loader';
-import { Store, Plus, Trash2, Pencil, CheckCircle2, Calendar, Filter, ArrowLeft, Package, MapPin, AlertTriangle, ArrowDownUp, FileUp, FileDown, Send, LocateFixed, Loader2, Camera } from 'lucide-react';
+import { Store, Plus, Trash2, Pencil, CheckCircle2, Calendar, Filter, ArrowLeft, Package, MapPin, AlertTriangle, ArrowDownUp, FileUp, FileDown, Send, Loader2, Camera } from 'lucide-react';
 import { MessageSquare } from 'lucide-react'; // Import MessageSquare
 import * as XLSX from 'xlsx'; // Import xlsx library
 
@@ -21,7 +20,7 @@ const HARI_LABEL = {
     sabtu: 'Sabtu',
 };
 
-export default function TokoPage({ orderList = [], kunjunganList = [], onModalChange }) {
+export default function TokoPage({ orderList = [], kunjunganList = [], onModalChange, showNotification }) {
     const [tokoList, setTokoList] = useState([]);
     const [loading, setLoading] = useState(true);
     const [showForm, setShowForm] = useState(false);
@@ -30,12 +29,9 @@ export default function TokoPage({ orderList = [], kunjunganList = [], onModalCh
 
     const [nama, setNama] = useState('');
     const [kode, setKode] = useState('');
-    const [jadwalKunjungan, setJadwalKunjungan] = useState([]);
-    const [fotoToko, setFotoToko] = useState(''); // State baru untuk foto toko
+    const [jadwalKunjungan, setJadwalKunjungan] = useState([]); //
+    const [fotoToko, setFotoToko] = useState([]); // State baru untuk foto toko (diubah menjadi array)
     const [kodeFreezer, setKodeFreezer] = useState(''); // New state for kodeFreezer
-    const [latitude, setLatitude] = useState('');
-    const [longitude, setLongitude] = useState('');
-    const [isFetchingLocation, setIsFetchingLocation] = useState(false);
     const [searchTerm, setSearchTerm] = useState(''); // New state for search term
     const [nomorWa, setNomorWa] = useState('');
     const [filterHari, setFilterHari] = useState('semua');
@@ -92,23 +88,23 @@ export default function TokoPage({ orderList = [], kunjunganList = [], onModalCh
         const loadData = async () => {
             try {
                 setLoading(true);
-                const tokoSnapshot = await getDocs(collection(db, 'toko'));
-                const tokoData = tokoSnapshot.docs.map((doc) => {
-                    const data = doc.data();
+                const { data: tokoData, error } = await supabase.from('toko').select('*');
+                if (error) throw error;
+
+                const formattedTokoData = tokoData.map((data) => {
                     // Ambil jadwalKunjungan, pastikan array
                     const jadwal = Array.isArray(data.jadwalKunjungan) ? data.jadwalKunjungan.filter((h) => HARI.includes(h)) : [];
                     return {
-                        id: doc.id,
                         ...data,
                         kodeFreezer: data.kodeFreezer || '', // Ensure kodeFreezer exists
                         jadwalKunjungan: jadwal,
                     };
                 });
 
-                setTokoList(tokoData);
+                setTokoList(formattedTokoData);
             } catch (error) {
                 console.error('Error load data:', error);
-                alert('Gagal memuat data toko.');
+                showNotification('Gagal memuat data toko.', 'error');
             } finally {
                 setLoading(false);
             }
@@ -120,11 +116,9 @@ export default function TokoPage({ orderList = [], kunjunganList = [], onModalCh
         setNama('');
         setKode('');
         setJadwalKunjungan([]);
-        setFotoToko(''); // Reset foto toko
+        setFotoToko([]); // Reset foto toko menjadi array kosong
         setKodeFreezer(''); // Reset kodeFreezer
         setNomorWa('');
-        setLatitude('');
-        setLongitude('');
         setEditingId(null);
         setShowForm(false);
     };
@@ -138,12 +132,11 @@ export default function TokoPage({ orderList = [], kunjunganList = [], onModalCh
         setEditingId(toko.id);
         setNama(toko.nama || '');
         setKode(toko.kode || '');
-        setFotoToko(toko.fotoToko || ''); // Set foto toko untuk edit
+        // Pastikan fotoToko selalu array, bahkan jika data lama adalah string
+        setFotoToko(Array.isArray(toko.fotoToko) ? toko.fotoToko : toko.fotoToko ? [toko.fotoToko] : []);
         setKodeFreezer(toko.kodeFreezer || ''); // Set kodeFreezer for editing
         setJadwalKunjungan(Array.isArray(toko.jadwalKunjungan) ? toko.jadwalKunjungan : []);
         setNomorWa(toko.nomorWa || '');
-        setLatitude(toko.latitude || '');
-        setLongitude(toko.longitude || '');
         setShowForm(true);
     };
 
@@ -192,31 +185,33 @@ export default function TokoPage({ orderList = [], kunjunganList = [], onModalCh
             nama: nama.trim(),
             kode: kode.trim() || '-',
             jadwalKunjungan: jadwalKunjungan, // Ensure this is an array of strings
-            fotoToko: fotoToko.trim(), // Simpan URL foto toko
+            fotoToko: fotoToko.filter((url) => url.trim() !== ''), // Simpan array URL foto, hapus yang kosong
             kodeFreezer: kodeFreezer.trim(), // Include kodeFreezer
             nomorWa: nomorWa.trim(),
-            latitude: latitude,
-            longitude: longitude,
-            totalBoxesOrdered: 0, // Inisialisasi field baru
-            mysteryBoxesAwarded: 0, // Inisialisasi field baru
-            monthlyRewardsClaimed: {}, // Inisialisasi untuk hadiah bulanan
         };
 
         try {
             if (editingId) {
-                // 🔧 Update
-                await updateDoc(doc(db, 'toko', editingId), tokoData);
-                // Perbarui state lokal tanpa refetch
-                setTokoList((prevList) => prevList.map((toko) => (toko.id === editingId ? { ...toko, ...tokoData, totalBoxesOrdered: toko.totalBoxesOrdered, mysteryBoxesAwarded: toko.mysteryBoxesAwarded, monthlyRewardsClaimed: toko.monthlyRewardsClaimed || {} } : toko)));
+                // Update with Supabase
+                const { error } = await supabase.from('toko').update(tokoData).eq('id', editingId);
+                if (error) throw error;
+                setTokoList((prevList) => prevList.map((toko) => (toko.id === editingId ? { ...toko, ...tokoData } : toko)));
             } else {
-                // ➕ Create
-                const docRef = await addDoc(collection(db, 'toko'), {
-                    ...tokoData,
-                    createdAt: serverTimestamp(), // Use serverTimestamp for new documents
-                });
-                // Tambahkan ke state lokal tanpa refetch
-                // Kita gunakan new Date() untuk tampilan sementara, serverTimestamp akan update saat reload
-                setTokoList((prevList) => [...prevList, { id: docRef.id, ...tokoData, createdAt: { seconds: Date.now() / 1000 } }]);
+                // Create with Supabase
+                const { data, error } = await supabase
+                    .from('toko')
+                    .insert([
+                        {
+                            ...tokoData,
+                            createdAt: new Date().toISOString(),
+                        },
+                    ])
+                    .select();
+
+                if (error) throw error;
+                if (data) {
+                    setTokoList((prevList) => [...prevList, data[0]]);
+                }
             }
 
             resetForm();
@@ -226,45 +221,6 @@ export default function TokoPage({ orderList = [], kunjunganList = [], onModalCh
         }
     };
 
-    const fetchCurrentLocation = () => {
-        if (!navigator.geolocation) {
-            alert('Geolocation tidak didukung oleh browser Anda.');
-            return;
-        }
-        setIsFetchingLocation(true);
-        navigator.geolocation.getCurrentPosition(
-            (position) => {
-                setLatitude(position.coords.latitude);
-                setLongitude(position.coords.longitude);
-                setIsFetchingLocation(false);
-            },
-            (error) => {
-                alert(`Gagal mendapatkan lokasi: ${error.message}`);
-                setIsFetchingLocation(false);
-            },
-            { enableHighAccuracy: true },
-        );
-    };
-
-    const handleGmapsLinkPaste = (e) => {
-        const pastedText = e.target.value;
-
-        // Regex untuk mengekstrak koordinat dari berbagai format URL Google Maps
-        // Contoh: https://www.google.com/maps/place/Monas/@-6.1753924,106.8271528,17z
-        // Contoh: https://maps.app.goo.gl/abcdefg
-        // Contoh: -6.1753924, 106.8271528
-        const regex = /@(-?\d+\.\d+),(-?\d+\.\d+)|(-?\d+\.\d+),\s*(-?\d+\.\d+)/;
-        const match = pastedText.match(regex);
-
-        if (match) {
-            // `match[1]` dan `match[2]` untuk format URL dengan `@`
-            // `match[3]` dan `match[4]` untuk format teks "lat, lng"
-            const lat = parseFloat(match[1] || match[3]);
-            const lng = parseFloat(match[2] || match[4]);
-            setLatitude(lat);
-            setLongitude(lng);
-        }
-    };
     const handleBroadcastWA = () => {
         if (filterHari === 'semua') {
             alert('Pilih hari spesifik untuk broadcast.');
@@ -282,28 +238,28 @@ export default function TokoPage({ orderList = [], kunjunganList = [], onModalCh
         setShowBroadcastModal(true);
     };
     const handleConfirmUpdate = async () => {
-        const batch = writeBatch(db);
-        let updatedCount = 0;
-        let addedCount = 0;
-
-        // Proses update data yang sudah ada
-        storesToUpdate.forEach((toko) => {
-            const { id, ...tokoData } = toko;
-            const tokoRef = doc(db, 'toko', id);
-            batch.update(tokoRef, tokoData);
-            updatedCount++;
-        });
-
-        // Proses tambah data baru
-        storesToAdd.forEach((tokoData) => {
-            const newTokoRef = doc(collection(db, 'toko'));
-            batch.set(newTokoRef, tokoData);
-            addedCount++;
-        });
-
         try {
-            await batch.commit();
-            alert(`Proses selesai: ${updatedCount} toko diperbarui, ${addedCount} toko baru ditambahkan.`);
+            let updatedCount = 0;
+            let addedCount = 0;
+
+            // Proses update dan tambah menggunakan upsert
+            if (storesToUpdate.length > 0 || storesToAdd.length > 0) {
+                const allDataToProcess = [...storesToUpdate, ...storesToAdd.map((toko) => ({ ...toko, createdAt: new Date().toISOString() }))];
+
+                const { error, count } = await supabase.from('toko').upsert(allDataToProcess, { onConflict: 'id' });
+
+                if (error) throw error;
+
+                // Perkiraan jumlah, karena upsert tidak membedakan
+                updatedCount = storesToUpdate.length;
+                addedCount = storesToAdd.length;
+            }
+
+            if (updatedCount > 0 || addedCount > 0) {
+                alert(`Proses selesai: ${updatedCount} toko diperbarui, ${addedCount} toko baru ditambahkan.`);
+            } else {
+                alert('Tidak ada data yang diproses.');
+            }
             window.location.reload(); // Reload untuk sinkronisasi data
         } catch (error) {
             console.error('Error updating/adding stores:', error);
@@ -382,25 +338,28 @@ export default function TokoPage({ orderList = [], kunjunganList = [], onModalCh
                     updatedStores.push({ id: existingToko.id, ...tokoData });
                 } else {
                     // Toko baru, siapkan untuk ditambah
-                    newStores.push({ ...tokoData, createdAt: serverTimestamp(), totalBoxesOrdered: 0, mysteryBoxesAwarded: 0, monthlyRewardsClaimed: {} });
+                    newStores.push({ ...tokoData, totalBoxesOrdered: 0, mysteryBoxesAwarded: 0, monthlyRewardsClaimed: {} });
                 }
             }
 
-            if (updatedStores.length > 0) {
+            if (updatedStores.length > 0 || newStores.length > 0) {
                 // Jika ada data yang sama, tampilkan modal konfirmasi
                 setStoresToUpdate(updatedStores);
                 setStoresToAdd(newStores); // Simpan juga data baru untuk diproses bersamaan
                 setShowUpdateConfirm(true);
-            } else if (newStores.length > 0) {
-                // Jika hanya ada data baru, langsung proses
-                const batch = writeBatch(db);
-                newStores.forEach((tokoData) => {
-                    const newTokoRef = doc(collection(db, 'toko'));
-                    batch.set(newTokoRef, tokoData);
-                });
-                await batch.commit();
+            } else if (updatedStores.length === 0 && newStores.length > 0) {
+                // Jika hanya ada data baru, langsung proses (meskipun logika di atas sudah mencakup ini)
+                const { error } = await supabase.from('toko').insert(
+                    newStores.map((toko) => ({
+                        ...toko,
+                        createdAt: new Date().toISOString(),
+                    })),
+                );
+
+                if (error) throw error;
+
                 alert(`${newStores.length} toko baru berhasil diimpor!`);
-                window.location.reload();
+                window.location.reload(); // Reload untuk sinkronisasi data
             } else {
                 alert('Tidak ada data baru atau data untuk diperbarui. Semua data mungkin sudah ada dan identik.');
             }
@@ -434,7 +393,8 @@ export default function TokoPage({ orderList = [], kunjunganList = [], onModalCh
         if (!itemToDelete) return;
 
         try {
-            await deleteDoc(doc(db, 'toko', itemToDelete.id));
+            const { error } = await supabase.from('toko').delete().eq('id', itemToDelete.id);
+            if (error) throw error;
             setTokoList(tokoList.filter((t) => t.id !== itemToDelete.id));
             setShowDeleteConfirm(false);
             setItemToDelete(null);
@@ -476,16 +436,16 @@ export default function TokoPage({ orderList = [], kunjunganList = [], onModalCh
         .filter((toko) => {
             // Filter by search term
             const term = searchTerm.toLowerCase();
-            return toko.nama.toLowerCase().includes(term) || (toko.kode && toko.kode.toLowerCase().includes(term));
+            return (toko.nama || '').toLowerCase().includes(term) || (toko.kode || '').toLowerCase().includes(term);
         })
         .sort((a, b) => {
             switch (sortBy) {
                 case 'nama-desc':
                     return b.nama.localeCompare(a.nama);
                 case 'terbaru':
-                    return (b.createdAt?.seconds || 0) - (a.createdAt?.seconds || 0);
+                    return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
                 case 'terlama':
-                    return (a.createdAt?.seconds || 0) - (b.createdAt?.seconds || 0);
+                    return new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime();
                 case 'kunjungan-terbanyak':
                     return b.stats.totalKunjungan - a.stats.totalKunjungan;
                 case 'box-terbanyak':
@@ -582,14 +542,35 @@ export default function TokoPage({ orderList = [], kunjunganList = [], onModalCh
                                     <input type="text" value={nama} onChange={(e) => setNama(e.target.value)} placeholder="Contoh: Toko Jaya Abadi" className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500" required />
                                 </div>
                                 <div>
-                                    <label className="block text-sm font-medium text-slate-700 mb-1">URL Foto Toko (Opsional)</label>
-                                    <div className="flex items-center gap-2">
-                                        <input type="text" value={fotoToko} onChange={(e) => setFotoToko(e.target.value)} placeholder="https://example.com/foto.jpg" className="flex-grow p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500" />
-                                        <button type="button" onClick={() => setShowCamera(true)} className="p-3 bg-purple-100 text-purple-700 rounded-lg hover:bg-purple-200 transition-colors">
-                                            <Camera size={20} />
-                                        </button>
+                                    <label className="block text-sm font-medium text-slate-700 mb-2">Foto Toko (Opsional)</label>
+                                    <div className="space-y-2">
+                                        {fotoToko.map((url, index) => (
+                                            <div key={index} className="flex items-center gap-2">
+                                                <input
+                                                    type="text"
+                                                    value={url}
+                                                    onChange={(e) => {
+                                                        const newFotos = [...fotoToko];
+                                                        newFotos[index] = e.target.value;
+                                                        setFotoToko(newFotos);
+                                                    }}
+                                                    placeholder={`URL Foto ${index + 1}`}
+                                                    className="flex-grow p-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-purple-500"
+                                                />
+                                                <button type="button" onClick={() => setFotoToko(fotoToko.filter((_, i) => i !== index))} className="p-2 bg-red-100 text-red-600 rounded-full hover:bg-red-200 transition-colors">
+                                                    <Trash2 size={14} />
+                                                </button>
+                                            </div>
+                                        ))}
+                                        <div className="flex gap-2">
+                                            <button type="button" onClick={() => setFotoToko([...fotoToko, ''])} className="flex-1 text-sm py-2 bg-slate-200 text-slate-700 rounded-lg hover:bg-slate-300 transition-colors flex items-center justify-center gap-2">
+                                                <Plus size={16} /> Tambah URL
+                                            </button>
+                                            <button type="button" onClick={() => setShowCamera(true)} className="flex-1 text-sm py-2 bg-purple-100 text-purple-700 rounded-lg hover:bg-purple-200 transition-colors flex items-center justify-center gap-2">
+                                                <Camera size={16} /> Ambil Foto
+                                            </button>
+                                        </div>
                                     </div>
-                                    {fotoToko && <img src={fotoToko} alt="Preview" className="mt-2 w-24 h-24 object-cover rounded-lg border" />}
                                 </div>
                                 <div>
                                     <label className="block text-sm font-medium text-slate-700 mb-1">Kode Toko (Opsional)</label>
@@ -602,23 +583,6 @@ export default function TokoPage({ orderList = [], kunjunganList = [], onModalCh
                                 <div>
                                     <label className="block text-sm font-medium text-slate-700 mb-1">Nomor WhatsApp (Opsional)</label>
                                     <input type="tel" value={nomorWa} onChange={handleNomorWaChange} placeholder="Contoh: 628123456789" className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500" />
-                                </div>
-
-                                {/* Lokasi GPS */}
-                                <div className="pt-4">
-                                    <h3 className="font-semibold text-slate-800 mb-3 flex items-center gap-1.5">
-                                        <MapPin size={16} className="text-purple-600" />
-                                        Lokasi GPS (Opsional)
-                                    </h3>
-                                    <div className="space-y-2">
-                                        <input type="text" onChange={handleGmapsLinkPaste} placeholder="Tempel link Google Maps di sini" className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500" />
-                                        <input type="text" value={latitude} onChange={(e) => setLatitude(e.target.value)} placeholder="Latitude (otomatis)" className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 bg-slate-100" readOnly />
-                                        <input type="text" value={longitude} onChange={(e) => setLongitude(e.target.value)} placeholder="Longitude (otomatis)" className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 bg-slate-100" readOnly />
-                                    </div>
-                                    <button type="button" onClick={fetchCurrentLocation} disabled={isFetchingLocation} className="mt-2 w-full flex items-center justify-center gap-2 text-sm font-semibold text-purple-700 bg-purple-100 p-2 rounded-lg hover:bg-purple-200 transition disabled:opacity-70">
-                                        {isFetchingLocation ? <Loader2 size={16} className="animate-spin" /> : <LocateFixed size={16} />}
-                                        {isFetchingLocation ? 'Mencari Lokasi...' : 'Gunakan Lokasi Saat Ini'}
-                                    </button>
                                 </div>
 
                                 {/* Jadwal Kunjungan */}
@@ -691,12 +655,6 @@ export default function TokoPage({ orderList = [], kunjunganList = [], onModalCh
                                                 <Calendar size={12} className="text-purple-600" />
                                                 <span>{formatHari(toko.jadwalKunjungan)}</span>
                                             </div>
-                                            {toko.latitude && toko.longitude && (
-                                                <a href={`https://www.google.com/maps?q=${toko.latitude},${toko.longitude}`} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1 text-xs text-blue-700 hover:underline">
-                                                    <MapPin size={12} className="text-blue-600" />
-                                                    <span>Buka di Peta</span>
-                                                </a>
-                                            )}
                                         </div>
                                     </div>
                                     <div className="flex flex-col items-end gap-2">

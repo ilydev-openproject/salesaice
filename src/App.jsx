@@ -1,7 +1,6 @@
 // src/App.jsx
 import { useState, useEffect, useCallback } from 'react';
-import { collection, getDocs, query, orderBy, doc, getDoc } from 'firebase/firestore';
-import { db } from './lib/firebase';
+import { supabase } from './lib/supabase';
 import HomePage from './pages/HomePage';
 import TokoPage from './pages/TokoPage';
 import ProdukPage from './pages/ProdukPage';
@@ -36,48 +35,6 @@ export default function App() {
     const [exitConfirm, setExitConfirm] = useState(false);
     const [notification, setNotification] = useState({ show: false, message: '', type: 'success' });
 
-    // === Load data dari Firebase ===
-    useEffect(() => {
-        const loadData = async () => {
-            try {
-                const targetDocRef = doc(db, 'config', 'salesTarget');
-                const [tokoSnapshot, kunjunganSnapshot, produkSnapshot, orderSnapshot, targetSnapshot] = await Promise.all([
-                    getDocs(collection(db, 'toko')),
-                    getDocs(query(collection(db, 'kunjungan'), orderBy('createdAt', 'desc'))),
-                    getDocs(query(collection(db, 'produk'), orderBy('nama', 'asc'))),
-                    getDocs(query(collection(db, 'orders'), orderBy('createdAt', 'desc'))), // Load orders
-                    getDoc(targetDocRef),
-                ]);
-
-                if (targetSnapshot.exists()) {
-                    setTargets(targetSnapshot.data());
-                } else {
-                    // Jika dokumen target belum ada, Anda bisa set default atau membiarkannya
-                    console.log('Dokumen target belum ada, menggunakan nilai default.');
-                }
-
-                setDaftarToko(tokoSnapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() })));
-                setKunjunganList(kunjunganSnapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() })));
-                setProdukList(produkSnapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() })));
-                setOrderList(orderSnapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }))); // Set orders
-            } catch (error) {
-                console.error('Error loading data:', error);
-                alert('Gagal memuat data. Cek koneksi internet.');
-            } finally {
-                setLoading(false);
-            }
-        };
-        loadData();
-    }, []);
-
-    const handleTargetsUpdate = (newTargets) => {
-        setTargets((prev) => ({ ...prev, ...newTargets }));
-    };
-
-    const handleSetModalOpen = useCallback((isOpen) => {
-        setIsModalOpen(isOpen);
-    }, []);
-
     const showNotification = useCallback((message, type = 'success') => {
         setNotification({ show: true, message, type });
         setTimeout(() => {
@@ -91,6 +48,120 @@ export default function App() {
         setTimeout(() => setNotification({ show: false, message: '', type: 'success' }), 2000);
     };
 
+    // === Load data dari Firebase ===
+    useEffect(() => {
+        const loadData = async () => {
+            setLoading(true);
+            try {
+                const [tokoResponse, kunjunganResponse, produkResponse, orderResponse, configResponse] = await Promise.all([supabase.from('toko').select('*'), supabase.from('kunjungan').select('*').order('createdAt', { ascending: false }), supabase.from('produk').select('*').order('nama', { ascending: true }), supabase.from('orders').select('*').order('createdAt', { ascending: false }), supabase.from('config').select('*').eq('id', 'salesTarget').single()]);
+
+                if (tokoResponse.error) throw tokoResponse.error;
+                if (kunjunganResponse.error) throw kunjunganResponse.error;
+                if (produkResponse.error) throw produkResponse.error;
+                if (orderResponse.error) throw orderResponse.error;
+                // Abaikan error jika config tidak ada, karena kita punya default
+                if (configResponse.error && configResponse.error.code !== 'PGRST116') {
+                    throw configResponse.error;
+                }
+
+                if (configResponse.data) {
+                    setTargets(configResponse.data);
+                } else {
+                    console.log('Dokumen target belum ada, menggunakan nilai default.');
+                }
+
+                setDaftarToko(tokoResponse.data || []);
+                setKunjunganList(kunjunganResponse.data || []);
+                setProdukList(produkResponse.data || []);
+                setOrderList(orderResponse.data || []);
+            } catch (error) {
+                console.error('Error loading data:', error);
+                showNotification(`Gagal memuat data: ${error.message}`, 'error');
+            } finally {
+                setLoading(false);
+            }
+        };
+        loadData();
+    }, [showNotification]);
+
+    const handleSaveOrder = async (orderData, editingOrderId) => {
+        try {
+            if (editingOrderId) {
+                // Update
+                const { data, error } = await supabase.from('orders').update(orderData).eq('id', editingOrderId).select();
+                if (error) throw error;
+                setOrderList((prev) => prev.map((order) => (order.id === editingOrderId ? data[0] : order)));
+                showNotification('Order berhasil diperbarui.', 'success');
+            } else {
+                // Create
+                const { data, error } = await supabase.from('orders').insert([orderData]).select();
+                if (error) throw error;
+                setOrderList((prev) => [data[0], ...prev]);
+                showNotification('Order berhasil disimpan.', 'success');
+            }
+        } catch (error) {
+            console.error('Error saving order:', error);
+            showNotification(`Gagal menyimpan order: ${error.message}`, 'error');
+            throw error; // Re-throw to be caught by the calling component
+        }
+    };
+
+    const handleToggleAvailable = async (produk) => {
+        const newStatus = !produk.available;
+        try {
+            const { data, error } = await supabase.from('produk').update({ available: newStatus }).eq('id', produk.id).select().single();
+
+            if (error) throw error;
+
+            // Update state lokal dengan data yang baru dari database
+            setProdukList((prevList) => prevList.map((p) => (p.id === produk.id ? data : p)));
+            showNotification(`Status produk "${produk.nama}" berhasil diubah.`, 'success');
+        } catch (error) {
+            console.error('Error toggling product availability:', error);
+            showNotification('Gagal mengubah status produk.', 'error');
+        }
+    };
+
+    const handleSaveProduk = async (produkData, editingProdukId) => {
+        try {
+            let data, error;
+            if (editingProdukId) {
+                // Update
+                ({ data, error } = await supabase.from('produk').update(produkData).eq('id', editingProdukId).select().single());
+                if (error) throw error;
+                setProdukList((prev) => prev.map((p) => (p.id === editingProdukId ? data : p)));
+                showNotification('Produk berhasil diperbarui.', 'success');
+            } else {
+                // Create
+                ({ data, error } = await supabase.from('produk').insert([produkData]).select().single());
+                if (error) throw error;
+                setProdukList((prev) => [...prev, data]);
+                showNotification('Produk baru berhasil disimpan.', 'success');
+            }
+        } catch (error) {
+            console.error('Error saving produk:', error);
+            showNotification(`Gagal menyimpan produk: ${error.message}`, 'error');
+            throw error; // Re-throw agar form tahu ada error
+        }
+    };
+
+    const handleDeleteOrder = async (orderId) => {
+        try {
+            const { error } = await supabase.from('orders').delete().eq('id', orderId);
+            if (error) throw error;
+            setOrderList((prev) => prev.filter((order) => order.id !== orderId));
+            showNotification('Order berhasil dihapus.', 'success');
+        } catch (error) {
+            console.error('Error deleting order:', error);
+            showNotification(`Gagal menghapus order: ${error.message}`, 'error');
+            throw error; // Re-throw to be caught by the calling component if needed
+        }
+    };
+
+    const handleTargetsUpdate = (newTargets) => {
+        setTargets((prev) => ({ ...prev, ...newTargets }));
+    };
+
     // === Simpan activePage ke localStorage setiap kali berubah ===
     useEffect(() => {
         localStorage.setItem('activePage', activePage);
@@ -100,6 +171,10 @@ export default function App() {
         // Menambahkan state ke history browser untuk deteksi tombol kembali
         window.history.pushState({ page: activePage }, '');
     }, [activePage]);
+
+    const handleSetModalOpen = useCallback((isOpen) => {
+        setIsModalOpen(isOpen);
+    }, []);
 
     // Efek untuk menangani tombol kembali (back button)
     useEffect(() => {
@@ -173,13 +248,13 @@ export default function App() {
             <div style={{ flex: 1, paddingBottom: '70px' }}>
                 {activePage === 'home' && <HomePage daftarToko={daftarToko} kunjunganList={kunjunganList} produkList={produkList} orderList={orderList} setActivePage={setActivePage} targets={targets} showNotification={showNotification} />}
                 {activePage === 'toko' && <TokoPage setActivePage={setActivePage} orderList={orderList} kunjunganList={kunjunganList} onModalChange={handleSetModalOpen} showNotification={showNotification} />}
-                {activePage === 'produk' && <ProdukPage produkList={produkList} setProdukList={setProdukList} setActivePage={setActivePage} onModalChange={handleSetModalOpen} showNotification={showNotification} />}
-                {activePage === 'order' && <OrderPage setActivePage={setActivePage} orderList={orderList} setOrderList={setOrderList} tokoList={daftarToko} produkList={produkList} onModalChange={handleSetModalOpen} showNotification={showNotification} />}
+                {activePage === 'produk' && <ProdukPage produkList={produkList} onToggleAvailable={handleToggleAvailable} onSaveProduk={handleSaveProduk} setActivePage={setActivePage} onModalChange={handleSetModalOpen} showNotification={showNotification} />}
+                {activePage === 'order' && <OrderPage setActivePage={setActivePage} orderList={orderList} setOrderList={setOrderList} tokoList={daftarToko} produkList={produkList} onSaveOrder={handleSaveOrder} onDeleteOrder={handleDeleteOrder} onModalChange={handleSetModalOpen} showNotification={showNotification} />}
                 {activePage === 'produk-terlaris' && <ProdukTerlarisPage produkList={produkList} kunjunganList={kunjunganList} orderList={orderList} setActivePage={setActivePage} />}
                 {activePage === 'target' && <TargetPage setActivePage={setActivePage} targets={targets} onTargetsUpdate={handleTargetsUpdate} showNotification={showNotification} />}
                 {activePage === 'analisis-toko' && <AnalisisTokoPage tokoList={daftarToko} orderList={orderList} kunjunganList={kunjunganList} setActivePage={setActivePage} />}
                 {activePage === 'visit' && <VisitPage setActivePage={setActivePage} orderList={orderList} kunjunganList={kunjunganList} setKunjunganList={setKunjunganList} tokoList={daftarToko} produkList={produkList} onModalChange={handleSetModalOpen} showNotification={showNotification} />}
-                {activePage === 'product-velocity' && <ProductVelocityPage tokoList={daftarToko} orderList={orderList} setActivePage={setActivePage} />}
+                {activePage === 'product-velocity' && <ProductVelocityPage tokoList={daftarToko} orderList={orderList} produkList={produkList} setActivePage={setActivePage} />}
                 {activePage === 'analisis-grade-toko' && <TokoGradePage setActivePage={setActivePage} tokoList={daftarToko} orderList={orderList} onModalChange={handleSetModalOpen} showNotification={showNotification} />}
                 {activePage === 'mystery-box' && <MysteryBoxPage setActivePage={setActivePage} tokoList={daftarToko} orderList={orderList} showNotification={showNotification} />}
                 {activePage === 'variant-wajib' && <VariantWajibPage setActivePage={setActivePage} produkList={produkList} orderList={orderList} />}

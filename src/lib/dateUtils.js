@@ -1,4 +1,20 @@
-import { startOfMonth, endOfMonth, subDays, lastDayOfMonth } from 'date-fns';
+import { startOfMonth, endOfMonth, subDays, isValid } from 'date-fns';
+
+/**
+ * Normalizes a date value that might be an ISO string or a Firebase-style timestamp object.
+ * @param {string | {seconds: number, nanoseconds: number} | Date} dateInput - The date value to normalize.
+ * @returns {Date | null} A valid Date object or null if the input is invalid.
+ */
+export function normalizeDate(dateInput) {
+    if (!dateInput) return null;
+    // If it's a Firebase-style timestamp object
+    if (typeof dateInput === 'object' && dateInput !== null && 'seconds' in dateInput) {
+        return new Date(dateInput.seconds * 1000);
+    }
+    // If it's already a Date object or a parsable string
+    const date = new Date(dateInput);
+    return !isValid(date) ? null : date;
+}
 
 /**
  * Menghitung tanggal mulai dan selesai untuk periode penjualan "taking order".

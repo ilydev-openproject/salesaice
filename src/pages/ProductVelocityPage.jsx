@@ -1,12 +1,14 @@
 import { useState, useMemo } from 'react';
 import { ArrowLeft, Zap, BarChart2, Store, ChevronDown, CheckCircle2 } from 'lucide-react';
-import { differenceInDays } from 'date-fns';
+import { differenceInDays, endOfMonth, startOfMonth, isWithinInterval } from 'date-fns';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Label } from 'recharts';
+import { findProduct } from '../lib/utils';
 
-export default function ProductVelocityPage({ tokoList, orderList, setActivePage }) {
+export default function ProductVelocityPage({ tokoList, orderList, produkList, setActivePage }) {
     const [selectedTokoId, setSelectedTokoId] = useState('');
     const [isTokoDropdownOpen, setIsTokoDropdownOpen] = useState(false);
     const [tokoSearchTerm, setTokoSearchTerm] = useState('');
+    const [timeFilter, setTimeFilter] = useState('allTime'); // 'allTime' or 'thisMonth'
 
     const handleSelectToko = (tokoId) => {
         setSelectedTokoId(tokoId);
@@ -17,19 +19,41 @@ export default function ProductVelocityPage({ tokoList, orderList, setActivePage
     const velocityData = useMemo(() => {
         if (!selectedTokoId) return [];
 
-        const ordersForToko = orderList.filter((o) => o.tokoId === selectedTokoId && o.items?.length > 0).sort((a, b) => a.createdAt.seconds - b.createdAt.seconds);
+        // Langkah 1: Filter orderList berdasarkan periode waktu yang dipilih.
+        let filteredOrderList = orderList;
+        if (timeFilter === 'thisMonth') {
+            const today = new Date();
+            const monthStart = startOfMonth(today);
+            const monthEnd = endOfMonth(today);
+
+            filteredOrderList = orderList.filter((order) => {
+                if (!order.createdAt) return false;
+                const orderDate = new Date(order.createdAt);
+                // Filter order yang tanggal pencatatannya masuk dalam bulan kalender ini.
+                return isWithinInterval(orderDate, { start: monthStart, end: monthEnd });
+            });
+        }
+
+        // Langkah 2: Dari hasil filter waktu, ambil order untuk toko yang dipilih.
+        const ordersForToko = filteredOrderList.filter((o) => o.tokoId === selectedTokoId && o.items?.length > 0).sort((a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime());
 
         const productOrders = new Map();
 
         ordersForToko.forEach((order) => {
-            order.items.forEach((item) => {
-                if (!productOrders.has(item.productId)) {
-                    productOrders.set(item.productId, {
-                        name: item.nama,
+            // Perbaikan: Pastikan `items` adalah array sebelum di-loop untuk mencegah error.
+            const items = Array.isArray(order.items) ? order.items : [];
+            items.forEach((item) => {
+                const product = findProduct(produkList, item.productId);
+                if (!product) return; // Lewati jika produk tidak ditemukan
+
+                if (!productOrders.has(product.id)) {
+                    productOrders.set(product.id, {
+                        // Gunakan nama dari produkList
+                        name: product.nama,
                         dates: [],
                     });
                 }
-                productOrders.get(item.productId).dates.push(new Date(order.createdAt.seconds * 1000));
+                productOrders.get(product.id).dates.push(new Date(order.createdAt));
             });
         });
 
@@ -38,10 +62,9 @@ export default function ProductVelocityPage({ tokoList, orderList, setActivePage
             if (data.dates.length > 1) {
                 const diffs = [];
                 for (let i = 1; i < data.dates.length; i++) {
-                    const diff = differenceInDays(data.dates[i], data.dates[i - 1]);
-                    if (diff > 0) {
-                        diffs.push(diff);
-                    }
+                    // Perbaikan: Gunakan differenceInDays untuk konsistensi, tapi pastikan hanya > 0
+                    const diff = Math.abs(differenceInDays(data.dates[i], data.dates[i - 1]));
+                    if (diff >= 0) diffs.push(diff); // FIX: Izinkan selisih 0 hari (order di hari yang sama/besok)
                 }
 
                 if (diffs.length > 0) {
@@ -57,7 +80,7 @@ export default function ProductVelocityPage({ tokoList, orderList, setActivePage
         });
 
         return analysis.sort((a, b) => a.avgDays - b.avgDays);
-    }, [selectedTokoId, orderList]);
+    }, [selectedTokoId, orderList, timeFilter, produkList]);
 
     const getVelocityStatus = (days) => {
         if (days <= 7) return { text: 'Sangat Cepat', color: 'bg-red-100 text-red-800 border-red-200' };
@@ -91,12 +114,12 @@ export default function ProductVelocityPage({ tokoList, orderList, setActivePage
                     </button>
                     {isTokoDropdownOpen && (
                         <div className="absolute z-10 mt-1 w-full bg-white border border-gray-200 rounded-lg shadow-lg flex flex-col">
-                            <div className="p-2 border-b border-gray-200">
+                            <div className="p-2 border-b border-gray-200" onClick={(e) => e.stopPropagation()}>
                                 <input type="text" placeholder="Cari toko..." value={tokoSearchTerm} onChange={(e) => setTokoSearchTerm(e.target.value)} onClick={(e) => e.stopPropagation()} className="w-full p-2 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-purple-500" />
                             </div>
                             <div className="max-h-60 overflow-y-auto">
                                 {tokoList
-                                    .filter((t) => t.nama.toLowerCase().includes(tokoSearchTerm.toLowerCase()))
+                                    .filter((t) => (t.nama || '').toLowerCase().includes(tokoSearchTerm.toLowerCase()))
                                     .sort((a, b) => a.nama.localeCompare(b.nama))
                                     .map((toko) => (
                                         <div key={toko.id} onClick={() => handleSelectToko(toko.id)} className={`p-3 cursor-pointer hover:bg-purple-50 flex justify-between items-center ${selectedTokoId === toko.id ? 'bg-purple-100 font-semibold' : ''}`}>
@@ -108,6 +131,16 @@ export default function ProductVelocityPage({ tokoList, orderList, setActivePage
                         </div>
                     )}
                 </div>
+            </div>
+
+            {/* Filter Waktu */}
+            <div className="flex items-center gap-2 p-1 bg-slate-100 rounded-lg mb-6">
+                <button onClick={() => setTimeFilter('thisMonth')} className={`flex-1 text-sm font-semibold py-2 rounded-md transition-colors ${timeFilter === 'thisMonth' ? 'bg-white text-purple-700 shadow' : 'text-slate-500'}`}>
+                    Bulan Ini
+                </button>
+                <button onClick={() => setTimeFilter('allTime')} className={`flex-1 text-sm font-semibold py-2 rounded-md transition-colors ${timeFilter === 'allTime' ? 'bg-white text-purple-700 shadow' : 'text-slate-500'}`}>
+                    Semua Waktu
+                </button>
             </div>
 
             {/* Hasil Analisis */}

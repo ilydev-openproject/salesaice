@@ -1,12 +1,11 @@
 // src/pages/ProdukPage.jsx
 import { useState, useEffect } from 'react';
-import { collection, getDocs, addDoc, deleteDoc, doc, updateDoc, query, orderBy, serverTimestamp } from 'firebase/firestore';
+import { supabase } from '../lib/supabase'; // Import Supabase client
 import { Package, Plus, Trash2, TrendingUp, Wallet, Tag, Box, CheckCircle2, XCircle, Eye, EyeOff, Pencil, ArrowDownUp, AlertTriangle } from 'lucide-react';
 import Loader from '../components/Loader';
-import { db } from '../lib/firebase';
 
-export default function ProdukPage({ setActivePage, onModalChange }) {
-    const [produkList, setProdukList] = useState([]);
+export default function ProdukPage({ produkList: initialProdukList, onToggleAvailable, onSaveProduk, setActivePage, onModalChange, showNotification, setProdukList: _setProdukList }) {
+    const [produkList, setProdukList] = useState(initialProdukList || []);
     const [loading, setLoading] = useState(true);
     const [showForm, setShowForm] = useState(false);
     const [editingProdukId, setEditingProdukId] = useState(null);
@@ -43,22 +42,12 @@ export default function ProdukPage({ setActivePage, onModalChange }) {
     }, [showForm, showDeleteConfirm, onModalChange]);
 
     useEffect(() => {
-        const loadProduk = async () => {
-            try {
-                // Order by createdAt to show newest first, or by nama for alphabetical
-                const q = query(collection(db, 'produk'), orderBy('createdAt', 'desc'));
-                const snapshot = await getDocs(q);
-                const list = snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
-                setProdukList(list);
-            } catch (error) {
-                console.error('Error load produk:', error);
-                alert('Gagal memuat produk. Cek koneksi internet.');
-            } finally {
-                setLoading(false);
-            }
-        };
-        loadProduk();
-    }, []);
+        // Perbaikan: Sinkronkan state lokal dengan prop dari App.jsx
+        setProdukList(initialProdukList || []);
+        if (initialProdukList) {
+            setLoading(false);
+        }
+    }, [initialProdukList]);
 
     const toggleForm = () => {
         setShowForm(!showForm);
@@ -87,73 +76,49 @@ export default function ProdukPage({ setActivePage, onModalChange }) {
     const simpanProduk = async (e) => {
         e.preventDefault();
         if (!nama || !hargaPerBox || !hargaJualPerPcs || !isiPerBox) {
-            alert('Semua field wajib diisi!');
+            showNotification('Semua field wajib diisi!', 'error');
             return;
         }
 
-        const produkData = {
+        const produkDataToSave = {
             nama: nama.trim(),
             available: available,
             hargaPerBox: parseFloat(hargaPerBox),
-            hargaJualPerPcs: parseFloat(hargaJualPerPcs),
+            hargaJualPerPcs: parseFloat(hargaJualPerPcs), //
             isiPerBox: parseInt(isiPerBox),
             foto: foto.trim() || 'https://via.placeholder.com/100?text=Produk',
         };
-
-        try {
-            if (editingProdukId) {
-                // Update
-                const produkRef = doc(db, 'produk', editingProdukId);
-                await updateDoc(produkRef, produkData);
-            } else {
-                // Create
-                await addDoc(collection(db, 'produk'), {
-                    ...produkData,
-                    createdAt: serverTimestamp(), // Use server timestamp for new documents
-                });
-            }
-
-            const snapshot = await getDocs(collection(db, 'produk'));
-            const list = snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
-            setProdukList(list);
-            toggleForm(); // Close and reset form
-        } catch (error) {
-            console.error('Error saving produk:', error);
-            alert('Gagal menyimpan produk.');
-        }
-    };
-
-    const toggleAvailable = async (produk) => {
-        const newStatus = !produk.available;
-        try {
-            await updateDoc(doc(db, 'produk', produk.id), { available: newStatus });
-            setProdukList(produkList.map((p) => (p.id === produk.id ? { ...p, available: newStatus } : p)));
-        } catch (error) {
-            console.error('Error update status:', error);
-        }
+        // Panggil fungsi dari App.jsx
+        await onSaveProduk(produkDataToSave, editingProdukId); // Ini akan mengupdate state di App.jsx
+        toggleForm(); // Tutup dan reset form setelah berhasil
     };
 
     const openDeleteConfirm = (produk) => {
         setItemToDelete(produk);
         setShowDeleteConfirm(true);
     };
-
+    // Fungsi handleConfirmDelete sudah benar, tidak perlu diubah.
     const handleConfirmDelete = async () => {
         if (!itemToDelete) return;
 
         try {
-            await deleteDoc(doc(db, 'produk', itemToDelete.id));
-            setProdukList(produkList.filter((p) => p.id !== itemToDelete.id));
+            const { error } = await supabase.from('produk').delete().eq('id', itemToDelete.id);
+            if (error) throw error;
+
+            // Perbaikan: Update state lokal secara langsung setelah berhasil menghapus.
+            // Ini lebih baik daripada reload halaman.
+            setProdukList((prevList) => prevList.filter((p) => p.id !== itemToDelete.id));
+            showNotification('Produk berhasil dihapus.', 'success');
             setShowDeleteConfirm(false);
             setItemToDelete(null);
         } catch (error) {
             console.error('Error hapus produk:', error);
-            alert('Gagal menghapus produk.'); //
+            showNotification('Gagal menghapus produk.', 'error');
         }
     };
 
     const filteredProduk = produkList
-        .filter((produk) => produk.nama.toLowerCase().includes(searchTerm.toLowerCase()))
+        .filter((produk) => (produk.nama || '').toLowerCase().includes(searchTerm.toLowerCase()))
         .sort((a, b) => {
             switch (sortBy) {
                 case 'hargaPcs':
@@ -228,7 +193,7 @@ export default function ProdukPage({ setActivePage, onModalChange }) {
 
                         {/* Tombol Aksi */}
                         <div className="flex flex-col gap-1 self-start">
-                            <button onClick={() => toggleAvailable(produk)} className="p-1 rounded-full hover:bg-slate-100 text-slate-500 transition-colors">
+                            <button onClick={() => onToggleAvailable(produk)} className="p-1 rounded-full hover:bg-slate-100 text-slate-500 transition-colors">
                                 {isAvailable ? <EyeOff size={14} /> : <Eye size={14} />}
                             </button>
                             <button onClick={() => bukaFormEdit(produk)} className="p-1 rounded-full hover:bg-blue-100 text-blue-500 transition-colors">

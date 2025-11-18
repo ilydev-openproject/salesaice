@@ -4,7 +4,7 @@ import { format, isSameDay } from 'date-fns';
 import { id } from 'date-fns/locale';
 
 export default function VisitDetailPage({ toko, kunjunganList, orderList, onBack }) {
-    const kunjunganToko = kunjunganList.filter((k) => k.tokoId === toko.id).sort((a, b) => (b.createdAt?.seconds || 0) - (a.createdAt?.seconds || 0));
+    const kunjunganToko = kunjunganList.filter((k) => k.tokoId === toko.id).sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
 
     return (
         <div className="p-5 pb-20 max-w-md mx-auto animate-in fade-in slide-in-from-right-5 duration-300">
@@ -29,14 +29,14 @@ export default function VisitDetailPage({ toko, kunjunganList, orderList, onBack
             ) : (
                 <div className="space-y-4">
                     {kunjunganToko.map((kunjungan) => {
-                        if (!kunjungan.createdAt?.seconds) return null;
+                        if (!kunjungan.createdAt) return null;
 
-                        const visitDate = new Date(kunjungan.createdAt.seconds * 1000);
+                        const visitDate = new Date(kunjungan.createdAt);
 
                         // Cari semua order yang terkait dengan kunjungan ini (toko yang sama, hari yang sama)
                         const relatedOrders = orderList.filter((order) => {
-                            if (!order.createdAt?.seconds) return false;
-                            const orderDate = new Date(order.createdAt.seconds * 1000);
+                            if (!order.createdAt) return false;
+                            const orderDate = new Date(order.createdAt);
                             return order.tokoId === kunjungan.tokoId && isSameDay(orderDate, visitDate);
                         });
 

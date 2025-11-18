@@ -1,11 +1,10 @@
 // src/pages/TargetPage.jsx
 import { useState, useEffect } from 'react';
-import { doc, getDoc, setDoc } from 'firebase/firestore';
-import { db } from '../lib/firebase';
+import { supabase } from '../lib/supabase';
 import { ArrowLeft, Target, Save, CheckCircle2, Wallet, Package, MapPin } from 'lucide-react';
 import Loader from '../components/Loader';
 
-export default function TargetPage({ setActivePage, targets, onTargetsUpdate }) {
+export default function TargetPage({ setActivePage, targets, onTargetsUpdate, showNotification }) {
     const [loading, setLoading] = useState(false);
     const [saving, setSaving] = useState(false);
     const [notification, setNotification] = useState('');
@@ -31,14 +30,17 @@ export default function TargetPage({ setActivePage, targets, onTargetsUpdate }) 
         };
 
         try {
-            const targetDocRef = doc(db, 'config', 'salesTarget');
-            await setDoc(targetDocRef, newTargets, { merge: true });
+            const { error } = await supabase.from('config').upsert({ id: 'salesTarget', ...newTargets });
+
+            if (error) {
+                throw error;
+            }
             onTargetsUpdate(newTargets); // Update state di App.jsx
             setNotification('Target berhasil disimpan!');
             setTimeout(() => setNotification(''), 3000);
         } catch (error) {
             console.error('Error saving targets:', error);
-            alert('Gagal menyimpan target.');
+            showNotification('Gagal menyimpan target.', 'error');
         } finally {
             setSaving(false);
         }

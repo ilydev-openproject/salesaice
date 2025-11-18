@@ -1,19 +1,19 @@
 // src/pages/VisitPage.jsx
 import { useState, useEffect, useRef, useCallback, useMemo } from 'react';
-import { collection, getDocs, addDoc, query, orderBy, doc, updateDoc, deleteDoc, writeBatch, where } from 'firebase/firestore';
 import { DayPicker } from 'react-day-picker';
-import { format, isSameDay, isSameMonth, startOfMonth, endOfMonth, addDays } from 'date-fns';
+import { format, isSameDay, isSameMonth, startOfMonth, endOfMonth, addDays, isValid } from 'date-fns';
 import { id } from 'date-fns/locale';
 import { toPng } from 'html-to-image';
+import { findProduct } from '../lib/utils'; // Impor helper baru
+import { normalizeDate } from '../lib/dateUtils'; // Impor fungsi normalizeDate
 import 'react-day-picker/dist/style.css';
-import { db } from '../lib/firebase'; //
+import { supabase } from '../lib/supabase';
 import { Store, Package, Plus, Minus, CheckCircle2, XCircle, ChevronDown, MapPin, ArrowLeft, ShoppingCart, Calendar, Pencil, Trash2, Wallet, Search, CalendarRange, Download, MoreVertical, Eye, X, MessageSquare, AlertTriangle, Camera, Star } from 'lucide-react';
-import Loader from '../components/Loader';
-import VisitReceipt from '../components/VisitReceipt';
-import TimestampCamera from './TimestampCamera'; // Impor komponen kamera
+import Loader from '../components/Loader'; //
+import VisitReceipt from '../components/VisitReceipt'; //
 
 // Komponen MiniLoader kita definisikan di sini untuk memperbaiki error
-export function MiniLoader({ text = 'Memuat...' }) {
+function MiniLoader({ text = 'Memuat...' }) {
     return (
         <div className="flex items-center justify-center gap-3 text-xs text-slate-600 py-3">
             <div className="relative">
@@ -33,6 +33,7 @@ export default function VisitPage({ setActivePage, orderList = [], kunjunganList
     const [showForm, setShowForm] = useState(false);
     const [selectedTokoId, setSelectedTokoId] = useState('');
     const [catatan, setCatatan] = useState('');
+    const [selectedToko, setSelectedToko] = useState(null); // State baru untuk objek toko
     const [visitDate, setVisitDate] = useState(new Date()); // State untuk tanggal di form
     const [submitting, setSubmitting] = useState(false);
     const [editingVisitId, setEditingVisitId] = useState(null);
@@ -50,9 +51,6 @@ export default function VisitPage({ setActivePage, orderList = [], kunjunganList
     const [customDate, setCustomDate] = useState(new Date());
     const [showCalendar, setShowCalendar] = useState(false);
 
-    // State untuk fitur kamera
-    const [showCamera, setShowCamera] = useState(false); // Hanya untuk membuka/menutup kamera
-    const [cameraVisitData, setCameraVisitData] = useState(null); // Untuk menyimpan data kunjungan yang akan difoto
     // State dan Ref untuk ekspor resi
     const [receiptKunjungan, setReceiptKunjungan] = useState(null);
     const receiptRef = useRef(null);
@@ -77,7 +75,7 @@ export default function VisitPage({ setActivePage, orderList = [], kunjunganList
 
     // Efek untuk memberitahu App.jsx jika ada modal yang terbuka
     useEffect(() => {
-        const isAnyModalOpen = showForm || showReceiptPreview || showDeleteConfirm || showCamera;
+        const isAnyModalOpen = showForm || showReceiptPreview || showDeleteConfirm;
         onModalChange(isAnyModalOpen);
 
         const handlePopState = (event) => {
@@ -87,15 +85,13 @@ export default function VisitPage({ setActivePage, orderList = [], kunjunganList
                 if (showForm) setShowForm(false);
                 else if (showReceiptPreview) closePreview();
                 else if (showDeleteConfirm) setShowDeleteConfirm(false);
-                else if (showCamera) setShowCamera(false);
-                setCameraVisitData(null);
             }
         };
 
         if (isAnyModalOpen) window.history.pushState({ modal: 'visit' }, '');
         window.addEventListener('popstate', handlePopState);
         return () => window.removeEventListener('popstate', handlePopState);
-    }, [showForm, showReceiptPreview, showDeleteConfirm, showCamera, onModalChange]);
+    }, [showForm, showReceiptPreview, showDeleteConfirm, onModalChange]);
 
     // Load daftar kunjungan
     useEffect(() => {
@@ -161,18 +157,21 @@ export default function VisitPage({ setActivePage, orderList = [], kunjunganList
 
     const fetchKunjungan = async () => {
         try {
-            const q = query(collection(db, 'kunjungan'), orderBy('createdAt', 'desc'));
-            const snapshot = await getDocs(q); //
-            const list = snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() })); //
-            setKunjunganList(list); // Update state di App.jsx
+            const { data, error } = await supabase.from('kunjungan').select('*').order('createdAt', { ascending: false });
+            if (error) throw error;
+            setKunjunganList(data || []); // Update state di App.jsx
         } catch (error) {
             console.error('Error fetching kunjungan:', error);
             showNotification('Gagal memuat ulang data kunjungan.', 'error');
         }
     };
+    // Fungsi untuk memuat ulang order, diperlukan setelah update
+    const fetchOrders = async () => await supabase.from('orders').select('*').order('createdAt', { ascending: false });
 
-    const handleSelectToko = (tokoId) => {
-        setSelectedTokoId(tokoId);
+    const handleSelectToko = (toko) => {
+        // Terima objek toko secara langsung
+        setSelectedTokoId(toko.id);
+        setSelectedToko(toko);
         setIsTokoDropdownOpen(false);
         setTokoSearchTerm(''); // Reset pencarian saat toko dipilih
     };
@@ -233,7 +232,7 @@ export default function VisitPage({ setActivePage, orderList = [], kunjunganList
         const items = produkList
             .filter((produk) => cart[produk.id] > 0)
             .map((produk) => ({
-                productId: produk.id,
+                productId: produk.id, // FIX: Always save the new UUID
                 nama: produk.nama,
                 hargaPerBox: produk.hargaPerBox,
                 isiPerBox: produk.isiPerBox,
@@ -247,7 +246,7 @@ export default function VisitPage({ setActivePage, orderList = [], kunjunganList
             tokoId: selectedTokoId,
             tokoNama: selectedToko?.nama || 'Toko Tidak Diketahui',
             kodeToko: selectedToko?.kode || '',
-            items,
+            items, // items akan disimpan di order, bukan di kunjungan
             catatan: catatan.trim(),
             total: getGrandTotal(),
             // createdAt tidak diupdate saat edit
@@ -258,90 +257,94 @@ export default function VisitPage({ setActivePage, orderList = [], kunjunganList
         setSubmitting(true);
         try {
             if (editingVisitId) {
-                // Update
-                const batch = writeBatch(db);
-                const visitRef = doc(db, 'kunjungan', editingVisitId);
-
-                // 1. Update data kunjungan (tanpa item)
-                batch.update(visitRef, {
-                    tokoId: kunjunganData.tokoId,
-                    tokoNama: kunjunganData.tokoNama,
-                    kodeToko: kunjunganData.kodeToko,
-                    catatan: kunjunganData.catatan,
-                    createdAt: visitDate, // Kunjungan dicatat pada Hari H (tanggal di form)
-                });
-
-                // 2. Cari dan update order terkait
-                const originalVisit = kunjunganList.find((v) => v.id === editingVisitId);
-                const originalVisitDate = new Date(originalVisit.createdAt.seconds * 1000); // Tanggal kunjungan asli (Hari H)
-                const orderEffectiveDate = addDays(originalVisitDate, 1); // Tanggal order terkait adalah H+1
-
-                // Cari order yang terkait dengan kunjungan yang sedang diedit
-                const relatedOrders = orderList.filter((order) => {
-                    if (!order.createdAt?.seconds) return false;
-                    const orderDate = new Date(order.createdAt.seconds * 1000);
-                    // Cocokkan tokoId dan tanggal order (H+1 dari tanggal kunjungan)
-                    return order.tokoId === originalVisit.tokoId && isSameDay(orderDate, orderEffectiveDate);
-                });
-
-                if (relatedOrders.length > 0) {
-                    // Jika ada order terkait
-                    const orderToUpdateRef = doc(db, 'orders', relatedOrders[0].id);
-                    if (hasOrder) {
-                        // Jika sekarang ada item, update order tersebut
-                        batch.update(orderToUpdateRef, {
-                            tokoId: kunjunganData.tokoId,
-                            tokoNama: kunjunganData.tokoNama,
-                            items: kunjunganData.items,
-                            total: kunjunganData.total,
-                            catatan: `Order dari kunjungan: ${kunjunganData.catatan}`,
-                            createdAt: deliveryDate, // Order diupdate dengan tanggal H+1
-                        });
-                    } else {
-                        // Jika sekarang tidak ada item, hapus order tersebut
-                        batch.delete(orderToUpdateRef);
-                    }
-                } else if (hasOrder) {
-                    // Jika tidak ada order terkait tapi sekarang ada item, buat order baru
-                    const newOrderRef = doc(collection(db, 'orders'));
-                    batch.set(newOrderRef, { ...kunjunganData, createdAt: deliveryDate }); // Order baru dicatat dengan tanggal H+1
-                }
-
-                await batch.commit();
-                showNotification('Kunjungan berhasil diperbarui.');
-            } else {
-                // Create Kunjungan baru (tanpa item dan total)
-                await addDoc(collection(db, 'kunjungan'), {
-                    tokoId: kunjunganData.tokoId,
-                    tokoNama: kunjunganData.tokoNama,
-                    kodeToko: kunjunganData.kodeToko,
-                    catatan: kunjunganData.catatan,
-                    items: [], // Kunjungan tidak menyimpan item
-                    total: 0,
-                    createdAt: visitDate, // Kunjungan dicatat pada Hari H (tanggal di form)
-                });
-                showNotification('Kunjungan berhasil dicatat.');
-
-                // Jika ada order, buat entri terpisah di koleksi 'orders'
-                if (hasOrder) {
-                    await addDoc(collection(db, 'orders'), {
+                // UPDATE LOGIC
+                // 1. Update data kunjungan
+                const { error: visitError } = await supabase
+                    .from('kunjungan')
+                    .update({
                         tokoId: kunjunganData.tokoId,
                         tokoNama: kunjunganData.tokoNama,
                         kodeToko: kunjunganData.kodeToko,
-                        items: kunjunganData.items,
-                        catatan: `Order dari kunjungan: ${kunjunganData.catatan}`,
-                        total: kunjunganData.total,
-                        createdAt: deliveryDate, // Order dicatat dengan tanggal H+1
-                    });
+                        catatan: kunjunganData.catatan,
+                        createdAt: visitDate.toISOString(), // Kunjungan dicatat pada Hari H
+                    })
+                    .eq('id', editingVisitId);
+                if (visitError) throw visitError;
+
+                // 2. Cari dan update order terkait
+                // Dapatkan tanggal kunjungan asli dari state sebelum diubah
+                const originalVisit = kunjunganList.find((v) => v.id === editingVisitId); //
+                const originalVisitDate = new Date(originalVisit.createdAt);
+                const orderDayStart = addDays(originalVisitDate, 1);
+                orderDayStart.setHours(0, 0, 0, 0); // Awal hari H+1
+                const orderDayEnd = new Date(orderDayStart);
+                orderDayEnd.setDate(orderDayEnd.getDate() + 1); // Awal hari H+2
+
+                // Cari order yang cocok dengan tokoId dan tanggal efektif order ASLI
+                const { data: relatedOrders, error: findError } = await supabase.from('orders').select('id').eq('tokoId', originalVisit.tokoId).gte('createdAt', orderDayStart.toISOString()).lt('createdAt', orderDayEnd.toISOString());
+
+                if (findError) throw findError;
+
+                if (relatedOrders && relatedOrders.length > 0) {
+                    const orderToUpdateId = relatedOrders[0].id;
+                    if (hasOrder) {
+                        // Jika ada item di keranjang, update order yang sudah ada
+                        const { error: orderUpdateError } = await supabase
+                            .from('orders')
+                            .update({
+                                // Update juga tokoId dan nama jika diubah
+                                tokoId: kunjunganData.tokoId,
+                                tokoNama: kunjunganData.tokoNama,
+                                kodeToko: kunjunganData.kodeToko,
+                                items: kunjunganData.items,
+                                total: kunjunganData.total,
+                                createdAt: deliveryDate.toISOString(),
+                            })
+                            .eq('id', orderToUpdateId);
+                        if (orderUpdateError) throw orderUpdateError;
+                    } else {
+                        // Jika keranjang kosong, hapus order yang sudah ada
+                        const { error: orderDeleteError } = await supabase.from('orders').delete().eq('id', orderToUpdateId);
+                        if (orderDeleteError) throw orderDeleteError;
+                    }
+                } else if (hasOrder) {
+                    // Jika tidak ada order terkait tapi sekarang ada item, buat order baru
+                    const { error: orderInsertError } = await supabase.from('orders').insert([{ ...kunjunganData, items: items, total: getGrandTotal(), createdAt: deliveryDate.toISOString() }]);
+                    if (orderInsertError) throw orderInsertError;
+                }
+                showNotification('Kunjungan berhasil diperbarui.');
+            } else {
+                // CREATE LOGIC
+                // 1. Buat Kunjungan baru dan minta data yang baru dibuat dikembalikan
+                const { data: newVisitData, error: visitError } = await supabase
+                    .from('kunjungan')
+                    .insert([
+                        {
+                            tokoId: kunjunganData.tokoId,
+                            tokoNama: kunjunganData.tokoNama,
+                            kodeToko: kunjunganData.kodeToko,
+                            catatan: kunjunganData.catatan,
+                            createdAt: visitDate.toISOString(), // Kunjungan dicatat pada Hari H
+                        },
+                    ])
+                    .select(); // Tambahkan .select() untuk mendapatkan data yang baru dibuat
+                if (visitError) throw visitError;
+                showNotification('Kunjungan berhasil dicatat.');
+
+                // 2. Jika ada order, buat entri terpisah di koleksi 'orders'
+                if (hasOrder) {
+                    const { error: orderError } = await supabase.from('orders').insert([{ ...kunjunganData, createdAt: deliveryDate.toISOString() }]);
+                    if (orderError) throw orderError;
                     showNotification('Order dari kunjungan berhasil disimpan.', 'success');
                 }
             }
 
-            // Reset
+            // Reset dan muat ulang data
             resetForm();
-            fetchKunjungan(); // Muat ulang daftar kunjungan
+            fetchKunjungan();
+            fetchOrders(); // Muat ulang data order juga
         } catch (error) {
-            console.error('Error saving visit:', error);
+            console.error('Error saving visit:', error.message);
             showNotification('Gagal menyimpan kunjungan.', 'error');
         } finally {
             setSubmitting(false);
@@ -360,6 +363,7 @@ export default function VisitPage({ setActivePage, orderList = [], kunjunganList
         setCart({});
         setCatatan('');
         setSelectedTokoId('');
+        setSelectedToko(null);
         setVisitDate(new Date()); // Reset tanggal ke hari ini
         setTokoSearchTerm('');
         setProductSearchTerm(''); // Reset filter produk saat form ditutup
@@ -367,26 +371,43 @@ export default function VisitPage({ setActivePage, orderList = [], kunjunganList
 
     const handleEdit = async (kunjungan) => {
         // Pastikan data form (terutama tokoList) sudah dimuat sebelum mengisi state
+        if (!isDataLoaded) {
+            await loadFormData();
+        }
         await loadFormData();
+        const tokoToEdit = tokoList.find((t) => t.id === kunjungan.tokoId);
+
         setEditingVisitId(kunjungan.id);
         setSelectedTokoId(kunjungan.tokoId);
+        setSelectedToko(tokoToEdit);
         setCatatan(kunjungan.catatan || ''); // Ambil catatan dari kunjungan
         // Tanggal form diisi dari tanggal kunjungan itu sendiri (Hari H)
-        setVisitDate(new Date(kunjungan.createdAt.seconds * 1000));
+        if (!kunjungan.createdAt) {
+            console.error('Kunjungan yang diedit tidak memiliki createdAt:', kunjungan);
+            showNotification('Data kunjungan tidak lengkap, tidak bisa diedit.', 'error');
+            return;
+        }
+        setVisitDate(new Date(kunjungan.createdAt));
 
         // Saat edit, cart diisi dari data 'order' yang terkait, bukan dari 'kunjungan'
-        const visitDateFromKunjungan = new Date(kunjungan.createdAt.seconds * 1000);
+        const visitDateFromKunjungan = normalizeDate(kunjungan.createdAt);
         const relatedOrder = orderList.find((order) => {
-            if (!order.createdAt?.seconds) return false;
-            const orderDate = new Date(order.createdAt.seconds * 1000);
+            const orderDate = normalizeDate(order.createdAt);
+            const expectedOrderDate = addDays(visitDateFromKunjungan, 1);
+            if (!orderDate || !isValid(orderDate)) return false;
             // Cari order yang cocok dengan tokoId dan tanggalnya adalah H+1 dari tanggal kunjungan
-            return order.tokoId === kunjungan.tokoId && isSameDay(orderDate, addDays(visitDateFromKunjungan, 1));
+            // Perbandingan yang lebih toleran terhadap perbedaan waktu/zona waktu
+            return order.tokoId === kunjungan.tokoId && orderDate.getFullYear() === expectedOrderDate.getFullYear() && orderDate.getMonth() === expectedOrderDate.getMonth() && orderDate.getDate() === expectedOrderDate.getDate();
         });
 
         let initialCart = {};
         if (relatedOrder && relatedOrder.items) {
-            initialCart = relatedOrder.items.reduce((acc, item) => {
-                acc[item.productId] = item.qtyBox;
+            const items = typeof relatedOrder.items === 'string' ? JSON.parse(relatedOrder.items) : relatedOrder.items;
+            initialCart = items.reduce((acc, item) => {
+                // Gunakan helper untuk menemukan produk yang benar (berdasarkan UUID atau Firebase ID)
+                const product = findProduct(produkList, item.productId);
+                // Gunakan UUID produk yang ditemukan sebagai key di keranjang
+                if (product) acc[product.id] = item.qtyBox;
                 return acc;
             }, {});
         }
@@ -405,7 +426,8 @@ export default function VisitPage({ setActivePage, orderList = [], kunjunganList
         if (!itemToDelete) return;
 
         try {
-            await deleteDoc(doc(db, 'kunjungan', itemToDelete.id));
+            const { error } = await supabase.from('kunjungan').delete().eq('id', itemToDelete.id);
+            if (error) throw error;
             showNotification('Kunjungan berhasil dihapus.');
             fetchKunjungan(); // Muat ulang daftar
             setShowDeleteConfirm(false);
@@ -418,15 +440,15 @@ export default function VisitPage({ setActivePage, orderList = [], kunjunganList
 
     const filteredKunjungan = kunjunganList
         .filter((kunjungan) => {
-            if (!kunjungan.createdAt?.seconds) return false;
-            const visitDate = new Date(kunjungan.createdAt.seconds * 1000);
+            if (!kunjungan.createdAt) return false;
+            const visitDate = new Date(kunjungan.createdAt);
 
             if (filterType === 'today') {
                 const today = new Date();
-                return visitDate.getDate() === today.getDate() && visitDate.getMonth() === today.getMonth() && visitDate.getFullYear() === today.getFullYear();
+                return isSameDay(visitDate, today);
             }
             if (filterType === 'custom') {
-                return visitDate.getDate() === customDate.getDate() && visitDate.getMonth() === customDate.getMonth() && visitDate.getFullYear() === customDate.getFullYear();
+                return isSameDay(visitDate, customDate);
             }
             return true; // Should not happen if filterType is always 'today' or 'custom'
         })
@@ -442,18 +464,19 @@ export default function VisitPage({ setActivePage, orderList = [], kunjunganList
 
     const handlePreview = useCallback(
         async (kunjungan) => {
-            // Cari SEMUA order yang terkait dengan kunjungan pada hari yang sama
-            const visitDate = new Date(kunjungan.createdAt.seconds * 1000);
+            // Cari SEMUA order yang terkait dengan kunjungan (order dicatat H+1 dari kunjungan)
+            const visitDate = normalizeDate(kunjungan.createdAt);
+            const orderEffectiveDate = addDays(visitDate, 1);
             const relatedOrders = orderList.filter((order) => {
-                if (!order.createdAt?.seconds) return false;
-                const orderDate = new Date(order.createdAt.seconds * 1000);
-                return order.tokoId === kunjungan.tokoId && isSameDay(orderDate, visitDate);
+                const orderDate = normalizeDate(order.createdAt);
+                if (!orderDate || !isValid(orderDate)) return false;
+                return order.tokoId === kunjungan.tokoId && isSameDay(orderDate, orderEffectiveDate); //
             });
 
             // Gabungkan data kunjungan dengan data order untuk resi
             const receiptData = {
                 ...kunjungan, // Ambil id, tokoNama, kodeToko, createdAt dari kunjungan
-                items: relatedOrders.flatMap((order) => order.items || []), // Gabungkan semua item dari order terkait
+                items: relatedOrders.flatMap((order) => (typeof order.items === 'string' ? JSON.parse(order.items) : order.items || [])), // Gabungkan semua item dari order terkait
                 total: relatedOrders.reduce((sum, order) => sum + (order.total || 0), 0), // Jumlahkan semua total dari order terkait
             };
 
@@ -502,10 +525,11 @@ export default function VisitPage({ setActivePage, orderList = [], kunjunganList
                 }
             }, 100); // Timeout untuk memastikan DOM siap
         },
-        [orderList],
+        [orderList, showNotification],
     ); // Tambahkan orderList sebagai dependensi
 
     const closePreview = () => {
+        // Fungsi ini tidak ada di kode Anda, saya tambahkan untuk kelengkapan
         setShowReceiptPreview(false);
         setPreviewImageUrl('');
         setReceiptKunjungan(null); // Hide receipt component when modal closes
@@ -531,7 +555,7 @@ export default function VisitPage({ setActivePage, orderList = [], kunjunganList
 
         const toko = tokoList.find((t) => t.id === kunjungan.tokoId);
         // Handle case where createdAt is not yet populated by the server
-        const visitDate = kunjungan.createdAt?.seconds ? new Date(kunjungan.createdAt.seconds * 1000) : new Date(); // Fallback to now() if createdAt is null
+        const visitDate = kunjungan.createdAt ? new Date(kunjungan.createdAt) : new Date(); // Fallback to now() if createdAt is null
 
         if (!toko || !visitDate) {
             showNotification('Data toko tidak ditemukan untuk membuat laporan.', 'error');
@@ -540,10 +564,8 @@ export default function VisitPage({ setActivePage, orderList = [], kunjunganList
         }
         console.log('Found Toko:', toko);
 
-        console.log('Visit Date (from kunjungan.createdAt or fallback):', visitDate);
-
         // 1. No Urut Kunjungan Hari Ini
-        const visitsToday = kunjunganList.filter((v) => v.createdAt?.seconds && isSameDay(new Date(v.createdAt.seconds * 1000), visitDate)).sort((a, b) => a.createdAt.seconds - b.createdAt.seconds);
+        const visitsToday = kunjunganList.filter((v) => v.createdAt && isSameDay(new Date(v.createdAt), visitDate)).sort((a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime());
         const visitOrderToday = visitsToday.findIndex((v) => v.id === kunjungan.id) + 1;
 
         // --- PERBAIKAN LOGIKA BULANAN ---
@@ -557,8 +579,8 @@ export default function VisitPage({ setActivePage, orderList = [], kunjunganList
         // Karena kunjungan ini baru saja dibuat, kita mulai hitungan dari 1.
         // Lalu tambahkan kunjungan lain yang sudah ada di bulan yang relevan.
         const otherVisitsThisMonth = kunjunganList.filter((v) => {
-            if (!v.createdAt?.seconds || v.id === kunjungan.id) return false;
-            const d = new Date(v.createdAt.seconds * 1000);
+            if (!v.createdAt || v.id === kunjungan.id) return false;
+            const d = new Date(v.createdAt);
             return v.tokoId === kunjungan.tokoId && isSameMonth(d, dateForMonthlyStats);
         });
         const totalVisitsThisMonth = 1 + otherVisitsThisMonth.length;
@@ -567,37 +589,36 @@ export default function VisitPage({ setActivePage, orderList = [], kunjunganList
         // 3. Total Order (kunjungan ini): Cari order terkait di orderList
         // Order terkait memiliki tanggal H+1 dari tanggal kunjungan.
         const orderEffectiveDate = addDays(visitDate, 1);
-        const relatedOrder = orderList.find((o) => o.createdAt?.seconds && o.tokoId === kunjungan.tokoId && isSameDay(new Date(o.createdAt.seconds * 1000), orderEffectiveDate));
+        const relatedOrder = orderList.find((o) => o.createdAt && o.tokoId === kunjungan.tokoId && isSameDay(new Date(o.createdAt), orderEffectiveDate));
 
-        // Hitung total box dari order yang ditemukan.
-        const totalOrderBox = relatedOrder ? relatedOrder.items?.reduce((sum, item) => sum + (item.qtyBox || 0), 0) || 0 : 0;
+        const itemsForThisOrder = relatedOrder && typeof relatedOrder.items === 'string' ? JSON.parse(relatedOrder.items) : relatedOrder?.items || [];
+        const totalOrderBox = itemsForThisOrder.reduce((sum, item) => sum + (item.qtyBox || 0), 0);
 
         // 4. Total Box (bulan ini)
         // Gabungkan total box dari kunjungan ini dengan order lain yang sudah ada di bulan yang relevan.
         const ordersThisMonthForToko = orderList.filter((o) => {
-            if (!o.createdAt?.seconds) return false;
-            const d = new Date(o.createdAt.seconds * 1000);
+            if (!o.createdAt) return false;
+            const d = new Date(o.createdAt);
             return o.tokoId === kunjungan.tokoId && isSameMonth(d, dateForMonthlyStats);
         });
 
-        // Hitung total box bulan ini LANGSUNG dari semua order yang relevan.
-        // Ini mencegah penghitungan ganda.
-        const totalBoxesThisMonth = ordersThisMonthForToko.reduce((sum, o) => sum + (o.items?.reduce((itemSum, item) => itemSum + item.qtyBox, 0) || 0), 0);
+        const totalBoxesThisMonth = ordersThisMonthForToko.reduce((sum, o) => {
+            const items = typeof o.items === 'string' ? JSON.parse(o.items) : o.items || [];
+            const orderTotalBoxes = items.reduce((itemSum, item) => itemSum + (item.qtyBox || 0), 0);
+            return sum + orderTotalBoxes;
+        }, 0);
 
-        const message = `*LAPORAN KUNJUNGAN*
+        const message = `> LAPORAN KUNJUNGAN
+\`\`\`
+No Urut Kunjungan   : ${visitOrderToday}
+Nama Toko           : ${kunjungan.tokoNama}
+Kode Toko           : ${kunjungan.kodeToko || '-'}
+Nomor WA Toko       : ${toko.nomorWa || '-'}
 
-*No Urut Kunjungan:* ${visitOrderToday}
-*Nama Toko:* ${kunjungan.tokoNama}
-*Kode Toko:* ${kunjungan.kodeToko || '-'}
-
-*Kunjungan ke (bulan ini):* ${totalVisitsThisMonth}
-*Total Order (kunjungan ini):* ${totalOrderBox} box
-*Total Box (bulan ini):* ${totalBoxesThisMonth} box
-
-*Nomor WA Toko:* ${toko.nomorWa || '-'}
-
-*Tanggal Laporan:* ${format(new Date(), 'd MMMM yyyy, HH:mm', { locale: id })}
-`.trim();
+Kunjungan ke (bln)  : ${totalVisitsThisMonth}
+Order (kunjungan)   : ${totalOrderBox} box
+Total Box (bln)     : ${totalBoxesThisMonth} box
+\`\`\``.trim();
 
         const whatsappUrl = `https://wa.me/?text=${encodeURIComponent(message)}`;
         window.open(whatsappUrl, '_blank');
@@ -608,7 +629,9 @@ export default function VisitPage({ setActivePage, orderList = [], kunjunganList
     const productSales = useMemo(() => {
         const salesMap = new Map();
         orderList.forEach((order) => {
-            order.items?.forEach((item) => {
+            // Perbaikan: Pastikan items adalah array sebelum di-loop
+            const items = typeof order.items === 'string' ? JSON.parse(order.items) : order.items || [];
+            items.forEach((item) => {
                 salesMap.set(item.productId, (salesMap.get(item.productId) || 0) + item.qtyBox);
             });
         });
@@ -641,17 +664,6 @@ export default function VisitPage({ setActivePage, orderList = [], kunjunganList
 
     return (
         <>
-            {/* Render Komponen Kamera */}
-            {showCamera && cameraVisitData && (
-                <TimestampCamera
-                    onClose={() => {
-                        setShowCamera(false);
-                        setCameraVisitData(null);
-                    }}
-                    visitData={cameraVisitData}
-                />
-            )}
-
             {/* Halaman Utama: Daftar Kunjungan */}
             <div className=" pb-20 max-w-md mx-auto" onClick={closeMenu}>
                 <div className="p-5 pb-20">
@@ -729,14 +741,17 @@ export default function VisitPage({ setActivePage, orderList = [], kunjunganList
                     ) : (
                         <div className="space-y-3">
                             {filteredKunjungan.map((kunjungan) => {
-                                const visitDate = new Date(kunjungan.createdAt.seconds * 1000); // Tanggal Kunjungan (Hari H)
+                                const visitDate = new Date(kunjungan.createdAt); // Tanggal Kunjungan (Hari H)
                                 const orderEffectiveDate = addDays(visitDate, 1); // Tanggal Order terkait adalah H+1
 
-                                const relatedOrders = orderList.filter((order) => order.createdAt?.seconds && order.tokoId === kunjungan.tokoId && isSameDay(new Date(order.createdAt.seconds * 1000), orderEffectiveDate));
+                                const relatedOrders = orderList.filter((order) => order.createdAt && order.tokoId === kunjungan.tokoId && isSameDay(new Date(order.createdAt), orderEffectiveDate));
 
                                 // Akumulasi total dari semua order terkait
-                                const displayTotal = relatedOrders.reduce((sum, order) => sum + (order.total || 0), 0);
-                                const totalBoxes = relatedOrders.reduce((sum, order) => sum + (order.items?.reduce((itemSum, item) => itemSum + item.qtyBox, 0) || 0), 0);
+                                const displayTotal = relatedOrders.reduce((sum, order) => sum + Number(order.total || 0), 0);
+                                const totalBoxes = relatedOrders.reduce((sum, order) => {
+                                    const items = typeof order.items === 'string' ? JSON.parse(order.items) : order.items || [];
+                                    return sum + items.reduce((itemSum, item) => itemSum + item.qtyBox, 0);
+                                }, 0);
 
                                 return (
                                     <div key={kunjungan.id} onClick={() => handleEdit(kunjungan)} className={`bg-gradient-to-r from-white via-slate-50/50 to-purple-50/30 rounded-2xl shadow-sm border border-slate-200/50 transition-all duration-300 hover:shadow-lg hover:border-purple-300 cursor-pointer relative hover-lift focus-ring group backdrop-blur-sm ${openMenuId === kunjungan.id ? 'z-20' : 'z-10'}`}>
@@ -744,7 +759,7 @@ export default function VisitPage({ setActivePage, orderList = [], kunjunganList
                                             <div className="w-10 h-10 rounded-full bg-gradient-to-br from-purple-100 to-fuchsia-100 flex items-center justify-center text-purple-600 font-bold text-sm shadow-sm group-hover:scale-110 transition-transform">{kunjungan.tokoNama.charAt(0).toUpperCase()}</div>
                                             <div className="flex-grow min-w-0">
                                                 <h3 className="font-bold text-slate-800 text-xs leading-tight truncate">{kunjungan.tokoNama}</h3>
-                                                <p className="text-[10px] text-slate-500 mt-0.5">{kunjungan.createdAt ? new Date(kunjungan.createdAt.seconds * 1000).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' }) : 'Baru saja'}</p>
+                                                <p className="text-[10px] text-slate-500 mt-0.5">{kunjungan.createdAt ? new Date(kunjungan.createdAt).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' }) : 'Baru saja'}</p>
                                             </div>
                                             <div className="text-right pr-5">
                                                 <p className={`font-bold text-xs ${displayTotal > 0 ? 'text-green-600' : 'text-slate-500'}`}>Rp{displayTotal.toLocaleString('id-ID')}</p>
@@ -785,19 +800,6 @@ export default function VisitPage({ setActivePage, orderList = [], kunjunganList
                                                             <Eye size={14} className="text-emerald-600" />
                                                         </div>{' '}
                                                         Lihat Resi
-                                                    </button>
-                                                    <button
-                                                        onClick={() => {
-                                                            setCameraVisitData(kunjungan);
-                                                            setShowCamera(true);
-                                                            closeMenu();
-                                                        }}
-                                                        className="w-full text-left px-3 py-2 text-xs text-slate-700 hover:bg-gradient-to-r hover:from-yellow-50 hover:to-orange-50 flex items-center gap-2 transition-all duration-200 hover-lift rounded-lg mx-1"
-                                                    >
-                                                        <div className="p-1 bg-gradient-to-br from-yellow-100 to-orange-100 rounded-md">
-                                                            <Camera size={14} className="text-yellow-600" />
-                                                        </div>{' '}
-                                                        Ambil Foto
                                                     </button>
                                                     <button onClick={() => handleWhatsAppShare(kunjungan)} className="w-full text-left px-3 py-2 text-xs text-slate-700 hover:bg-gradient-to-r hover:from-green-50 hover:to-teal-50 flex items-center gap-2 transition-all duration-200 hover-lift rounded-lg mx-1">
                                                         <div className="p-1 bg-gradient-to-br from-green-100 to-teal-100 rounded-md">
@@ -885,13 +887,13 @@ export default function VisitPage({ setActivePage, orderList = [], kunjunganList
                                         <div className="w-2 h-2 bg-gradient-to-r from-emerald-500 to-teal-500 rounded-full"></div>
                                         Toko yang Dikunjungi
                                     </label>
-                                    <div className="relative" style={{ pointerEvents: editingVisitId ? 'none' : 'auto', opacity: editingVisitId ? 0.7 : 1 }}>
+                                    <div className="relative group">
                                         <button type="button" onClick={() => setIsTokoDropdownOpen(!isTokoDropdownOpen)} className="w-full p-3 text-left bg-white/80 backdrop-blur-sm border border-slate-200 rounded-xl flex justify-between items-center focus:outline-none focus:ring-2 focus:ring-emerald-500/50 focus:border-emerald-300 transition-all duration-200">
                                             <span className="flex items-center gap-3">
                                                 <div className="p-2 bg-gradient-to-br from-emerald-100 to-teal-100 rounded-xl">
                                                     <Store size={16} className="text-emerald-600" />
                                                 </div>
-                                                <span className="text-slate-700 font-medium text-xs">{tokoList.find((t) => t.id === selectedTokoId)?.nama || 'Pilih Toko'}</span>
+                                                <span className="text-slate-700 font-medium text-xs">{selectedToko?.nama || 'Pilih Toko'}</span>
                                             </span>
                                             <ChevronDown size={20} className={`text-slate-400 transition-all duration-300 ${isTokoDropdownOpen ? 'rotate-180 text-emerald-600' : ''}`} />
                                         </button>
@@ -907,14 +909,9 @@ export default function VisitPage({ setActivePage, orderList = [], kunjunganList
                                                 <div className="max-h-40 overflow-y-auto p-2">
                                                     {tokoList
                                                         .filter((t) => t.nama.toLowerCase().includes(tokoSearchTerm.toLowerCase()) || (t.kode && t.kode.toLowerCase().includes(tokoSearchTerm.toLowerCase())))
-                                                        .slice() // Buat salinan agar tidak mengubah state asli
-                                                        .sort((a, b) => {
-                                                            if (a.id === selectedTokoId) return -1; // a (selected) comes first
-                                                            if (b.id === selectedTokoId) return 1; // b (selected) comes first
-                                                            return a.nama.localeCompare(b.nama); // Urutkan sisanya berdasarkan abjad
-                                                        })
+                                                        .sort((a, b) => a.nama.localeCompare(b.nama))
                                                         .map((toko) => (
-                                                            <div key={toko.id} onClick={() => handleSelectToko(toko.id)} className={`p-2 cursor-pointer rounded-lg transition-all duration-200 flex justify-between items-center group ${selectedTokoId === toko.id ? 'bg-gradient-to-r from-emerald-50 to-teal-50 border border-emerald-200 shadow-sm' : ''}`}>
+                                                            <div key={toko.id} onClick={() => handleSelectToko(toko)} className={`p-2 cursor-pointer rounded-lg transition-all duration-200 flex justify-between items-center group ${selectedTokoId === toko.id ? 'bg-gradient-to-r from-emerald-50 to-teal-50 border border-emerald-200 shadow-sm' : ''}`}>
                                                                 <div className="flex items-center gap-3">
                                                                     <div className={`w-6 h-6 rounded-full flex items-center justify-center text-[10px] font-bold ${selectedTokoId === toko.id ? 'bg-gradient-to-r from-emerald-500 to-teal-500 text-white' : 'bg-slate-200 text-slate-600'}`}>{toko.nama.charAt(0).toUpperCase()}</div>
                                                                     <div>
@@ -1033,8 +1030,8 @@ export default function VisitPage({ setActivePage, orderList = [], kunjunganList
                                                     return (
                                                         <div
                                                             key={produk.id}
-                                                            onClick={() => isAvailable && updateQty(produk.id, 1)}
-                                                            className={`relative flex flex-col items-center justify-center p-2 border rounded-2xl transition-all duration-200 group cursor-pointer ${qty > 0 ? 'bg-green-50 border-green-300 shadow-md' : 'bg-white/80 backdrop-blur-sm border-slate-200 hover:border-purple-300 hover:shadow-lg'} ${!isAvailable ? 'bg-slate-100 border-slate-200 opacity-60 cursor-not-allowed' : ''} ${produk.isWajib ? 'border-yellow-400 border-2' : ''}`}
+                                                            onClick={isAvailable ? () => updateQty(produk.id, 1) : undefined}
+                                                            className={`relative flex flex-col items-center justify-center p-2 border rounded-2xl transition-all duration-200 group cursor-pointer ${qty > 0 ? 'bg-lime-300 border-lime-300 shadow-md' : 'bg-white/80 backdrop-blur-sm border-slate-200 hover:border-purple-300 hover:shadow-lg'} ${!isAvailable ? 'bg-slate-100 border-slate-200 opacity-60 cursor-not-allowed' : ''} ${produk.isWajib ? 'border-yellow-400 border-2' : ''}`}
                                                         >
                                                             {produk.isWajib && (
                                                                 <div className="absolute -top-2 -left-2 bg-yellow-400 text-white p-1 rounded-full shadow-md z-10">

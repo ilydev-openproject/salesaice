@@ -4,7 +4,7 @@ import { X, Camera, SwitchCamera, MapPin, Download, Loader2 } from 'lucide-react
 import { format } from 'date-fns';
 import { id } from 'date-fns/locale';
 
-const TimestampCamera = ({ onClose, visitData }) => {
+const TimestampCamera = ({ onClose, visitData, showNotification }) => {
     const videoRef = useRef(null);
     const canvasRef = useRef(null);
     const [stream, setStream] = useState(null);
@@ -29,11 +29,11 @@ const TimestampCamera = ({ onClose, visitData }) => {
                 }
             } catch (err) {
                 console.error('Error accessing camera:', err);
-                alert('Tidak dapat mengakses kamera. Pastikan izin telah diberikan.');
+                showNotification('Tidak dapat mengakses kamera. Pastikan izin telah diberikan.', 'error');
                 onClose();
             }
         },
-        [stream, onClose],
+        [stream, onClose, showNotification],
     );
 
     useEffect(() => {
@@ -63,8 +63,7 @@ const TimestampCamera = ({ onClose, visitData }) => {
                 stream.getTracks().forEach((track) => track.stop());
             }
         };
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [facingMode]); // Hanya dijalankan ulang saat facingMode berubah
+    }, [facingMode, startCamera, stream]); // Hanya dijalankan ulang saat facingMode berubah
 
     const handleSwitchCamera = () => {
         setFacingMode((prev) => (prev === 'user' ? 'environment' : 'user'));
@@ -113,13 +112,13 @@ const TimestampCamera = ({ onClose, visitData }) => {
         const dataUrl = canvas.toDataURL('image/jpeg', 0.9);
         const link = document.createElement('a');
         link.href = dataUrl;
-        link.download = `visit_${visitData.tokoNama.replace(/\s/g, '_')}_${format(now, 'yyyyMMdd_HHmmss')}.jpg`;
+        link.download = `visit_${(visitData.tokoNama || 'unknown_toko').replace(/\s/g, '_')}_${format(now, 'yyyyMMdd_HHmmss')}.jpg`;
         document.body.appendChild(link);
         link.click();
         document.body.removeChild(link);
 
         setIsProcessing(false);
-        alert('Foto berhasil disimpan ke perangkat Anda!');
+        showNotification('Foto berhasil disimpan ke perangkat Anda!', 'success');
         onClose();
     };
 

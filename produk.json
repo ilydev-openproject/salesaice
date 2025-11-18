@@ -1,0 +1,398 @@
+[
+  {
+    "id": "4ZGi81slpOycqNbJ8lvW",
+    "createdAt": "2025-09-25T15:16:05.118Z",
+    "foto": "https://aice.sesarengan.my.id/storage/products/SSxKLpfF6yYTHrK3a0LZiLsGXFRkb8kfDL0VDWHf.webp",
+    "hargaPerBox": 110000,
+    "hargaJualPerPcs": 3500,
+    "isiPerBox": 40,
+    "available": true,
+    "nama": "STRAWBERRY CRISPY"
+  },
+  {
+    "id": "7UxUJTQkHUiENrlXOJp2",
+    "hargaJualPerPcs": 7000,
+    "createdAt": "2025-09-25T15:19:26.241Z",
+    "hargaPerBox": 131000,
+    "available": false,
+    "isiPerBox": 24,
+    "foto": "https://aice.sesarengan.my.id/storage/products/d7CGovomQBPk8ho7ztHzYkEEcuL1lkP1VeUP4QYL.webp",
+    "nama": "CHOCOLATE MAX CONE"
+  },
+  {
+    "id": "BaaVl0Oq2oHnOUy1Cfuw",
+    "nama": "COFFE CRISPY",
+    "foto": "https://aice.sesarengan.my.id/storage/products/gSm9V8Bt9wPe5XmwphauOuCDQxpbUyYKl7gmMuPj.webp",
+    "hargaPerBox": 110000,
+    "hargaJualPerPcs": 3500,
+    "isiPerBox": 40,
+    "createdAt": "2025-09-25T15:15:13.973Z",
+    "available": true
+  },
+  {
+    "id": "DoKWCzEByEeYXQFxFinE",
+    "isiPerBox": 24,
+    "available": true,
+    "createdAt": "2025-09-25T15:14:37.541Z",
+    "hargaJualPerPcs": 5000,
+    "nama": "STRAWBERRY CONE",
+    "foto": "https://aice.sesarengan.my.id/storage/products/3N1ZJ02M9IDeuSLwAhhboYcBhON287R5HEGCy1SX.jpg",
+    "hargaPerBox": 97500
+  },
+  {
+    "id": "EF26XY2EwO1i35LRXuBv",
+    "createdAt": "2025-09-25T15:03:42.453Z",
+    "hargaJualPerPcs": 3000,
+    "hargaPerBox": 92500,
+    "available": true,
+    "nama": "MOCHI PEACH",
+    "foto": "https://aice.sesarengan.my.id/storage/products/PevV8KlSTksJP0ktV9TPx5FnXnSEX2dUoGCFoDJm.webp",
+    "isiPerBox": 40
+  },
+  {
+    "id": "ETb42XTcLpBbcC1aLhcb",
+    "hargaJualPerPcs": 5000,
+    "nama": "CHOCOLATE CRISPY",
+    "isiPerBox": 30,
+    "available": true,
+    "foto": "https://aice.sesarengan.my.id/storage/products/MNAhtt2tce3oxRkH4g6xZbd8T2W22dVchOqqHK1u.webp",
+    "hargaPerBox": 117000,
+    "createdAt": "2025-09-25T15:16:34.030Z"
+  },
+  {
+    "id": "F4qHZUhwkEnkGMWDyqIm",
+    "createdAt": "2025-09-25T15:21:41.535Z",
+    "isiPerBox": 27,
+    "hargaPerBox": 192000,
+    "isWajib": false,
+    "available": true,
+    "targetWajib": 0,
+    "hargaJualPerPcs": 9000,
+    "foto": "https://aice.sesarengan.my.id/storage/products/eX9HjjeDRHyjPQCefbNz7Yz3puuGYICMZr9md8z6.webp",
+    "nama": "3 IN 1"
+  },
+  {
+    "id": "Hzn6DvSXYxLmhtuekqkk",
+    "createdAt": "2025-10-27T02:01:52.753Z",
+    "foto": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRcx4O-uTnIuHtYK2KBh5kqoE6tsvdeKdlRmAELfzggKUXD486e36--rwYn&s=10",
+    "nama": "VANILLA BERRY CONE",
+    "hargaPerBox": 115200,
+    "available": false,
+    "hargaJualPerPcs": 3000,
+    "isiPerBox": 48
+  },
+  {
+    "id": "IDeDw8ay7rGfQANXeYLM",
+    "available": true,
+    "isWajib": true,
+    "nama": "CHOCOLATE STICK (BINGO)",
+    "isiPerBox": 50,
+    "hargaJualPerPcs": 2500,
+    "createdAt": "2025-09-25T15:13:09.441Z",
+    "targetWajib": 74,
+    "hargaPerBox": 97000,
+    "foto": "https://aice.sesarengan.my.id/storage/products/58FBFOGQBciMPLYKFR6kzdFkZdGkUnJAsXolCgbd.jpg"
+  },
+  {
+    "id": "IObGPAtQC6EtHr2XcpUY",
+    "foto": "https://aice.sesarengan.my.id/storage/products/2kbEnRaD8p9ZBsDuCfqtN9TYf7I8pZ9YFmlIOgWZ.webp",
+    "hargaJualPerPcs": 3000,
+    "available": false,
+    "isiPerBox": 40,
+    "createdAt": "2025-09-25T15:03:05.754Z",
+    "nama": "MOCHI CHOCOLATE",
+    "hargaPerBox": 93500
+  },
+  {
+    "id": "KtjGECYEwOyqkWM0Iu4E",
+    "available": true,
+    "nama": "FRUIZY GRAPE",
+    "foto": "https://aice.sesarengan.my.id/storage/products/Xvohj5mrCaIhTy16Yq2uCVtNQWMWCMInUr5iMKMi.webp",
+    "isiPerBox": 50,
+    "hargaPerBox": 80000,
+    "createdAt": "2025-09-25T14:59:02.610Z",
+    "hargaJualPerPcs": 2000
+  },
+  {
+    "id": "L0uQuYqgS8Q4smIuyRs4",
+    "available": true,
+    "hargaJualPerPcs": 5000,
+    "createdAt": "2025-09-25T15:17:58.850Z",
+    "isiPerBox": 30,
+    "nama": "CRISPY BALLS COOKIS",
+    "foto": "https://aice.sesarengan.my.id/storage/products/vIXBzhNpvjEqRAAtW260J7iJErSx79kI67uO5mnn.webp",
+    "targetWajib": 64,
+    "hargaPerBox": 118500,
+    "isWajib": true
+  },
+  {
+    "id": "Msk1v54GqR6gX6mqxqGS",
+    "createdAt": "2025-09-25T14:57:34.478Z",
+    "foto": "https://aice.sesarengan.my.id/storage/products/TUcti1ApAW6TKfmFIDSgzYBRo4FDv8tYXvrdXDXx.webp",
+    "isiPerBox": 50,
+    "nama": "NANAS",
+    "available": true,
+    "hargaJualPerPcs": 2000,
+    "hargaPerBox": 77500
+  },
+  {
+    "id": "N8oPUfk4JcfNuyfZeRcM",
+    "createdAt": "2025-09-25T14:58:24.682Z",
+    "available": true,
+    "foto": "https://aice.sesarengan.my.id/storage/products/1NcuZQc7zjASuqjOVqD0a3ZgCsGrROu1qwfbb3jL.webp",
+    "hargaPerBox": 78000,
+    "nama": "JERUK",
+    "hargaJualPerPcs": 2000,
+    "isiPerBox": 50
+  },
+  {
+    "id": "NOHAYE89jzvVJFKZcLFB",
+    "isiPerBox": 50,
+    "targetWajib": 115,
+    "foto": "https://aice.sesarengan.my.id/storage/products/sttm4zAbP6NN41t071jljxZPB63XOnNxHo2RYEqF.webp",
+    "nama": "CHOCO MALT",
+    "available": true,
+    "isWajib": true,
+    "createdAt": "2025-09-25T14:59:29.457Z",
+    "hargaJualPerPcs": 2000,
+    "hargaPerBox": 80000
+  },
+  {
+    "id": "PnPJnogSXAiytWfTxQWM",
+    "available": true,
+    "createdAt": "2025-09-25T15:08:33.189Z",
+    "isWajib": true,
+    "isiPerBox": 40,
+    "hargaJualPerPcs": 3000,
+    "targetWajib": 49,
+    "foto": "https://aice.sesarengan.my.id/storage/products/FTNWHaGoTeuzMx6bBu2OnYPp3OeefOpOWE0whJc0.webp",
+    "hargaPerBox": 94500,
+    "nama": "MOCHI MANGO"
+  },
+  {
+    "id": "QLk1TKlyQAC1EHOPZ7M6",
+    "available": true,
+    "hargaJualPerPcs": 5000,
+    "createdAt": "2025-09-25T15:12:03.995Z",
+    "nama": "SUNDAE CHOCOLATE",
+    "isiPerBox": 24,
+    "hargaPerBox": 97000,
+    "foto": "https://aice.sesarengan.my.id/storage/products/bZk39NqZIxMqV4yDbl6PQqhhyPTBzWFlqSEUNTrM.webp"
+  },
+  {
+    "id": "R52hO3IOVzVI3PRqPmGP",
+    "createdAt": "2025-09-25T15:05:05.754Z",
+    "hargaPerBox": 93500,
+    "foto": "https://aice.sesarengan.my.id/storage/products/djl4C4sNadUKvb8pqjg1m4pGrw9Lfl2nrvsvqnBK.jpg",
+    "isiPerBox": 60,
+    "hargaJualPerPcs": 2000,
+    "available": true,
+    "nama": "MIKI-MIKI DOUBLE CHOCO"
+  },
+  {
+    "id": "U3qfJlCyL3zOiNLFUFkb",
+    "createdAt": "2025-09-25T15:11:36.068Z",
+    "nama": "TARO CRISPY",
+    "hargaPerBox": 96500,
+    "available": true,
+    "hargaJualPerPcs": 3000,
+    "foto": "https://aice.gamora.id/storage/products/KHflNNGzSAXOFPrqnJETDIoORbTQPtCVYbjj0ZUA.webp",
+    "isiPerBox": 40
+  },
+  {
+    "id": "Uu5WSQZmqTLoXc9oxlUj",
+    "isiPerBox": 60,
+    "hargaJualPerPcs": 2000,
+    "nama": "MIKI-MIKI",
+    "foto": "https://aice.sesarengan.my.id/storage/products/2JIQldGjQClca4gY4xcHoMuGnOtfSiTWDuMdCNoe.webp",
+    "available": true,
+    "hargaPerBox": 93500,
+    "createdAt": "2025-09-25T15:04:35.008Z"
+  },
+  {
+    "id": "aok5I2XQHFg2m97mC387",
+    "isiPerBox": 24,
+    "foto": "https://aice.sesarengan.my.id/storage/products/O7w720txpjkenbbiLFOuZ6eWW0XkKU0Dta9jZViA.webp",
+    "hargaPerBox": 97000,
+    "nama": "SUNDAE STRAWBERRY",
+    "available": true,
+    "hargaJualPerPcs": 5000,
+    "createdAt": "2025-09-25T15:12:36.818Z"
+  },
+  {
+    "id": "bIHGFn5MHtXpqVeM9enF",
+    "hargaPerBox": 97500,
+    "hargaJualPerPcs": 5000,
+    "isiPerBox": 24,
+    "createdAt": "2025-09-25T15:14:07.724Z",
+    "foto": "https://aice.sesarengan.my.id/storage/products/oPJoSW5VDnBOLeZlibrAZVkyQuQRhIoLfsR1PDTX.webp",
+    "nama": "CHOCOMELT CONE",
+    "available": true
+  },
+  {
+    "id": "bNkl5FX7SlWzgxLhu2Pw",
+    "hargaJualPerPcs": 3000,
+    "foto": "https://aice.sesarengan.my.id/storage/products/UgqqJIIxrYEyqPwIaNgQQOkQDF8LjBWEynuXWLdr.webp",
+    "targetWajib": 253,
+    "createdAt": "2025-09-25T15:10:14.752Z",
+    "hargaPerBox": 96000,
+    "isWajib": true,
+    "isiPerBox": 40,
+    "available": true,
+    "nama": "SWEET CORN"
+  },
+  {
+    "id": "bo7uoDBVttrD7nfgPod8",
+    "available": false,
+    "isiPerBox": 40,
+    "foto": "https://aice.sesarengan.my.id/storage/products/n8vK0DJGmGFaDshX7hON9lQxoO7k21sN8WHf4hC0.webp",
+    "hargaPerBox": 94500,
+    "nama": "MOCHI KLEPON",
+    "hargaJualPerPcs": 3000,
+    "createdAt": "2025-09-25T15:05:39.814Z"
+  },
+  {
+    "id": "czThQD5TNzChwlsAr7ds",
+    "hargaJualPerPcs": 3000,
+    "hargaPerBox": 92500,
+    "nama": "MOCHI BANANA",
+    "isiPerBox": 40,
+    "foto": "https://aice.sesarengan.my.id/storage/products/0u9jjUwUYqZjmMU8B3NmlOCXesY1V6KJfwb7WpS5.webp",
+    "available": true,
+    "createdAt": "2025-09-25T15:02:13.996Z"
+  },
+  {
+    "id": "eqWzbtAv3MmMCbLAYbYP",
+    "createdAt": "2025-09-25T15:19:01.071Z",
+    "available": false,
+    "hargaJualPerPcs": 7000,
+    "foto": "https://aice.sesarengan.my.id/storage/products/loHI7lxX7vORsRfALFeH5lwBaTh5GD46fHsKP4jG.webp",
+    "isiPerBox": 24,
+    "hargaPerBox": 131000,
+    "nama": "STRAWBERRY MAX CONE"
+  },
+  {
+    "id": "iegvzVPz0yZbNTHzwcj3",
+    "isiPerBox": 40,
+    "available": true,
+    "createdAt": "2025-09-25T15:09:43.946Z",
+    "hargaJualPerPcs": 3000,
+    "foto": "https://aice.sesarengan.my.id/storage/products/ysW7oQ0V7lQ1V9Ec6HOofsMKSUOZ7RSsg6xQQl49.webp",
+    "nama": "FRUIZY BLUEBERRY YOGURT",
+    "hargaPerBox": 96000
+  },
+  {
+    "id": "jJ0aqMzW8XNZeKsXBWuQ",
+    "hargaJualPerPcs": 3000,
+    "nama": "2 COLOR",
+    "hargaPerBox": 92000,
+    "isiPerBox": 40,
+    "available": true,
+    "foto": "https://aice.sesarengan.my.id/storage/products/FiPaWBf1PZrGQUO7KF1AEkIIakjhgjNqhNdBtXap.webp",
+    "createdAt": "2025-09-25T15:01:15.057Z"
+  },
+  {
+    "id": "k7TnmqAqR1yAmsY042eK",
+    "hargaPerBox": 77500,
+    "available": true,
+    "foto": "https://aice.sesarengan.my.id/storage/products/uFL1TtxuCAfpKEpkibghqaFeoGRL8tNc1ZH4cuke.webp",
+    "createdAt": "2025-09-25T14:43:18.140Z",
+    "hargaJualPerPcs": 2000,
+    "nama": "SEMANGKA",
+    "isiPerBox": 50
+  },
+  {
+    "id": "kaxtCMx6rMhQn9EbjJAw",
+    "foto": "https://aice.sesarengan.my.id/storage/products/a4Pqe82k2uzymeiWKmUP8AApZq3sCaPckMHJx5GM.webp",
+    "nama": "CRISPY BALLS ORIGINAL",
+    "hargaPerBox": 118500,
+    "isWajib": true,
+    "isiPerBox": 30,
+    "createdAt": "2025-09-25T15:17:15.408Z",
+    "hargaJualPerPcs": 5000,
+    "available": true,
+    "targetWajib": 32
+  },
+  {
+    "id": "l1deHwCLSgFDr80nCpBh",
+    "hargaPerBox": 152000,
+    "nama": "HISTERIA ORIGINAL",
+    "hargaJualPerPcs": 8500,
+    "available": false,
+    "createdAt": "2025-09-25T15:20:40.981Z",
+    "foto": "https://aice.sesarengan.my.id/storage/products/wXVBSjClwLdvFiAJ9eptqUsBpaEofWeM5FnyP5Y0.webp",
+    "isiPerBox": 24
+  },
+  {
+    "id": "sE1vrskyLfmynFjNEfrm",
+    "hargaJualPerPcs": 8500,
+    "isiPerBox": 24,
+    "available": false,
+    "foto": "https://aice.sesarengan.my.id/storage/products/o49fpApTQ0umqAVtKyvSChbyqj3ZLz37IbrjDQpn.webp",
+    "createdAt": "2025-09-25T15:20:07.157Z",
+    "nama": "HISTERIA PEACH",
+    "hargaPerBox": 152000
+  },
+  {
+    "id": "sHRwloXPPG1VfsQTJl29",
+    "nama": "HISTERIA MATCHA",
+    "isiPerBox": 24,
+    "foto": "https://aice.sesarengan.my.id/storage/products/1rIHtuGOl0qW8ongwR5zLI7a7dGATSQzxlpYWgb4.webp",
+    "hargaJualPerPcs": 8500,
+    "available": false,
+    "hargaPerBox": 152000,
+    "createdAt": "2025-09-25T15:21:08.426Z"
+  },
+  {
+    "id": "sKjCtHbEsvTpBhbQOyHB",
+    "foto": "https://aice.sesarengan.my.id/storage/products/YwmNWkWjU6erQOanhDQRHbMVkz8b7OqwnnZMIA1Z.jpg",
+    "nama": "FRUITY ROLL",
+    "hargaJualPerPcs": 4000,
+    "createdAt": "2025-09-25T15:13:38.585Z",
+    "available": true,
+    "isiPerBox": 40,
+    "hargaPerBox": 124800
+  },
+  {
+    "id": "xJbJEd4mYcSMcB4V4492",
+    "available": true,
+    "targetWajib": 71,
+    "isWajib": true,
+    "hargaPerBox": 92500,
+    "createdAt": "2025-09-25T15:04:04.629Z",
+    "foto": "https://aice.sesarengan.my.id/storage/products/BpzgVpjZW2k7B8LnFYbxJT7bOUlapn3UPhlpQT9w.webp",
+    "nama": "MOCHI VANILLA",
+    "isiPerBox": 40,
+    "hargaJualPerPcs": 3000
+  },
+  {
+    "id": "xKVy2PZD4ymrzym0pndZ",
+    "hargaJualPerPcs": 4000,
+    "createdAt": "2025-09-25T15:10:59.845Z",
+    "foto": "https://aice.sesarengan.my.id/storage/products/AZvTal4r45JjOW06PpcUk9oaOWXbnzmmK5Kx1Hhr.png",
+    "isiPerBox": 30,
+    "hargaPerBox": 96500,
+    "nama": "MOONG BEAN",
+    "available": false
+  },
+  {
+    "id": "xaB42zjrDkGuzdTP7tpO",
+    "nama": "MANGO SLUSH",
+    "isiPerBox": 30,
+    "createdAt": "2025-09-25T15:00:09.654Z",
+    "hargaPerBox": 90500,
+    "foto": "https://aice.sesarengan.my.id/storage/products/WHYEJiHU3fQz8du2hqaxjDrhjIEB5UYnS8ixE5gE.webp",
+    "available": true,
+    "hargaJualPerPcs": 4000
+  },
+  {
+    "id": "y44wV7EqlAwgQKUJj38O",
+    "hargaJualPerPcs": 3000,
+    "nama": "MILK MELON",
+    "hargaPerBox": 95000,
+    "foto": "https://aice.sesarengan.my.id/storage/products/Jowhtqybp0E7rH1TIrL85J81tcFvnPVMYxNGHwuS.webp",
+    "available": true,
+    "createdAt": "2025-09-25T15:09:07.784Z",
+    "isiPerBox": 40
+  }
+]

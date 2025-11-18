@@ -1,8 +1,8 @@
 import { useState, useRef, useEffect, useCallback } from 'react';
-import { getStorage, ref, uploadString, getDownloadURL } from 'firebase/storage';
+import { supabase } from '../lib/supabase';
 import { X, Camera, SwitchCamera, Loader2 } from 'lucide-react';
 
-const ImageUploaderCamera = ({ onClose, onCapture }) => {
+const ImageUploaderCamera = ({ onClose, onCapture, showNotification }) => {
     const videoRef = useRef(null);
     const [stream, setStream] = useState(null);
     const [facingMode, setFacingMode] = useState('environment');
@@ -23,11 +23,11 @@ const ImageUploaderCamera = ({ onClose, onCapture }) => {
                 }
             } catch (err) {
                 console.error('Error accessing camera:', err);
-                alert('Tidak dapat mengakses kamera. Pastikan izin telah diberikan.');
+                showNotification('Tidak dapat mengakses kamera. Pastikan izin telah diberikan.', 'error');
                 onClose();
             }
         },
-        [stream, onClose],
+        [stream, onClose, showNotification],
     );
 
     useEffect(() => {
@@ -37,8 +37,7 @@ const ImageUploaderCamera = ({ onClose, onCapture }) => {
                 stream.getTracks().forEach((track) => track.stop());
             }
         };
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [facingMode]);
+    }, [facingMode, startCamera, stream]);
 
     const handleSwitchCamera = () => {
         setFacingMode((prev) => (prev === 'user' ? 'environment' : 'user'));
@@ -58,21 +57,21 @@ const ImageUploaderCamera = ({ onClose, onCapture }) => {
         const dataUrl = canvas.toDataURL('image/jpeg', 0.8); // Kompresi gambar
 
         try {
-            const storage = getStorage();
             const fileName = `toko_photos/${new Date().getTime()}.jpg`;
-            const storageRef = ref(storage, fileName);
+            const { data, error: uploadError } = await supabase.storage.from('foto-toko').upload(fileName, dataUrl, {
+                contentType: 'image/jpeg',
+            });
 
-            // Unggah gambar
-            const snapshot = await uploadString(storageRef, dataUrl, 'data_url');
-            // Dapatkan URL download
-            const downloadURL = await getDownloadURL(snapshot.ref);
+            if (uploadError) throw uploadError;
 
+            const { data: urlData } = supabase.storage.from('foto-toko').getPublicUrl(fileName);
+            const downloadURL = urlData.publicUrl;
             // Kembalikan URL ke parent component
             onCapture(downloadURL);
             onClose();
         } catch (error) {
             console.error('Upload failed:', error);
-            alert('Gagal mengunggah foto. Silakan coba lagi.');
+            showNotification('Gagal mengunggah foto. Silakan coba lagi.', 'error');
         } finally {
             setIsProcessing(false);
         }

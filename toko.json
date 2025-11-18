@@ -1,0 +1,1318 @@
+[
+  {
+    "id": "0nchyPCKCX7ahDdo6icy",
+    "nomorWa": "6282329672750",
+    "kode": "K1854",
+    "kodeFreezer": "IDNR2020406919",
+    "jadwalKunjungan": [
+      "kamis"
+    ],
+    "nama": "SEJAHTERA FROZEN FOOD",
+    "createdAt": "2025-10-02T01:21:20.662Z"
+  },
+  {
+    "id": "1pS2Vw8a9fu0UurNB4v7",
+    "createdAt": "2025-10-06T15:15:16.603Z",
+    "jadwalKunjungan": [
+      "selasa"
+    ],
+    "nama": "ILMA JAYA",
+    "kode": "K1118",
+    "kodeFreezer": "IDNR2020306654",
+    "nomorWa": "6282134796040"
+  },
+  {
+    "id": "2zobAduRXbA1IyykFf5n",
+    "kode": "K0441",
+    "jadwalKunjungan": [
+      "jumat"
+    ],
+    "nomorWa": "6289631762052",
+    "nama": "MJ CELL",
+    "kodeFreezer": "IDN2016301601",
+    "createdAt": "2025-10-02T16:09:25.922Z"
+  },
+  {
+    "id": "36KgS7wC1Qnude8tPEJW",
+    "kode": "K1480",
+    "nomorWa": "6289671891232",
+    "kodeFreezer": "IDNA2018303580",
+    "nama": "PUTRA / ADE ZONE",
+    "createdAt": "2025-10-02T01:15:17.764Z",
+    "jadwalKunjungan": [
+      "kamis"
+    ]
+  },
+  {
+    "id": "42f4rMSZhOHXH6oYOXMn",
+    "nomorWa": "6287773453003",
+    "kode": "K1571",
+    "jadwalKunjungan": [
+      "jumat"
+    ],
+    "createdAt": "2025-10-02T16:16:43.321Z",
+    "nama": "TOKO KOBER",
+    "kodeFreezer": "IDNR2020306988"
+  },
+  {
+    "id": "4RrFtYEGtIzcVvzYWaMY",
+    "createdAt": "2025-10-02T16:17:55.176Z",
+    "nama": "SD IT AL HUSNA PELEMKEREP",
+    "nomorWa": "6289682912554",
+    "kode": "K1656",
+    "jadwalKunjungan": [
+      "jumat"
+    ],
+    "kodeFreezer": "IDNR2022305033"
+  },
+  {
+    "id": "4m6k3Lx6PkBmmkEOUFc1",
+    "nomorWa": "62882006281366",
+    "createdAt": "2025-10-06T01:12:39.608Z",
+    "kodeFreezer": "IDNR2020306776",
+    "jadwalKunjungan": [
+      "senin"
+    ],
+    "kode": "K1128",
+    "nama": "AISYA"
+  },
+  {
+    "id": "517lFqCrv4ylnAybXBuH",
+    "kodeFreezer": "BIDNAICE202060416",
+    "kode": "K1367",
+    "nama": "ENDANG SRI WAHYUNI",
+    "createdAt": "2025-10-01T01:38:15.424Z",
+    "jadwalKunjungan": [
+      "rabu"
+    ],
+    "nomorWa": "6285641913643"
+  },
+  {
+    "id": "615zUNcqDmWisXG92rkP",
+    "kode": "K1533",
+    "jadwalKunjungan": [
+      "senin"
+    ],
+    "createdAt": "2025-10-06T01:24:14.500Z",
+    "nama": "TOKO M ANIQ ALFARUQI",
+    "nomorWa": "6282210259789",
+    "kodeFreezer": "IDNR2022304999"
+  },
+  {
+    "id": "6XnHlhaup6RQesAHfOFv",
+    "nama": "AL-FALAH",
+    "kode": "K0375",
+    "createdAt": "2025-10-06T15:15:16.603Z",
+    "nomorWa": "6285175434599",
+    "kodeFreezer": "IDN2016033365",
+    "jadwalKunjungan": [
+      "selasa"
+    ]
+  },
+  {
+    "id": "6pw30ZdwX1mjmVnAvMaL",
+    "nomorWa": "6281250746642",
+    "createdAt": "2025-10-01T01:41:15.634Z",
+    "kodeFreezer": "IDNR2023238458",
+    "nama": "TOKO MBAK RINI",
+    "kode": "K1725",
+    "jadwalKunjungan": [
+      "rabu"
+    ]
+  },
+  {
+    "id": "7eLpiuXvWvr11bxaDZWz",
+    "kodeFreezer": "IDN2016016021",
+    "createdAt": "2025-10-04T01:06:47.374Z",
+    "jadwalKunjungan": [
+      "sabtu"
+    ],
+    "nama": "MBAK IMA",
+    "kode": "K0740",
+    "nomorWa": "6285227844850"
+  },
+  {
+    "id": "7l4t8ictEySaPyXnKMDa",
+    "nomorWa": "6282141285297",
+    "createdAt": "2025-10-04T01:05:13.001Z",
+    "kodeFreezer": "IDNR2023303612",
+    "kode": "K1498",
+    "nama": "RATU WALI",
+    "jadwalKunjungan": [
+      "sabtu"
+    ]
+  },
+  {
+    "id": "7xXpzkyryOEVARIJWA8V",
+    "kodeFreezer": "IDN2016315905",
+    "nomorWa": "62895401338700",
+    "jadwalKunjungan": [
+      "kamis"
+    ],
+    "createdAt": "2025-10-02T01:09:32.952Z",
+    "kode": "K0467",
+    "nama": "SUKATI"
+  },
+  {
+    "id": "878SE6zfogSZSvQEzaQC",
+    "nomorWa": "6285701623259",
+    "kode": "K1911",
+    "monthlyRewardsClaimed": {
+      "2025-10": 1
+    },
+    "createdAt": "2025-10-01T01:42:42.460Z",
+    "nama": "TOKO VIANA",
+    "kodeFreezer": "BIDNAICE202060266",
+    "jadwalKunjungan": [
+      "rabu"
+    ]
+  },
+  {
+    "id": "8k5mHDdqhzvAFdnkqWei",
+    "kodeFreezer": "IDNR2022305089",
+    "monthlyRewardsClaimed": {
+      "2025-10": 1
+    },
+    "nomorWa": "6285314156438",
+    "jadwalKunjungan": [
+      "kamis"
+    ],
+    "createdAt": "2025-10-02T01:14:29.977Z",
+    "nama": "SMK ISLAM AL HIKMAH MAYONG",
+    "kode": "K1387"
+  },
+  {
+    "id": "97dQ3fc5oJLPHPNSZvPe",
+    "nomorWa": "6285803768888",
+    "nama": "SUMUK CELL",
+    "kodeFreezer": "IDNR2019402849",
+    "jadwalKunjungan": [
+      "jumat"
+    ],
+    "kode": "K0504",
+    "createdAt": "2025-10-02T16:14:07.908Z",
+    "monthlyRewardsClaimed": {
+      "2025-10": 1
+    }
+  },
+  {
+    "id": "9pGAxSxQpP97NFr46tWJ",
+    "kode": "K2077",
+    "kodeFreezer": "IDN2016016011",
+    "createdAt": "2025-10-02T01:19:16.713Z",
+    "nomorWa": "62881012020116",
+    "nama": "MADURA BUNDA",
+    "jadwalKunjungan": [
+      "kamis"
+    ]
+  },
+  {
+    "id": "9uWRqV8KbynkKmi3nulk",
+    "kodeFreezer": "IDNR2024214571",
+    "nomorWa": "6282227092345",
+    "jadwalKunjungan": [
+      "jumat"
+    ],
+    "kode": "K2021",
+    "createdAt": "2025-10-02T16:20:57.852Z",
+    "nama": "WINARNO"
+  },
+  {
+    "id": "AiIHhFRAFqyGOx3AgdFI",
+    "kodeFreezer": "IDN2016301696",
+    "nama": "IRWAN CELL",
+    "kode": "K1867",
+    "createdAt": "2025-10-06T15:15:16.603Z",
+    "jadwalKunjungan": [
+      "selasa"
+    ],
+    "nomorWa": "6285226123313"
+  },
+  {
+    "id": "AkprBUTUqD1gZOpeqLQy",
+    "nomorWa": "62895382617137",
+    "nama": "TOKO IBU AMIN",
+    "latitude": "",
+    "createdAt": "2025-10-04T00:34:34.119Z",
+    "totalBoxesOrdered": 0,
+    "mysteryBoxesAwarded": 0,
+    "monthlyRewardsClaimed": {
+      "2025-10": 2
+    },
+    "jadwalKunjungan": [
+      "sabtu"
+    ],
+    "kodeFreezer": "IDNR2020417757",
+    "longitude": "",
+    "kode": "K0503"
+  },
+  {
+    "id": "Al3wNMsqeYtsyijq1Fvh",
+    "jadwalKunjungan": [
+      "sabtu"
+    ],
+    "kodeFreezer": "IDNR2023302656",
+    "createdAt": "2025-10-04T01:06:23.309Z",
+    "nomorWa": "6285290347061",
+    "nama": "KOPERASI AL-ALAWY",
+    "kode": "K1555"
+  },
+  {
+    "id": "B432NajzpIiYQHMjsajM",
+    "kode": "K0721",
+    "createdAt": "2025-10-04T01:09:14.058Z",
+    "kodeFreezer": "IDN2016304329",
+    "nama": "ALIYA CELL",
+    "jadwalKunjungan": [
+      "sabtu"
+    ],
+    "nomorWa": "6289654411333"
+  },
+  {
+    "id": "B8hPBUTijMD2pKkhKEoc",
+    "createdAt": "2025-10-06T15:15:16.603Z",
+    "nomorWa": "6282241097717",
+    "nama": "WIWIK",
+    "kode": "K0424",
+    "kodeFreezer": "IDN2016315514",
+    "jadwalKunjungan": [
+      "selasa"
+    ]
+  },
+  {
+    "id": "BYxFMWDMPNQaGNvbV341",
+    "kode": "K0366",
+    "nomorWa": "6285329439936",
+    "jadwalKunjungan": [
+      "rabu"
+    ],
+    "nama": "TATA MANDIRI",
+    "kodeFreezer": "IDN2016304343",
+    "createdAt": "2025-10-01T01:35:11.158Z"
+  },
+  {
+    "id": "Bs2oePYU0B48Em6U0NdQ",
+    "jadwalKunjungan": [
+      "rabu"
+    ],
+    "kodeFreezer": "IDN2016029331",
+    "nama": "BERKAH SAFAR",
+    "createdAt": "2025-10-01T01:39:14.248Z",
+    "kode": "K1482",
+    "nomorWa": "6285225325772"
+  },
+  {
+    "id": "CfKdWWsPbcqw3KjtwI29",
+    "createdAt": "2025-10-06T15:15:16.603Z",
+    "kode": "K1987",
+    "nama": "NOR AMIN MAHMUD",
+    "jadwalKunjungan": [
+      "selasa"
+    ],
+    "kodeFreezer": "IDN2016305685",
+    "nomorWa": "6285229245472",
+    "monthlyRewardsClaimed": {
+      "2025-10": 1
+    }
+  },
+  {
+    "id": "Djb9VhTmktwIGcPkALLf",
+    "createdAt": "2025-10-02T16:19:27.709Z",
+    "kodeFreezer": "IDN2016304332",
+    "nomorWa": "6281227216547",
+    "kode": "K2015",
+    "jadwalKunjungan": [
+      "jumat"
+    ],
+    "nama": "SDN 1 BAKALAN ( TOKO SEMBAKO AHLIS )"
+  },
+  {
+    "id": "GMtCP1QmCDJ6WK1Fzvee",
+    "kode": "K1819",
+    "jadwalKunjungan": [
+      "sabtu"
+    ],
+    "createdAt": "2025-10-04T01:04:53.616Z",
+    "nama": "MI SYUMUSUL HUDA",
+    "nomorWa": "6282134053838",
+    "kodeFreezer": "IDNR2024205098"
+  },
+  {
+    "id": "Hfn7DH6eAWCVrAkmczwl",
+    "kode": "K1409",
+    "createdAt": "2025-10-01T01:38:47.131Z",
+    "nama": "TOKO BINTANI MART",
+    "kodeFreezer": "IDNR2022305177",
+    "monthlyRewardsClaimed": {
+      "2025-10": 2
+    },
+    "jadwalKunjungan": [
+      "rabu"
+    ],
+    "nomorWa": "6285740741074"
+  },
+  {
+    "id": "HsBqJ8NfGtWtPy4dtOUp",
+    "kodeFreezer": "IDNR2023312704",
+    "nama": "TRANSIT MART 2",
+    "createdAt": "2025-10-02T16:19:53.556Z",
+    "nomorWa": "6285213922491",
+    "kode": "K1534",
+    "jadwalKunjungan": [
+      "jumat"
+    ]
+  },
+  {
+    "id": "I2ckekmi55nhDdQ2RGZn",
+    "nama": "KHUDIN",
+    "createdAt": "2025-10-01T01:36:35.110Z",
+    "nomorWa": "6281225322898",
+    "kode": "K0661",
+    "jadwalKunjungan": [
+      "rabu"
+    ],
+    "kodeFreezer": "IDN2016015831"
+  },
+  {
+    "id": "ICWLSSwzVvanVCAZdUih",
+    "createdAt": "2025-10-01T01:36:52.242Z",
+    "jadwalKunjungan": [
+      "rabu"
+    ],
+    "kodeFreezer": "IDN2016305839",
+    "kode": "K0742",
+    "nomorWa": "6285954262762",
+    "nama": "KUSRIYAH"
+  },
+  {
+    "id": "IQtU1AxfLTPqglkim04O",
+    "createdAt": "2025-10-06T01:28:31.820Z",
+    "monthlyRewardsClaimed": {
+      "2025-10": 1
+    },
+    "nama": "TOKO ANUGERAH",
+    "kode": "K1969",
+    "jadwalKunjungan": [
+      "senin"
+    ],
+    "nomorWa": "6285385090613",
+    "kodeFreezer": "IDNR2024309590"
+  },
+  {
+    "id": "IXBiyQspfEdWbNBMZp91",
+    "kodeFreezer": "IDNR2023241633",
+    "kode": "K1708",
+    "nama": "NYAH JIT",
+    "jadwalKunjungan": [
+      "sabtu"
+    ],
+    "createdAt": "2025-10-04T01:08:52.258Z",
+    "nomorWa": "628112770223"
+  },
+  {
+    "id": "ImE48v9OEwbSNMRIb16y",
+    "nomorWa": "6281327776779",
+    "kode": "K0373",
+    "monthlyRewardsClaimed": {
+      "2025-10": 1
+    },
+    "jadwalKunjungan": [
+      "selasa"
+    ],
+    "kodeFreezer": "IDN2016031928",
+    "createdAt": "2025-10-06T15:15:16.603Z",
+    "nama": "MADUN"
+  },
+  {
+    "id": "IrbkzdFUGCvAzQv01tks",
+    "jadwalKunjungan": [
+      "kamis"
+    ],
+    "longitude": 110.7595981,
+    "latitude": -6.7485002,
+    "nomorWa": "6285226494373",
+    "kodeFreezer": "IDN2016031630",
+    "kode": "K0525",
+    "createdAt": "2025-10-06T15:37:44.701Z",
+    "nama": "KANTIN SMA AL HIKMAH"
+  },
+  {
+    "id": "LjHKUWJDhaxyFOLArIdi",
+    "nama": "SAMI JF MART",
+    "nomorWa": "62895422887609",
+    "createdAt": "2025-10-02T01:08:52.208Z",
+    "kodeFreezer": "IDNR2020302871",
+    "monthlyRewardsClaimed": {
+      "2025-10": 1
+    },
+    "kode": "K1298",
+    "jadwalKunjungan": [
+      "kamis"
+    ]
+  },
+  {
+    "id": "LrDGivjSfm58oJ7eILXz",
+    "nama": "WARUNG MADURA AL-AMIN 2",
+    "monthlyRewardsClaimed": {
+      "2025-10": 2
+    },
+    "createdAt": "2025-10-02T01:17:51.473Z",
+    "kodeFreezer": "IDNR2020302583",
+    "jadwalKunjungan": [
+      "kamis"
+    ],
+    "kode": "K1649",
+    "nomorWa": "6281807153886"
+  },
+  {
+    "id": "MBtynOjLtaD7KngRrvOo",
+    "nomorWa": "62895347140404",
+    "createdAt": "2025-10-04T00:33:54.945Z",
+    "kodeFreezer": "IDNR2020302821",
+    "kode": "K1286",
+    "nama": "RIYADLUL QUR'AN",
+    "jadwalKunjungan": [
+      "sabtu"
+    ]
+  },
+  {
+    "id": "NKsOqczLvbzUQOrPcTvY",
+    "nama": "SD 1 BUARAN MAYONG",
+    "nomorWa": "628128090213",
+    "kode": "K1751",
+    "kodeFreezer": "IDN2016315726",
+    "createdAt": "2025-10-06T15:15:16.603Z",
+    "jadwalKunjungan": [
+      "selasa"
+    ]
+  },
+  {
+    "id": "NbD8s7PxFM7LcFShRs3Q",
+    "kodeFreezer": "IDNR2021203706",
+    "nama": "TOKO ANDI",
+    "jadwalKunjungan": [
+      "rabu"
+    ],
+    "kode": "K1179",
+    "nomorWa": "",
+    "createdAt": "2025-10-01T01:37:23.771Z"
+  },
+  {
+    "id": "O8g9w3lNqdo3pRpC2pwY",
+    "nomorWa": "6282241063199",
+    "kode": "K1278",
+    "kodeFreezer": "IDNR2021202119",
+    "createdAt": "2025-10-06T15:15:16.603Z",
+    "nama": "NUR AFIDAH",
+    "jadwalKunjungan": [
+      "selasa"
+    ]
+  },
+  {
+    "id": "OBIPITnGgdtvp0zkVSIL",
+    "monthlyRewardsClaimed": {
+      "2025-10": 1
+    },
+    "nomorWa": "6282323568152",
+    "nama": "MUSTAQIM",
+    "jadwalKunjungan": [
+      "senin"
+    ],
+    "kodeFreezer": "IDNR2022305114",
+    "kode": "K1352",
+    "createdAt": "2025-10-06T01:16:19.336Z"
+  },
+  {
+    "id": "OoHRaxncqsL1ElG0jLeK",
+    "kode": "K1868",
+    "createdAt": "2025-10-01T01:42:21.858Z",
+    "nomorWa": "6281246978795",
+    "jadwalKunjungan": [
+      "rabu"
+    ],
+    "kodeFreezer": "IDNR2020303541",
+    "nama": "TOKO VANIA"
+  },
+  {
+    "id": "P3S3LmNnq4sCQ7YUieWO",
+    "nomorWa": "6285713014269",
+    "kodeFreezer": "IDNR2020416243",
+    "monthlyRewardsClaimed": {
+      "2025-10": 2
+    },
+    "createdAt": "2025-10-06T01:09:11.803Z",
+    "jadwalKunjungan": [
+      "senin"
+    ],
+    "kode": "K0352",
+    "nama": "APOTEK PANCUR"
+  },
+  {
+    "id": "QHP3VKx7Xl66YirpJdsY",
+    "kodeFreezer": "IDNR2020417317",
+    "nama": "YANI 2",
+    "createdAt": "2025-10-02T01:20:54.959Z",
+    "nomorWa": "6285200485050",
+    "kode": "K1018",
+    "jadwalKunjungan": [
+      "kamis"
+    ]
+  },
+  {
+    "id": "R1Nb2wQKva33PYzOOokI",
+    "nomorWa": "6281398422237",
+    "nama": "TOKO PAK MUL",
+    "kode": "K1323",
+    "kodeFreezer": "IDN2016315137",
+    "jadwalKunjungan": [
+      "senin"
+    ],
+    "createdAt": "2025-10-06T01:15:54.621Z"
+  },
+  {
+    "id": "S3sXgtgCOOvXYK2lhUtV",
+    "jadwalKunjungan": [
+      "senin"
+    ],
+    "nama": "TOKO ZUMAEROH",
+    "nomorWa": "6281327336308",
+    "kodeFreezer": "IDN2016304323",
+    "kode": "K1599",
+    "createdAt": "2025-10-06T04:01:09.055Z"
+  },
+  {
+    "id": "SXfUg2IX86MSmv6tQUfp",
+    "kodeFreezer": "IDNR2023312878",
+    "nomorWa": "6288232390183",
+    "createdAt": "2025-10-06T01:24:52.287Z",
+    "nama": "REZEKI LANCAR",
+    "jadwalKunjungan": [
+      "senin"
+    ],
+    "kode": "K1540"
+  },
+  {
+    "id": "Sd6g46vJ9IKhkDW5DXlf",
+    "kodeFreezer": "IDN2016315119",
+    "createdAt": "2025-10-04T00:39:00.793Z",
+    "nomorWa": "6285325857797",
+    "nama": "MBAK IS",
+    "kode": "K0485",
+    "jadwalKunjungan": [
+      "sabtu"
+    ]
+  },
+  {
+    "id": "TTn9hWhaS5l9V1auHGCk",
+    "createdAt": "2025-10-02T16:20:34.571Z",
+    "kode": "K1970",
+    "nama": "MBAK MUNA",
+    "kodeFreezer": "IDNR2024309643",
+    "nomorWa": "6285867934154",
+    "jadwalKunjungan": [
+      "jumat"
+    ]
+  },
+  {
+    "id": "UakrWJWMX4JcwWKopZSl",
+    "jadwalKunjungan": [
+      "jumat"
+    ],
+    "nama": "M. FAIZUN",
+    "kode": "K1614",
+    "kodeFreezer": "IDNR2021305455",
+    "nomorWa": "6287773452593",
+    "createdAt": "2025-10-02T16:08:33.772Z"
+  },
+  {
+    "id": "Un8CXZKfqVE45zerIgis",
+    "nomorWa": "6285740741074",
+    "createdAt": "2025-10-01T01:40:29.701Z",
+    "nama": "TOKO WAHYUDI",
+    "kodeFreezer": "IDNR2020417628",
+    "kode": "K1586",
+    "jadwalKunjungan": [
+      "rabu"
+    ]
+  },
+  {
+    "id": "UwdRliDTCsIK7mN3UplU",
+    "kodeFreezer": "IDNR2020306880",
+    "nomorWa": "62816744086",
+    "longitude": 110.7595981,
+    "monthlyRewardsClaimed": {
+      "2025-10": 1
+    },
+    "latitude": -6.7485002,
+    "kode": "K1877",
+    "nama": "KANTOR PWI",
+    "createdAt": "2025-10-02T01:18:11.859Z",
+    "jadwalKunjungan": [
+      "kamis"
+    ]
+  },
+  {
+    "id": "VktFHlWljj8CqZVnsjtM",
+    "nama": "TOKO SHERLY",
+    "kodeFreezer": "BIDNAICE2021301484",
+    "kode": "K1500",
+    "createdAt": "2025-10-01T01:39:27.772Z",
+    "jadwalKunjungan": [
+      "rabu"
+    ],
+    "nomorWa": "6285266757533"
+  },
+  {
+    "id": "W5T0mkGuUhrS8Xv4nxtZ",
+    "nama": "SUDARTO",
+    "kode": "K0676",
+    "nomorWa": "6285731350549",
+    "createdAt": "2025-10-02T01:12:16.053Z",
+    "kodeFreezer": "IDN2016315922",
+    "jadwalKunjungan": [
+      "kamis"
+    ]
+  },
+  {
+    "id": "WbtoNXx8lwUgS8s1ojLR",
+    "nomorWa": "085877270059‬",
+    "jadwalKunjungan": [
+      "rabu"
+    ],
+    "kode": "K2066",
+    "nama": "BU ISTIANAH ( MTS URWATIL WATSQO )",
+    "createdAt": "2025-10-01T01:44:06.254Z",
+    "kodeFreezer": "IDNR2024204783"
+  },
+  {
+    "id": "Wd4tMZL3Gh5AME7jGCqL",
+    "nama": "TOKO RENASYA",
+    "jadwalKunjungan": [
+      "kamis"
+    ],
+    "kodeFreezer": "IDN2016302684",
+    "createdAt": "2025-10-02T01:16:06.093Z",
+    "nomorWa": "6285726032056",
+    "kode": "K1512"
+  },
+  {
+    "id": "X4G4Mm97geyTM8hWkcGe",
+    "createdAt": "2025-10-01T01:39:48.777Z",
+    "nama": "TOKO INDANAH",
+    "kodeFreezer": "IDNR2022305127",
+    "kode": "K1513",
+    "jadwalKunjungan": [
+      "rabu"
+    ],
+    "nomorWa": "6285217619579"
+  },
+  {
+    "id": "XiCglP9CSUbM0jrjNHny",
+    "kodeFreezer": "IDN2016315925",
+    "nomorWa": "6282137617130",
+    "kode": "K0367",
+    "createdAt": "2025-10-06T01:11:33.307Z",
+    "nama": "TIGA SAUDARA",
+    "jadwalKunjungan": [
+      "senin"
+    ]
+  },
+  {
+    "id": "YPpBOMPT2aukjCk1wvxw",
+    "createdAt": "2025-10-04T01:07:06.409Z",
+    "nama": "ABIYAN CAKE",
+    "jadwalKunjungan": [
+      "sabtu"
+    ],
+    "nomorWa": "62895383805899",
+    "kode": "K1613",
+    "kodeFreezer": "IDNR2019402816"
+  },
+  {
+    "id": "YfBQlzNngeGfMuvgAEuJ",
+    "kodeFreezer": "IDNR2020406917",
+    "nama": "BERKAH SHOLAWAT",
+    "longitude": "110.74951996909166",
+    "latitude": "-6.744701883665977",
+    "jadwalKunjungan": [
+      "kamis"
+    ],
+    "kode": "K1476",
+    "nomorWa": "6289635557262",
+    "createdAt": "2025-10-02T01:14:53.662Z"
+  },
+  {
+    "id": "Yqbds11ik7n7cnIbAlyj",
+    "kode": "K1945",
+    "nomorWa": "6285936525131",
+    "kodeFreezer": "BIDNAICE2021301770",
+    "jadwalKunjungan": [
+      "senin"
+    ],
+    "createdAt": "2025-10-06T01:28:08.462Z",
+    "nama": "SAMILATUN KHASANAH"
+  },
+  {
+    "id": "ZE2ppkrg8ZR49fnJZeOY",
+    "jadwalKunjungan": [
+      "sabtu"
+    ],
+    "nomorWa": "62882003319451",
+    "kode": "K1535",
+    "createdAt": "2025-10-04T01:08:32.838Z",
+    "kodeFreezer": "IDNR2023310665",
+    "nama": "SUMBER MULYA"
+  },
+  {
+    "id": "ZPG57TQu3HgMHFcjJS94",
+    "createdAt": "2025-10-02T16:16:02.099Z",
+    "kode": "K1543",
+    "jadwalKunjungan": [
+      "jumat"
+    ],
+    "nama": "NIKMAT SEMBAKO",
+    "nomorWa": "6289667642701",
+    "kodeFreezer": "IDNR2023302676"
+  },
+  {
+    "id": "ZpXCeOmAOnXDVw7mocUq",
+    "createdAt": "2025-10-06T15:15:16.603Z",
+    "nomorWa": "6282137026565",
+    "kodeFreezer": "IDN2016315927",
+    "kode": "K0743",
+    "jadwalKunjungan": [
+      "selasa"
+    ],
+    "nama": "RESTU"
+  },
+  {
+    "id": "ZwFykP7rgzkf1aJM6g3n",
+    "createdAt": "2025-10-02T01:18:47.390Z",
+    "nama": "TOKO HAPSARI",
+    "jadwalKunjungan": [
+      "kamis"
+    ],
+    "kodeFreezer": "IDNR2023302536",
+    "nomorWa": "6281320817460",
+    "kode": "K1936"
+  },
+  {
+    "id": "aKeHRY72jQ8R7GmJIMNH",
+    "kodeFreezer": "IDN2016302969",
+    "nomorWa": "6285712325513",
+    "kode": "K1658",
+    "nama": "SD IT AL ANWAR",
+    "createdAt": "2025-10-02T16:17:04.885Z",
+    "jadwalKunjungan": [
+      "jumat"
+    ]
+  },
+  {
+    "id": "aR8hwBYkMccoUYlxzjC7",
+    "kodeFreezer": "IDNR2020304386",
+    "totalBoxesOrdered": 0,
+    "monthlyRewardsClaimed": {},
+    "latitude": "",
+    "mysteryBoxesAwarded": 0,
+    "longitude": "",
+    "nama": "NICE SWALAYAN",
+    "nomorWa": "6282242602040",
+    "kode": "K2144",
+    "createdAt": "2025-10-29T04:27:12.813Z",
+    "jadwalKunjungan": [
+      "jumat"
+    ]
+  },
+  {
+    "id": "aYAbEMlBicLREQd8m70C",
+    "kode": "K0378",
+    "kodeFreezer": "IDN2016306000",
+    "jadwalKunjungan": [
+      "selasa"
+    ],
+    "nomorWa": "6282241063199",
+    "nama": "MARYATI",
+    "createdAt": "2025-10-06T15:15:16.603Z"
+  },
+  {
+    "id": "ahRcxXhTEcb9lxNWNaut",
+    "createdAt": "2025-10-06T01:15:36.712Z",
+    "kode": "K1149",
+    "nama": "TIGA SAUDARA 2",
+    "kodeFreezer": "IDNR2020306725",
+    "nomorWa": "6281992546416",
+    "jadwalKunjungan": [
+      "senin"
+    ]
+  },
+  {
+    "id": "bEH9JBG9XfbqU2R8PKNC",
+    "jadwalKunjungan": [
+      "rabu"
+    ],
+    "nama": "MUNTATIAH",
+    "kode": "K1366",
+    "nomorWa": "6282282875788",
+    "kodeFreezer": "IDNR2022305172",
+    "createdAt": "2025-10-06T15:37:44.701Z"
+  },
+  {
+    "id": "cBXhRkwzErSSQ2yHFz8H",
+    "nama": "TOKO RIZKY OS",
+    "createdAt": "2025-10-06T01:22:34.910Z",
+    "kodeFreezer": "IDNR2023312688",
+    "nomorWa": "6285712121843",
+    "jadwalKunjungan": [
+      "senin"
+    ],
+    "kode": "K1502"
+  },
+  {
+    "id": "d2fNqoVzXHxTmpY3E8v6",
+    "nomorWa": "628996621172",
+    "nama": "TOKO LISA",
+    "jadwalKunjungan": [
+      "kamis"
+    ],
+    "kodeFreezer": "IDN2016305956",
+    "kode": "K1899",
+    "createdAt": "2025-10-02T01:24:05.308Z"
+  },
+  {
+    "id": "dFJRnjEcCGZjVJ3vtZTF",
+    "createdAt": "2025-10-02T16:18:15.993Z",
+    "nama": "SD IT AL HUSNA 2",
+    "nomorWa": "62882007761067",
+    "kode": "K1759",
+    "jadwalKunjungan": [
+      "jumat"
+    ],
+    "kodeFreezer": "IDNR2024306141"
+  },
+  {
+    "id": "e3G6RcX2g2UHxpjV4Pem",
+    "nomorWa": "62895636347953",
+    "kode": "K0991",
+    "jadwalKunjungan": [
+      "sabtu"
+    ],
+    "kodeFreezer": "IDNR2020416362",
+    "nama": "PONPES MAYONG/ AL ISHOM",
+    "createdAt": "2025-10-04T01:08:11.648Z"
+  },
+  {
+    "id": "eLh6QEH4U1yPXyxJUerC",
+    "nomorWa": "6283133484041",
+    "kode": "K1121",
+    "nama": "MUNAWAROH",
+    "jadwalKunjungan": [
+      "senin"
+    ],
+    "createdAt": "2025-10-06T01:12:21.632Z",
+    "kodeFreezer": "IDNR2020306649"
+  },
+  {
+    "id": "ebebnNTVsoHmjsVzpaxp",
+    "kode": "K1788",
+    "createdAt": "2025-10-06T15:15:16.603Z",
+    "nama": "SD 3 BUARAN",
+    "jadwalKunjungan": [
+      "selasa"
+    ],
+    "kodeFreezer": "BIDNAICE2021301449",
+    "nomorWa": "6282133592434"
+  },
+  {
+    "id": "ewv2xw7GgJtJXR8nPfQw",
+    "nama": "STICOM",
+    "kode": "K0511",
+    "createdAt": "2025-10-02T16:14:35.856Z",
+    "kodeFreezer": "IDN2016305838",
+    "nomorWa": "628979346185",
+    "jadwalKunjungan": [
+      "jumat"
+    ]
+  },
+  {
+    "id": "f2Z73egCvMj4PXs56DKE",
+    "nama": "ENDANG RISTIYOWATI",
+    "kodeFreezer": "IDN2016014667",
+    "createdAt": "2025-10-02T16:15:38.477Z",
+    "monthlyRewardsClaimed": {
+      "2025-10": 1
+    },
+    "kode": "K0532",
+    "jadwalKunjungan": [
+      "jumat"
+    ],
+    "nomorWa": "6285201402811"
+  },
+  {
+    "id": "gHbbLlkgBIfTYKv7O0G6",
+    "kodeFreezer": "IDNR2019415025",
+    "createdAt": "2025-10-06T15:15:16.603Z",
+    "jadwalKunjungan": [
+      "selasa"
+    ],
+    "nomorWa": "6287797582343",
+    "nama": "TOSERBA JIWA MART",
+    "kode": "K2008"
+  },
+  {
+    "id": "gTE9rpKizzrf2b3XMEkU",
+    "jadwalKunjungan": [
+      "rabu"
+    ],
+    "nama": "MI ASSALAM SINGOROJO",
+    "createdAt": "2025-10-01T01:43:33.572Z",
+    "nomorWa": "6285865033360",
+    "kodeFreezer": "IDNR2024304058",
+    "kode": "K1928"
+  },
+  {
+    "id": "hHf2x3hxQleMEMp5aLvO",
+    "nama": "ALMA MART",
+    "jadwalKunjungan": [
+      "jumat"
+    ],
+    "nomorWa": "6282136610170",
+    "kodeFreezer": "IDNR2021305915",
+    "createdAt": "2025-10-02T16:19:02.727Z",
+    "kode": "K2002"
+  },
+  {
+    "id": "hWaUvcWJzlPMr3hZZqH7",
+    "kode": "K1197",
+    "jadwalKunjungan": [
+      "kamis"
+    ],
+    "createdAt": "2025-10-02T01:12:35.910Z",
+    "kodeFreezer": "IDNR2021202418",
+    "nomorWa": "62895415034236",
+    "nama": "LINAWATI SMU MUH 2"
+  },
+  {
+    "id": "i3vRFtdn75Z0P1RiyJus",
+    "nama": "ALHUSNA MART",
+    "kodeFreezer": "IDN2016315906",
+    "latitude": "-6.74796297592806",
+    "createdAt": "2025-10-02T01:09:15.678Z",
+    "longitude": "110.75664406641229",
+    "nomorWa": "6285799230790",
+    "jadwalKunjungan": [
+      "kamis"
+    ],
+    "kode": "K0439"
+  },
+  {
+    "id": "j5OQBnhs4A8lXEY9aNI4",
+    "createdAt": "2025-10-02T00:42:32.449Z",
+    "nomorWa": "6285845734462",
+    "kodeFreezer": "IDNR2022304981",
+    "kode": "K0391",
+    "monthlyRewardsClaimed": {
+      "2025-10": 3
+    },
+    "jadwalKunjungan": [
+      "selasa"
+    ],
+    "nama": "ELLA 2 KANTIN MTS BALEKAMBANG"
+  },
+  {
+    "id": "jNgDfhGZ4mVvt8VJrRX7",
+    "kodeFreezer": "IDNR2020303564",
+    "longitude": "110.735014",
+    "nama": "FARIDA ERYANTI",
+    "createdAt": "2025-10-02T01:25:00.495Z",
+    "jadwalKunjungan": [
+      "kamis"
+    ],
+    "latitude": "-6.730973",
+    "nomorWa": "6282226409008",
+    "kode": "K2005"
+  },
+  {
+    "id": "jVJBm18ggKRwQ9dO6sPu",
+    "nama": "MUSYAFAK",
+    "kodeFreezer": "IDNR2020301704",
+    "nomorWa": "628812664541",
+    "kode": "K0512",
+    "jadwalKunjungan": [
+      "jumat"
+    ],
+    "createdAt": "2025-10-02T16:15:05.314Z"
+  },
+  {
+    "id": "kHooCaS0ksQrVzljSVVi",
+    "createdAt": "2025-10-04T00:38:30.311Z",
+    "nama": "WAKHIDATUS SHOLEKHAH",
+    "kodeFreezer": "IDNR2024304199",
+    "kode": "K1923",
+    "nomorWa": "628996424455",
+    "jadwalKunjungan": [
+      "sabtu"
+    ]
+  },
+  {
+    "id": "lNRFpK00n4trF3j94v5p",
+    "createdAt": "2025-10-02T01:25:19.819Z",
+    "jadwalKunjungan": [
+      "kamis"
+    ],
+    "kode": "K2014",
+    "monthlyRewardsClaimed": {
+      "2025-10": 1
+    },
+    "nomorWa": "6287763869490",
+    "kodeFreezer": "IDNR2019402831",
+    "nama": "Toko Koss Mart"
+  },
+  {
+    "id": "n16DsU1bfxJ6le0HcELZ",
+    "nomorWa": "6285742270948",
+    "kode": "K1993",
+    "createdAt": "2025-10-02T16:18:36.981Z",
+    "jadwalKunjungan": [
+      "jumat"
+    ],
+    "kodeFreezer": "IDNR2020205015",
+    "nama": "APOTEK PUTRA PRIMA"
+  },
+  {
+    "id": "nhuEhSvTkbCX7F1rYyfg",
+    "createdAt": "2025-10-06T01:27:00.802Z",
+    "nomorWa": "6281389918811",
+    "kode": "K1787",
+    "kodeFreezer": "IDNR2021206420",
+    "nama": "SD 3 BUNGU",
+    "jadwalKunjungan": [
+      "senin"
+    ]
+  },
+  {
+    "id": "pfBZeBBflEj9cMD0uZa2",
+    "jadwalKunjungan": [
+      "rabu"
+    ],
+    "kode": "K1154",
+    "kodeFreezer": "IDNR2021201186",
+    "createdAt": "2025-10-01T01:37:09.761Z",
+    "nomorWa": "6283836812757",
+    "nama": "TOKO ALI"
+  },
+  {
+    "id": "pfVW6jSIplI2WXaQvEB7",
+    "latitude": -6.7399599,
+    "nama": "LAKSITA SWALAYAN",
+    "jadwalKunjungan": [
+      "kamis"
+    ],
+    "kode": "K2101",
+    "nomorWa": "6285348220760",
+    "createdAt": "2025-10-02T01:19:39.465Z",
+    "kodeFreezer": "IDNR20252002167",
+    "longitude": 110.7431569
+  },
+  {
+    "id": "prsjnt4eZWb4sKtsXAOd",
+    "nomorWa": "6289530948417",
+    "monthlyRewardsClaimed": {
+      "2025-10": 1
+    },
+    "nama": "DEWI",
+    "kodeFreezer": "IDNR2020306782",
+    "createdAt": "2025-10-02T16:13:41.305Z",
+    "kode": "K0502",
+    "jadwalKunjungan": [
+      "jumat"
+    ]
+  },
+  {
+    "id": "qBgHRkFD88KqnN8yy52I",
+    "jadwalKunjungan": [
+      "selasa"
+    ],
+    "nomorWa": "6281230441001",
+    "createdAt": "2025-10-06T15:15:16.603Z",
+    "kode": "K1484",
+    "kodeFreezer": "IDNR2023302392",
+    "nama": "SIDO MULYO"
+  },
+  {
+    "id": "rZ5BOP8Og7Zb2P9x4xE6",
+    "kode": "K0936",
+    "nomorWa": "6285225440089",
+    "kodeFreezer": "IDNR2023303662",
+    "nama": "RONDHI ARDIYANTO",
+    "createdAt": "2025-10-06T01:12:03.826Z",
+    "jadwalKunjungan": [
+      "senin"
+    ]
+  },
+  {
+    "id": "rwANC5lfSRpAKV2HzJBj",
+    "jadwalKunjungan": [
+      "sabtu"
+    ],
+    "monthlyRewardsClaimed": {
+      "2025-10": 1
+    },
+    "kodeFreezer": "BIDNAICE2021301524",
+    "nama": "NUR YONO",
+    "createdAt": "2025-10-04T01:05:33.418Z",
+    "kode": "K1982",
+    "nomorWa": "6285283953943"
+  },
+  {
+    "id": "sSufgeU8YIyZrAOZbEO6",
+    "nomorWa": "6281992546056",
+    "nama": "SISWANTO",
+    "kodeFreezer": "IDNR2022307638",
+    "kode": "K0526",
+    "jadwalKunjungan": [
+      "kamis"
+    ],
+    "createdAt": "2025-10-02T01:12:00.727Z"
+  },
+  {
+    "id": "t2gz4up7sN675kePt6Oc",
+    "kode": "K1315",
+    "kodeFreezer": "IDNR2021305510",
+    "createdAt": "2025-10-01T01:37:37.983Z",
+    "nomorWa": "6285726646436",
+    "nama": "ABDUL MUJIB",
+    "jadwalKunjungan": [
+      "rabu"
+    ]
+  },
+  {
+    "id": "tdeA3VNFi7t8G3VWRUm6",
+    "nama": "TOKO SAUDARA",
+    "jadwalKunjungan": [
+      "rabu"
+    ],
+    "kode": "K1916",
+    "kodeFreezer": "IDNR2024309601",
+    "createdAt": "2025-10-01T01:43:00.088Z",
+    "nomorWa": "6281335347912"
+  },
+  {
+    "id": "usLxLxZs3KRwiDECcgTd",
+    "nama": "SUPARNO",
+    "kodeFreezer": "IDNR2021203626",
+    "createdAt": "2025-10-01T01:36:16.448Z",
+    "kode": "K0390",
+    "jadwalKunjungan": [
+      "rabu"
+    ],
+    "nomorWa": "6285646486300"
+  },
+  {
+    "id": "uyiOKpYICdUeSfb42aOn",
+    "jadwalKunjungan": [
+      "rabu"
+    ],
+    "nomorWa": "6285217619579",
+    "kodeFreezer": "IDNR2023311578",
+    "nama": "TOKO SOCHIBATUL MUNAWAROH",
+    "createdAt": "2025-10-01T01:40:16.312Z",
+    "kode": "K1528"
+  },
+  {
+    "id": "wa6cy9OSn1Nt8nknPGk4",
+    "jadwalKunjungan": [
+      "kamis"
+    ],
+    "nomorWa": "628953155775",
+    "nama": "YANI",
+    "createdAt": "2025-10-02T01:20:06.500Z",
+    "kodeFreezer": "IDNR2019403127",
+    "kode": "K0462"
+  },
+  {
+    "id": "xLheMxVZ8I1BWrwmFw48",
+    "nama": "TOKO HALIMAH",
+    "kodeFreezer": "IDN2016031665",
+    "nomorWa": "6282351851385",
+    "createdAt": "2025-10-06T15:15:16.603Z",
+    "jadwalKunjungan": [
+      "selasa"
+    ],
+    "kode": "K1607"
+  },
+  {
+    "id": "xXcBnRjwrKPQNBumnzm6",
+    "kodeFreezer": "IDNR2022304956",
+    "nama": "MASRUKIN",
+    "createdAt": "2025-10-06T15:15:16.603Z",
+    "nomorWa": "6281230441001",
+    "jadwalKunjungan": [
+      "selasa"
+    ],
+    "kode": "K1334"
+  },
+  {
+    "id": "xp0ZRBc7iUKQ0VDFMW5Y",
+    "createdAt": "2025-10-06T15:15:16.603Z",
+    "kodeFreezer": "IDNR2020406909",
+    "jadwalKunjungan": [
+      "selasa"
+    ],
+    "nama": "MBAK YUYUN",
+    "nomorWa": "6285727184671",
+    "kode": "K0379"
+  },
+  {
+    "id": "xzGm4L1aBwzxJUEjFEWG",
+    "jadwalKunjungan": [
+      "kamis"
+    ],
+    "nama": "SD NEGERI 2 PELEMKEREP MAYONG",
+    "nomorWa": "6281335000424",
+    "createdAt": "2025-10-06T15:37:44.701Z",
+    "kode": "K1332",
+    "kodeFreezer": "IDN2016315741"
+  },
+  {
+    "id": "yBsQQkZjVb4f23z50jbC",
+    "fotoToko": "",
+    "nomorWa": "6282226508260",
+    "kodeFreezer": "IDNR2020306489",
+    "longitude": "",
+    "monthlyRewardsClaimed": {},
+    "latitude": "",
+    "kode": "K1127",
+    "mysteryBoxesAwarded": 0,
+    "nama": "ULFA KHASANAH",
+    "totalBoxesOrdered": 0,
+    "createdAt": "2025-10-06T15:52:06.770Z",
+    "jadwalKunjungan": [
+      "selasa"
+    ]
+  },
+  {
+    "id": "yUpqWUQuZmgdXeW3bt5N",
+    "kodeFreezer": "IDNR2023239329",
+    "createdAt": "2025-10-06T01:27:27.222Z",
+    "kode": "K1832",
+    "jadwalKunjungan": [
+      "senin"
+    ],
+    "nomorWa": "6288220363983",
+    "nama": "MUHKAFI"
+  },
+  {
+    "id": "z3pT9BDTtISnQFgCmOtx",
+    "kodeFreezer": "IDNR2024303728",
+    "kode": "K0392",
+    "monthlyRewardsClaimed": {
+      "2025-10": 2
+    },
+    "createdAt": "2025-10-06T15:15:16.603Z",
+    "jadwalKunjungan": [
+      "selasa"
+    ],
+    "nama": "ELLA 3 SMK PUTRI BALEKAMBANG",
+    "nomorWa": "6285877308299"
+  }
+]

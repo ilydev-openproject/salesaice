@@ -1,10 +1,11 @@
 import { useState, useMemo } from 'react';
 import { ArrowLeft, TrendingUp, Calendar, ChevronDown } from 'lucide-react';
-import { format, setMonth, getMonth, setYear, getYear, isSameDay, endOfMonth, addDays } from 'date-fns';
-import { getSalesPeriod } from '../lib/dateUtils'; // Impor fungsi getSalesPeriod
+import { format, setMonth, getMonth, setYear, getYear, isSameDay, endOfMonth, addDays, isValid } from 'date-fns';
+import { getSalesPeriod, normalizeDate } from '../lib/dateUtils'; // Impor fungsi getSalesPeriod dan normalizeDate
 import { id } from 'date-fns/locale';
+import { findProduct } from '../lib/utils'; // Impor helper baru
 
-export default function ProdukTerlarisPage({ produkList, kunjunganList, orderList, setActivePage }) {
+export default function ProdukTerlarisPage({ produkList, orderList, setActivePage }) {
     const [showAll, setShowAll] = useState(false);
 
     // --- PERBAIKAN LOGIKA: Samakan dengan HomePage ---
@@ -17,36 +18,42 @@ export default function ProdukTerlarisPage({ produkList, kunjunganList, orderLis
     const [showMonthDropdown, setShowMonthDropdown] = useState(false);
     const [showYearDropdown, setShowYearDropdown] = useState(false);
 
-    const filteredTransactions = useMemo(() => {
+    const filteredOrders = useMemo(() => {
         // Gunakan getSalesPeriod untuk mendapatkan rentang tanggal yang sesuai dengan logika H+1
-        const { startDate, endDate } = getSalesPeriod(selectedMonth);
+        const { startDate: monthStart, endDate: monthEnd } = getSalesPeriod(selectedMonth);
 
-        return [...kunjunganList, ...orderList].filter((transaction) => {
-            if (!transaction.createdAt?.seconds) return false;
-            const transactionDate = new Date(transaction.createdAt.seconds * 1000);
-            return transactionDate >= startDate && transactionDate <= endDate;
+        return orderList.filter((order) => {
+            const orderDate = normalizeDate(order.createdAt);
+            if (!orderDate || !isValid(orderDate)) return false;
+
+            // Logika yang sama dengan HomePage untuk menangani hari terakhir bulan
+            if (isLastDayOfCalendarMonth) {
+                const nextMonthFirstDay = addDays(monthEnd, 1);
+                return (orderDate >= monthStart && orderDate <= monthEnd) || isSameDay(orderDate, nextMonthFirstDay);
+            }
+            return orderDate >= monthStart && orderDate <= monthEnd;
         });
-    }, [selectedMonth, kunjunganList, orderList]);
+    }, [selectedMonth, orderList]);
 
     const sortedProductSales = useMemo(() => {
         const productSalesMap = new Map();
-        filteredTransactions.forEach((transaction) => {
-            if (transaction.items) {
-                transaction.items.forEach((item) => {
-                    const currentQty = productSalesMap.get(item.productId) || 0;
-                    productSalesMap.set(item.productId, currentQty + (item.qtyBox || 0));
-                });
-            }
+        filteredOrders.forEach((order) => {
+            // Perbaikan: Asumsikan order.items sudah di-parse di App.jsx,
+            // tapi tetap tangani jika null atau undefined.
+            (order.items || []).forEach((item) => {
+                const currentQty = productSalesMap.get(item.productId) || 0;
+                productSalesMap.set(item.productId, currentQty + (item.qtyBox || 0));
+            });
         });
 
         return Array.from(productSalesMap.entries())
             .map(([productId, totalQtyBox]) => {
-                const product = produkList.find((p) => p.id === productId);
+                const product = findProduct(produkList, productId); // Gunakan helper findProduct
                 return product ? { ...product, totalQtyBox } : null;
             })
             .filter(Boolean)
             .sort((a, b) => b.totalQtyBox - a.totalQtyBox);
-    }, [filteredTransactions, produkList]);
+    }, [filteredOrders, produkList]);
 
     const displayedProducts = showAll ? sortedProductSales : sortedProductSales.slice(0, 20);
 

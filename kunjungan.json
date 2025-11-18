@@ -1,0 +1,5002 @@
+[
+  {
+    "id": "0BMBr1Q5H1cJ4jn405ck",
+    "kodeToko": "K1502",
+    "catatan": "",
+    "tokoId": "cBXhRkwzErSSQ2yHFz8H",
+    "items": [],
+    "createdAt": "2025-11-10T06:44:59.000Z",
+    "total": 0,
+    "tokoNama": "TOKO RIZKY OS"
+  },
+  {
+    "id": "0JcKbRgMfrm2DAVvGcnE",
+    "tokoId": "42f4rMSZhOHXH6oYOXMn",
+    "kodeToko": "K1571",
+    "createdAt": "2025-10-03T06:51:51.006Z",
+    "tokoNama": "TOKO KOBER",
+    "total": 0,
+    "items": [],
+    "catatan": ""
+  },
+  {
+    "id": "0KxNUIlwgexG5JrdhnCq",
+    "catatan": "",
+    "createdAt": "2025-10-14T06:57:34.833Z",
+    "total": 0,
+    "items": [],
+    "tokoId": "xXcBnRjwrKPQNBumnzm6",
+    "tokoNama": "MASRUKIN",
+    "kodeToko": "K1334"
+  },
+  {
+    "id": "0c2LkDTd18ssgG5vUjUT",
+    "tokoNama": "AL HUSNA 5 PANCUR",
+    "kodeToko": "K1919",
+    "items": [],
+    "tokoId": "ofWTyzpsse8zoCymsmtO",
+    "createdAt": "2025-10-06T06:24:01.198Z",
+    "catatan": "",
+    "total": 0
+  },
+  {
+    "id": "0eLTGBSwigBYFLgcyI4s",
+    "catatan": "",
+    "tokoId": "yUpqWUQuZmgdXeW3bt5N",
+    "items": [],
+    "createdAt": "2025-11-10T05:55:21.943Z",
+    "tokoNama": "MUHKAFI",
+    "total": 0,
+    "kodeToko": "K1832"
+  },
+  {
+    "id": "0iKFUSXBHKCjEX24lphR",
+    "createdAt": "2025-10-25T06:52:58.891Z",
+    "tokoId": "hX7OpXJoabbPtqfEEJTI",
+    "total": 0,
+    "catatan": "",
+    "tokoNama": "KANTIN PKU MUHAMMADYAH MAYONG",
+    "items": [],
+    "kodeToko": "K0458"
+  },
+  {
+    "id": "10Ofpjir0rNCZVkk98uw",
+    "tokoId": "AkprBUTUqD1gZOpeqLQy",
+    "total": 0,
+    "createdAt": "2025-10-04T05:25:44.583Z",
+    "kodeToko": "K0503",
+    "items": [],
+    "catatan": "",
+    "tokoNama": "AMIN"
+  },
+  {
+    "id": "144Y6pGFCoyX4MIb5ILR",
+    "total": 0,
+    "tokoId": "WbtoNXx8lwUgS8s1ojLR",
+    "createdAt": "2025-10-01T06:32:26.480Z",
+    "catatan": "",
+    "items": [],
+    "tokoNama": "BU ISTIANAH (MTS URWATIL WATSQO)",
+    "kodeToko": "K2066"
+  },
+  {
+    "id": "14KzUZEUnM4dlBmERSHL",
+    "total": 0,
+    "kodeToko": "K1334",
+    "tokoNama": "MASRUKIN",
+    "createdAt": "2025-11-04T05:32:39.356Z",
+    "items": [],
+    "tokoId": "xXcBnRjwrKPQNBumnzm6",
+    "catatan": ""
+  },
+  {
+    "id": "1Iv0Xt8Y47Zj15h8pShW",
+    "createdAt": "2025-10-08T06:57:09.488Z",
+    "items": [],
+    "kodeToko": "K0390",
+    "tokoNama": "SUPARNO",
+    "tokoId": "usLxLxZs3KRwiDECcgTd",
+    "total": 0,
+    "catatan": ""
+  },
+  {
+    "id": "1LU1loUc99zEPYthBagW",
+    "tokoId": "qBgHRkFD88KqnN8yy52I",
+    "items": [],
+    "tokoNama": "SIDO MULYO",
+    "catatan": "",
+    "total": 0,
+    "kodeToko": "K1484",
+    "createdAt": "2025-10-18T06:38:30.240Z"
+  },
+  {
+    "id": "1LiHHiBcyXXcMARiRny2",
+    "kodeToko": "K1128",
+    "items": [],
+    "createdAt": "2025-11-03T07:43:06.318Z",
+    "tokoId": "4m6k3Lx6PkBmmkEOUFc1",
+    "catatan": "",
+    "total": 0,
+    "tokoNama": "AISYA"
+  },
+  {
+    "id": "1NheynIiBJNukvJJ2JT6",
+    "createdAt": "2025-10-16T05:32:23.073Z",
+    "kodeToko": "K0467",
+    "tokoNama": "SUKATI",
+    "items": [],
+    "total": 0,
+    "catatan": "",
+    "tokoId": "7xXpzkyryOEVARIJWA8V"
+  },
+  {
+    "id": "1OMGTRamZfb7CNjRCbMy",
+    "kodeToko": "K1409",
+    "tokoNama": "TOKO BINTANI MART",
+    "total": 0,
+    "items": [],
+    "catatan": "",
+    "tokoId": "Hfn7DH6eAWCVrAkmczwl",
+    "createdAt": "2025-10-29T03:50:21.451Z"
+  },
+  {
+    "id": "1QjBLVU6FiHGEPqTkt9F",
+    "tokoId": "qBgHRkFD88KqnN8yy52I",
+    "tokoNama": "SIDO MULYO",
+    "items": [],
+    "kodeToko": "K1484",
+    "total": 0,
+    "catatan": "",
+    "createdAt": "2025-11-04T05:36:00.835Z"
+  },
+  {
+    "id": "1S1Lh1SAc2uGLUkLp6Su",
+    "items": [],
+    "tokoId": "pfBZeBBflEj9cMD0uZa2",
+    "createdAt": "2025-10-15T10:22:16.685Z",
+    "catatan": "",
+    "kodeToko": "K1154",
+    "tokoNama": "TOKO ALI",
+    "total": 0
+  },
+  {
+    "id": "1Ug4J2EheD5D3GoYVv6e",
+    "createdAt": "2025-11-10T11:00:41.328Z",
+    "catatan": "",
+    "tokoNama": "WINARNO",
+    "kodeToko": "K2021",
+    "total": 0,
+    "items": [],
+    "tokoId": "9uWRqV8KbynkKmi3nulk"
+  },
+  {
+    "id": "1ZzmHIyq3LsgYxUwBTxu",
+    "items": [],
+    "tokoId": "eLh6QEH4U1yPXyxJUerC",
+    "tokoNama": "MUNAWAROH",
+    "kodeToko": "K1121",
+    "createdAt": "2025-11-10T07:31:49.276Z",
+    "catatan": "",
+    "total": 0
+  },
+  {
+    "id": "1d55wq5RhJlEzRnsZWDv",
+    "tokoNama": "ALHUSNA MART",
+    "kodeToko": "K0439",
+    "items": [],
+    "tokoId": "i3vRFtdn75Z0P1RiyJus",
+    "total": 0,
+    "createdAt": "2025-10-10T08:23:40.331Z",
+    "catatan": ""
+  },
+  {
+    "id": "1dgcvPOSmifszHNotFgx",
+    "tokoId": "AiIHhFRAFqyGOx3AgdFI",
+    "kodeToko": "K1867",
+    "total": 0,
+    "tokoNama": "IRWAN CELL",
+    "items": [],
+    "catatan": "",
+    "createdAt": "2025-10-14T06:04:11.424Z"
+  },
+  {
+    "id": "1e7i4nr91u194WP4GGRE",
+    "items": [],
+    "createdAt": "2025-09-30T15:54:08.782Z",
+    "kodeToko": "K1000",
+    "total": 0,
+    "tokoId": "A2C98b49QgAzpp25r8IG",
+    "tokoNama": "MARFUAH",
+    "catatan": ""
+  },
+  {
+    "id": "1jWTNQVQmOC4IXml9ZnH",
+    "kodeToko": "K0366",
+    "tokoId": "BYxFMWDMPNQaGNvbV341",
+    "total": 0,
+    "tokoNama": "TATA MANDIRI",
+    "items": [],
+    "createdAt": "2025-10-08T06:41:51.456Z",
+    "catatan": ""
+  },
+  {
+    "id": "1oOrcC5HueSjRRXoJNgF",
+    "tokoId": "W5T0mkGuUhrS8Xv4nxtZ",
+    "catatan": "",
+    "tokoNama": "SUDARTO",
+    "kodeToko": "K0676",
+    "items": [],
+    "total": 0,
+    "createdAt": "2025-11-06T05:29:19.278Z"
+  },
+  {
+    "id": "1qZgNzy9ZcHVAjie3HLN",
+    "total": 0,
+    "tokoId": "4m6k3Lx6PkBmmkEOUFc1",
+    "items": [],
+    "createdAt": "2025-10-06T06:28:17.999Z",
+    "kodeToko": "K1128",
+    "catatan": "",
+    "tokoNama": "AISYA"
+  },
+  {
+    "id": "2AsAijSRuGksvQw904Xy",
+    "tokoId": "AkprBUTUqD1gZOpeqLQy",
+    "tokoNama": "TOKO IBU AMIN",
+    "catatan": "",
+    "items": [],
+    "total": 0,
+    "createdAt": "2025-11-08T06:54:17.232Z",
+    "kodeToko": "K0503"
+  },
+  {
+    "id": "2CN44ofwulVik6CDLyFE",
+    "total": 0,
+    "tokoNama": "NUR YONO",
+    "createdAt": "2025-11-08T04:46:05.131Z",
+    "tokoId": "rwANC5lfSRpAKV2HzJBj",
+    "items": [],
+    "kodeToko": "K1982",
+    "catatan": ""
+  },
+  {
+    "id": "2Cyp7qxqLSKq044VpIG6",
+    "createdAt": "2025-10-30T04:14:03.839Z",
+    "items": [],
+    "catatan": "",
+    "kodeToko": "K0526",
+    "total": 0,
+    "tokoId": "sSufgeU8YIyZrAOZbEO6",
+    "tokoNama": "SISWANTO"
+  },
+  {
+    "id": "2K7Elq9oSkvZXe0LFdqC",
+    "tokoId": "P3S3LmNnq4sCQ7YUieWO",
+    "kodeToko": "K0352",
+    "createdAt": "2025-11-10T08:53:31.304Z",
+    "catatan": "",
+    "total": 0,
+    "tokoNama": "APOTEK PANCUR",
+    "items": []
+  },
+  {
+    "id": "2R7FGAvvqm09m3xvnnOU",
+    "tokoNama": "SD 3 BUNGU",
+    "catatan": "",
+    "items": [],
+    "createdAt": "2025-11-03T04:14:56.722Z",
+    "kodeToko": "K1787",
+    "tokoId": "nhuEhSvTkbCX7F1rYyfg",
+    "total": 0
+  },
+  {
+    "id": "2Up3cKPzVoHd2aKdoGSU",
+    "items": [],
+    "kodeToko": "K1658",
+    "catatan": "",
+    "total": 0,
+    "createdAt": "2025-10-10T07:48:20.167Z",
+    "tokoNama": "SD IT AL ANWAR",
+    "tokoId": "aKeHRY72jQ8R7GmJIMNH"
+  },
+  {
+    "id": "2pssO1mqGXCJGqyOxuuC",
+    "items": [],
+    "total": 0,
+    "createdAt": "2025-11-08T03:59:01.000Z",
+    "tokoId": "Sd6g46vJ9IKhkDW5DXlf",
+    "tokoNama": "MBAK IS",
+    "catatan": "",
+    "kodeToko": "K0485"
+  },
+  {
+    "id": "2svd4dn19kD057nVweqF",
+    "catatan": "",
+    "items": [],
+    "total": 0,
+    "tokoNama": "MUSYAFAK",
+    "tokoId": "jVJBm18ggKRwQ9dO6sPu",
+    "createdAt": "2025-10-10T06:32:58.839Z",
+    "kodeToko": "K0512"
+  },
+  {
+    "id": "2tY1YaE1xFPgOpwgmpzX",
+    "catatan": "",
+    "tokoNama": "IRWAN CELL",
+    "kodeToko": "K1867",
+    "total": 0,
+    "createdAt": "2025-11-04T05:35:32.824Z",
+    "items": [],
+    "tokoId": "AiIHhFRAFqyGOx3AgdFI"
+  },
+  {
+    "id": "2vsBmbv2yPSf6OnnIWTn",
+    "createdAt": "2025-10-10T07:30:49.633Z",
+    "total": 0,
+    "catatan": "",
+    "items": [],
+    "tokoNama": "TOKO KOBER",
+    "tokoId": "42f4rMSZhOHXH6oYOXMn",
+    "kodeToko": "K1571"
+  },
+  {
+    "id": "31JaQv1VJ7o7sRdG10vi",
+    "tokoId": "aR8hwBYkMccoUYlxzjC7",
+    "items": [],
+    "createdAt": "2025-10-29T04:28:13.000Z",
+    "kodeToko": "-",
+    "total": 0,
+    "tokoNama": "NICE SWALAYAN",
+    "catatan": ""
+  },
+  {
+    "id": "3CBVmqmWpNIG5tbEWrfu",
+    "createdAt": "2025-11-04T05:36:21.437Z",
+    "tokoId": "yBsQQkZjVb4f23z50jbC",
+    "tokoNama": "ULFA KHASANAH",
+    "total": 0,
+    "kodeToko": "K1127",
+    "items": [],
+    "catatan": ""
+  },
+  {
+    "id": "3NqC8F6D7mq66QpNSVRq",
+    "tokoNama": "WARUNG MADURA AL-AMIN 2",
+    "createdAt": "2025-10-23T05:40:42.373Z",
+    "items": [],
+    "tokoId": "LrDGivjSfm58oJ7eILXz",
+    "kodeToko": "K1649",
+    "catatan": "",
+    "total": 0
+  },
+  {
+    "id": "3PD0IqnHEfaVLjujhqKh",
+    "items": [],
+    "tokoNama": "NIKMAT SEMBAKO",
+    "kodeToko": "K1543",
+    "total": 0,
+    "catatan": "",
+    "createdAt": "2025-10-10T03:58:05.914Z",
+    "tokoId": "ZPG57TQu3HgMHFcjJS94"
+  },
+  {
+    "id": "3R1IfEpfrRB3HHFwNKLs",
+    "total": 0,
+    "tokoNama": "ILMA JAYA",
+    "kodeToko": "K1118",
+    "createdAt": "2025-10-07T03:58:08.089Z",
+    "tokoId": "1pS2Vw8a9fu0UurNB4v7",
+    "catatan": "",
+    "items": []
+  },
+  {
+    "id": "3yV7nRUvTMZqK7zvrCJA",
+    "total": 0,
+    "catatan": "",
+    "createdAt": "2025-09-30T15:55:36.865Z",
+    "tokoId": "r0Tw7NkLQD1aajraFOUW",
+    "items": [],
+    "kodeToko": "K1209",
+    "tokoNama": "SRI REJEKI"
+  },
+  {
+    "id": "41QLasgglJLbVav7M1i9",
+    "catatan": "",
+    "total": 0,
+    "kodeToko": "K1614",
+    "items": [],
+    "tokoNama": "M. FAIZUN",
+    "createdAt": "2025-10-10T06:48:57.665Z",
+    "tokoId": "UakrWJWMX4JcwWKopZSl"
+  },
+  {
+    "id": "463xBF8rNQf9cYRbXDMU",
+    "kodeToko": "K1916",
+    "items": [],
+    "tokoNama": "TOKO SAUDARA",
+    "catatan": "",
+    "tokoId": "tdeA3VNFi7t8G3VWRUm6",
+    "total": 0,
+    "createdAt": "2025-10-29T03:21:04.578Z"
+  },
+  {
+    "id": "4C4Rzl3VOE4aerQSAdd4",
+    "total": 0,
+    "items": [],
+    "kodeToko": "K2066",
+    "tokoNama": "BU ISTIANAH ( MTS URWATIL WATSQO )",
+    "catatan": "",
+    "tokoId": "WbtoNXx8lwUgS8s1ojLR",
+    "createdAt": "2025-10-20T02:05:39.958Z"
+  },
+  {
+    "id": "4EmFSt6Da1gYLngLBzjp",
+    "createdAt": "2025-11-03T07:54:54.193Z",
+    "kodeToko": "K0352",
+    "catatan": "",
+    "tokoNama": "APOTEK PANCUR",
+    "tokoId": "P3S3LmNnq4sCQ7YUieWO",
+    "items": [],
+    "total": 0
+  },
+  {
+    "id": "4JEJEKoHYA7HfGy4vF9o",
+    "tokoNama": "MADURA BUNDA",
+    "catatan": "",
+    "total": 0,
+    "createdAt": "2025-10-16T09:33:45.176Z",
+    "items": [],
+    "kodeToko": "K2077",
+    "tokoId": "9pGAxSxQpP97NFr46tWJ"
+  },
+  {
+    "id": "4NElsaJJyKvG9QVVJ3me",
+    "tokoNama": "RIYADLUL QUR'AN",
+    "items": [],
+    "catatan": "",
+    "total": 0,
+    "kodeToko": "K1286",
+    "createdAt": "2025-11-08T03:06:38.146Z",
+    "tokoId": "MBtynOjLtaD7KngRrvOo"
+  },
+  {
+    "id": "4QrP6Pw4r69EFNLIQFY1",
+    "catatan": "",
+    "tokoNama": "Toko Koss Mart",
+    "createdAt": "2025-10-30T05:04:39.429Z",
+    "total": 0,
+    "items": [],
+    "kodeToko": "K2014",
+    "tokoId": "lNRFpK00n4trF3j94v5p"
+  },
+  {
+    "id": "4RI5lBITqJEVZpFmxBMg",
+    "total": 0,
+    "kodeToko": "K1121",
+    "createdAt": "2025-10-27T06:34:37.000Z",
+    "tokoId": "eLh6QEH4U1yPXyxJUerC",
+    "tokoNama": "MUNAWAROH",
+    "items": [],
+    "catatan": ""
+  },
+  {
+    "id": "4WrlQ1Bsjw6xyte7ibST",
+    "kodeToko": "K1409",
+    "items": [],
+    "tokoId": "Hfn7DH6eAWCVrAkmczwl",
+    "catatan": "",
+    "createdAt": "2025-10-22T10:14:11.621Z",
+    "total": 0,
+    "tokoNama": "TOKO BINTANI MART"
+  },
+  {
+    "id": "4kwM1Lt4L1DoFsPdngrU",
+    "tokoNama": "SD 3 MEDINI",
+    "createdAt": "2025-09-30T15:52:59.193Z",
+    "catatan": "",
+    "tokoId": "JIyyabcbkCcvnaispiaO",
+    "items": [],
+    "kodeToko": "K1683",
+    "total": 0
+  },
+  {
+    "id": "4lTCpFo1hRMC6DU8T7qV",
+    "total": 0,
+    "tokoId": "wa6cy9OSn1Nt8nknPGk4",
+    "items": [],
+    "createdAt": "2025-10-09T08:44:50.653Z",
+    "kodeToko": "K0462",
+    "tokoNama": "YANI",
+    "catatan": ""
+  },
+  {
+    "id": "4tzJzTMCDG5AemtbRBWv",
+    "total": 0,
+    "items": [],
+    "tokoId": "ZpXCeOmAOnXDVw7mocUq",
+    "tokoNama": "RESTU",
+    "kodeToko": "K0743",
+    "createdAt": "2025-10-07T05:59:06.456Z",
+    "catatan": ""
+  },
+  {
+    "id": "57m5djLLsvuiH10CqZiR",
+    "items": [],
+    "catatan": "",
+    "createdAt": "2025-10-18T03:39:34.760Z",
+    "tokoNama": "RIYADLUL QUR'AN",
+    "total": 0,
+    "kodeToko": "K1286",
+    "tokoId": "MBtynOjLtaD7KngRrvOo"
+  },
+  {
+    "id": "58VmlsGqSGOSmxoxnWCk",
+    "total": 0,
+    "tokoNama": "SD 3 BUNGU",
+    "items": [],
+    "catatan": "",
+    "kodeToko": "K1787",
+    "createdAt": "2025-10-13T05:07:26.455Z",
+    "tokoId": "nhuEhSvTkbCX7F1rYyfg"
+  },
+  {
+    "id": "5d23KqEh0O6wAymGR29U",
+    "total": 0,
+    "createdAt": "2025-10-04T02:31:47.503Z",
+    "tokoNama": "MI SYUMUSUL HUDA",
+    "catatan": "Semqngka 74\nNanas 4\nJagung 33",
+    "tokoId": "GMtCP1QmCDJ6WK1Fzvee",
+    "items": [],
+    "kodeToko": "K1819"
+  },
+  {
+    "id": "5lVOfYSECMp4djN3i007",
+    "kodeToko": "K1387",
+    "tokoNama": "SMK ISLAM AL HIKMAH MAYONG",
+    "total": 0,
+    "items": [],
+    "createdAt": "2025-11-06T03:07:18.000Z",
+    "catatan": "",
+    "tokoId": "8k5mHDdqhzvAFdnkqWei"
+  },
+  {
+    "id": "628vMGKwTXMvs6KXuy1o",
+    "total": 0,
+    "catatan": "",
+    "tokoId": "OoHRaxncqsL1ElG0jLeK",
+    "items": [],
+    "createdAt": "2025-10-01T06:06:25.122Z",
+    "tokoNama": "TOKO VANIA",
+    "kodeToko": "K1868"
+  },
+  {
+    "id": "6BR94mSJwQBZiMQZbBmE",
+    "createdAt": "2025-10-14T04:00:19.505Z",
+    "catatan": "",
+    "kodeToko": "K1788",
+    "tokoId": "ebebnNTVsoHmjsVzpaxp",
+    "tokoNama": "SD 3 BUARAN",
+    "items": [],
+    "total": 0
+  },
+  {
+    "id": "6CqJm1E0Kgl5ej596x4j",
+    "tokoId": "f2Z73egCvMj4PXs56DKE",
+    "tokoNama": "ENDANG RISTIYOWATI",
+    "kodeToko": "K0532",
+    "total": 0,
+    "items": [],
+    "catatan": "",
+    "createdAt": "2025-11-07T05:04:45.950Z"
+  },
+  {
+    "id": "6NLjuFfqpDFvxi5MWQpM",
+    "items": [],
+    "createdAt": "2025-10-14T04:01:18.409Z",
+    "total": 0,
+    "tokoId": "j5OQBnhs4A8lXEY9aNI4",
+    "catatan": "",
+    "tokoNama": "ELLA 2 KANTIN MTS BALEKAMBANG",
+    "kodeToko": "K0391"
+  },
+  {
+    "id": "6O2xkYaeBXHW15ASYu7V",
+    "createdAt": "2025-10-25T05:21:20.396Z",
+    "tokoNama": "RATU WALI",
+    "items": [],
+    "kodeToko": "K1498",
+    "total": 0,
+    "tokoId": "7l4t8ictEySaPyXnKMDa",
+    "catatan": ""
+  },
+  {
+    "id": "6X8mOY7wDJa6NGj9Fl32",
+    "kodeToko": "K1613",
+    "tokoNama": "ABYAN CAKE",
+    "items": [],
+    "total": 0,
+    "catatan": "",
+    "tokoId": "YPpBOMPT2aukjCk1wvxw",
+    "createdAt": "2025-10-04T06:21:14.106Z"
+  },
+  {
+    "id": "6XIgODBmB3rDefbAkF7b",
+    "items": [],
+    "tokoId": "8qmFIegBFrcChbhUWEP1",
+    "createdAt": "2025-09-30T15:46:36.313Z",
+    "kodeToko": "K1265",
+    "tokoNama": "AZKA JAYA",
+    "catatan": "",
+    "total": 0
+  },
+  {
+    "id": "6klR4gutCoB15jSxXqHc",
+    "total": 0,
+    "tokoNama": "TOKO ANUGERAH",
+    "items": [],
+    "createdAt": "2025-11-03T03:34:33.073Z",
+    "kodeToko": "K1969",
+    "tokoId": "IQtU1AxfLTPqglkim04O",
+    "catatan": ""
+  },
+  {
+    "id": "6vRo03RzvY56iPjCE2FL",
+    "total": 0,
+    "createdAt": "2025-10-21T04:22:57.447Z",
+    "tokoNama": "ILMA JAYA",
+    "tokoId": "1pS2Vw8a9fu0UurNB4v7",
+    "items": [],
+    "catatan": "",
+    "kodeToko": "K1118"
+  },
+  {
+    "id": "71lHQVEjlYXtbjcQxjAg",
+    "tokoNama": "TOKO HALIMAH",
+    "items": [],
+    "createdAt": "2025-10-07T02:36:34.042Z",
+    "total": 0,
+    "catatan": "",
+    "kodeToko": "K1607",
+    "tokoId": "xLheMxVZ8I1BWrwmFw48"
+  },
+  {
+    "id": "73GbhWkKec6Sxt9ls0Ly",
+    "catatan": "",
+    "total": 0,
+    "tokoNama": "FARIDA ERYANTI",
+    "kodeToko": "K2005",
+    "tokoId": "jNgDfhGZ4mVvt8VJrRX7",
+    "items": [],
+    "createdAt": "2025-10-25T03:51:36.282Z"
+  },
+  {
+    "id": "77iHc9NIj1ih0F2cGrkI",
+    "items": [],
+    "tokoNama": "TOKO HAPSARI",
+    "createdAt": "2025-10-16T03:34:35.749Z",
+    "total": 0,
+    "tokoId": "ZwFykP7rgzkf1aJM6g3n",
+    "catatan": "",
+    "kodeToko": "K1936"
+  },
+  {
+    "id": "7E9XmILNzDquzjHOuJyu",
+    "tokoNama": "LINDA ALDINA",
+    "tokoId": "U9xR5JynZ7Jjn3kBAFvc",
+    "createdAt": "2025-09-30T15:45:30.269Z",
+    "items": [],
+    "catatan": "",
+    "kodeToko": "K1401",
+    "total": 0
+  },
+  {
+    "id": "7QZ0YA4UVamTZqhnCZi4",
+    "catatan": "",
+    "kodeToko": "K1599",
+    "items": [],
+    "tokoId": "S3sXgtgCOOvXYK2lhUtV",
+    "createdAt": "2025-10-26T17:00:00.000Z",
+    "tokoNama": "TOKO ZUMAEROH",
+    "total": 0
+  },
+  {
+    "id": "7YksNjhsOToPGE7Y8McT",
+    "createdAt": "2025-11-08T05:23:57.116Z",
+    "tokoNama": "ABIYAN CAKE",
+    "total": 0,
+    "kodeToko": "K1613",
+    "tokoId": "YPpBOMPT2aukjCk1wvxw",
+    "catatan": "",
+    "items": []
+  },
+  {
+    "id": "7f791TjhkNfuzKvRnWgO",
+    "total": 0,
+    "tokoId": "MBtynOjLtaD7KngRrvOo",
+    "createdAt": "2025-10-11T03:28:35.514Z",
+    "tokoNama": "RIYADLUL QUR'AN",
+    "catatan": "",
+    "kodeToko": "K1286",
+    "items": []
+  },
+  {
+    "id": "7s7jC0JswKHPJ8WPHPtV",
+    "createdAt": "2025-10-07T08:35:56.538Z",
+    "kodeToko": "K0373",
+    "total": 0,
+    "tokoNama": "MADUN",
+    "tokoId": "ImE48v9OEwbSNMRIb16y",
+    "catatan": "",
+    "items": []
+  },
+  {
+    "id": "81K02sKYihj6seMuB9mS",
+    "kodeToko": "K1649",
+    "tokoNama": "WARUNG MADURA AL AMIN 2",
+    "catatan": "",
+    "tokoId": "LrDGivjSfm58oJ7eILXz",
+    "total": 0,
+    "items": [],
+    "createdAt": "2025-10-02T05:27:55.370Z"
+  },
+  {
+    "id": "84rzTQousbpGU5QicsK8",
+    "items": [],
+    "catatan": "",
+    "kodeToko": "K0526",
+    "tokoId": "sSufgeU8YIyZrAOZbEO6",
+    "createdAt": "2025-10-02T07:29:27.042Z",
+    "tokoNama": "SISWANTO",
+    "total": 0
+  },
+  {
+    "id": "86X2xC2AiyHsFCdKmBUd",
+    "kodeToko": "K0743",
+    "tokoId": "ZpXCeOmAOnXDVw7mocUq",
+    "createdAt": "2025-10-14T05:21:26.100Z",
+    "tokoNama": "RESTU",
+    "items": [],
+    "total": 0,
+    "catatan": ""
+  },
+  {
+    "id": "8NfCdHHdeGl3JeHjP5LP",
+    "catatan": "",
+    "kodeToko": "K1787",
+    "tokoNama": "SD 3 BUNGU",
+    "total": 0,
+    "tokoId": "nhuEhSvTkbCX7F1rYyfg",
+    "items": [],
+    "createdAt": "2025-11-10T05:18:40.858Z"
+  },
+  {
+    "id": "8XGiFeKOSM4zTI71QyaH",
+    "catatan": "",
+    "items": [],
+    "createdAt": "2025-11-04T04:13:11.526Z",
+    "kodeToko": "K1987",
+    "tokoNama": "NOR AMIN MAHMUD",
+    "total": 0,
+    "tokoId": "CfKdWWsPbcqw3KjtwI29"
+  },
+  {
+    "id": "8gy1yiXg85ex6vKtcOyO",
+    "kodeToko": "K1684",
+    "catatan": "",
+    "tokoNama": "SD 2 SAMBUNG",
+    "tokoId": "5k0IiX8BPmDGfqaE43fc",
+    "createdAt": "2025-09-30T15:55:16.864Z",
+    "items": [],
+    "total": 0
+  },
+  {
+    "id": "8ySDmdiYiSQvqJeNVgJs",
+    "tokoNama": "WAKHIDATUS SHOLEHAH",
+    "catatan": "",
+    "createdAt": "2025-10-04T05:26:32.013Z",
+    "total": 0,
+    "items": [],
+    "kodeToko": "K1923",
+    "tokoId": "kHooCaS0ksQrVzljSVVi"
+  },
+  {
+    "id": "9MPQY2n6k36L9iHUjam9",
+    "tokoId": "UrH2f6s6EPPQrYHqN6CP",
+    "createdAt": "2025-09-30T15:52:41.083Z",
+    "items": [],
+    "tokoNama": "ASROFI",
+    "catatan": "",
+    "total": 0,
+    "kodeToko": "K0425"
+  },
+  {
+    "id": "9Mssw7j9jYXODcpV1sQZ",
+    "createdAt": "2025-10-08T04:52:41.818Z",
+    "tokoNama": "TOKO VIANA",
+    "kodeToko": "K1911",
+    "total": 0,
+    "tokoId": "878SE6zfogSZSvQEzaQC",
+    "catatan": "",
+    "items": []
+  },
+  {
+    "id": "9NW6jrqiDNoJui19CvcL",
+    "kodeToko": "K1500",
+    "tokoNama": "TOKO SHERLY",
+    "total": 0,
+    "createdAt": "2025-10-22T04:02:05.187Z",
+    "tokoId": "VktFHlWljj8CqZVnsjtM",
+    "items": [],
+    "catatan": ""
+  },
+  {
+    "id": "9TQ1Nl3LU2GtCOdKti3Z",
+    "total": 0,
+    "kodeToko": "K1298",
+    "tokoNama": "SAMI JF MART",
+    "items": [],
+    "tokoId": "LjHKUWJDhaxyFOLArIdi",
+    "createdAt": "2025-10-30T09:41:09.095Z",
+    "catatan": ""
+  },
+  {
+    "id": "9rvthw1Lo29DSjCp2MGk",
+    "items": [],
+    "tokoId": "UakrWJWMX4JcwWKopZSl",
+    "kodeToko": "K1614",
+    "tokoNama": "M. FAIZUN",
+    "catatan": "",
+    "createdAt": "2025-11-07T09:11:08.264Z",
+    "total": 0
+  },
+  {
+    "id": "A2HLJQtLjrG5lIYioWf4",
+    "items": [],
+    "catatan": "",
+    "kodeToko": "K1923",
+    "tokoNama": "WAKHIDATUS SHOLEKHAH",
+    "createdAt": "2025-11-01T03:32:18.976Z",
+    "tokoId": "kHooCaS0ksQrVzljSVVi",
+    "total": 0
+  },
+  {
+    "id": "AB23qhjvBughkOYMJE9R",
+    "kodeToko": "K2021",
+    "items": [],
+    "tokoId": "9uWRqV8KbynkKmi3nulk",
+    "tokoNama": "WINARNO",
+    "total": 0,
+    "createdAt": "2025-10-10T09:05:07.657Z",
+    "catatan": ""
+  },
+  {
+    "id": "AC1tuuFS7rtEfzrXfVCI",
+    "items": [],
+    "tokoId": "YPpBOMPT2aukjCk1wvxw",
+    "kodeToko": "K1613",
+    "createdAt": "2025-11-01T04:08:35.284Z",
+    "total": 0,
+    "catatan": "",
+    "tokoNama": "ABIYAN CAKE"
+  },
+  {
+    "id": "ADm9Wdb9YMItkcmrYxMh",
+    "tokoNama": "SDN 1 BAKALAN ( TOKO SEMBAKO AHLIS )",
+    "tokoId": "Djb9VhTmktwIGcPkALLf",
+    "items": [],
+    "createdAt": "2025-10-03T08:08:45.862Z",
+    "catatan": "",
+    "total": 0,
+    "kodeToko": "K2015"
+  },
+  {
+    "id": "AKN3CGzguNkXD8oWp9nq",
+    "kodeToko": "K1816",
+    "items": [],
+    "tokoId": "hrGSsYjRN0DC2i3QPnxO",
+    "total": 0,
+    "createdAt": "2025-10-03T08:42:36.094Z",
+    "tokoNama": "TOKO RAHMAT",
+    "catatan": ""
+  },
+  {
+    "id": "ALYtzFdUZuANvcUnfetn",
+    "tokoNama": "TOKO ZUMAEROH",
+    "kodeToko": "K1599",
+    "total": 0,
+    "tokoId": "S3sXgtgCOOvXYK2lhUtV",
+    "catatan": "",
+    "items": [],
+    "createdAt": "2025-11-03T03:34:40.920Z"
+  },
+  {
+    "id": "ARUViF3dQLj4T0jQqsBj",
+    "catatan": "",
+    "tokoId": "6pw30ZdwX1mjmVnAvMaL",
+    "total": 0,
+    "kodeToko": "K1725",
+    "createdAt": "2025-10-29T06:48:36.991Z",
+    "items": [],
+    "tokoNama": "TOKO MBAK RINI"
+  },
+  {
+    "id": "AYXNKEbURRfkLflAyJdo",
+    "tokoNama": "LAKSITA SWALAYAN",
+    "tokoId": "pfVW6jSIplI2WXaQvEB7",
+    "total": 0,
+    "kodeToko": "K2101",
+    "items": [],
+    "createdAt": "2025-10-16T09:33:35.103Z",
+    "catatan": ""
+  },
+  {
+    "id": "Ae2E2SpepZCksHngqmFE",
+    "tokoNama": "TOKO IBU AMIN",
+    "kodeToko": "K0503",
+    "catatan": "",
+    "createdAt": "2025-11-08T03:58:52.378Z",
+    "tokoId": "AkprBUTUqD1gZOpeqLQy",
+    "total": 0,
+    "items": []
+  },
+  {
+    "id": "AgZB8R0tgR62sz0Q9sq9",
+    "catatan": "",
+    "tokoId": "IrbkzdFUGCvAzQv01tks",
+    "createdAt": "2025-10-23T03:00:02.107Z",
+    "tokoNama": "KANTIN SMA AL HIKMAH",
+    "total": 0,
+    "items": [],
+    "kodeToko": "K0525"
+  },
+  {
+    "id": "Akx298jsZRIcmiOheKgQ",
+    "tokoNama": "TOKO BINTANI MART",
+    "total": 0,
+    "catatan": "",
+    "tokoId": "Hfn7DH6eAWCVrAkmczwl",
+    "createdAt": "2025-10-15T10:22:23.908Z",
+    "items": [],
+    "kodeToko": "K1409"
+  },
+  {
+    "id": "AugHcIzxGjWXXnPELZWV",
+    "items": [],
+    "tokoId": "i3vRFtdn75Z0P1RiyJus",
+    "catatan": "",
+    "kodeToko": "K0439",
+    "total": 0,
+    "createdAt": "2025-11-01T05:18:57.668Z",
+    "tokoNama": "ALHUSNA MART"
+  },
+  {
+    "id": "B1JN1bVl7XxzUHLgiPFr",
+    "kodeToko": "K1916",
+    "tokoNama": "TOKO SAUDARA",
+    "createdAt": "2025-11-05T03:21:02.905Z",
+    "items": [],
+    "tokoId": "tdeA3VNFi7t8G3VWRUm6",
+    "catatan": "",
+    "total": 0
+  },
+  {
+    "id": "B7vA2TsgvghLQUATULXz",
+    "catatan": "",
+    "total": 0,
+    "createdAt": "2025-10-09T10:38:34.254Z",
+    "items": [],
+    "kodeToko": "K1018",
+    "tokoId": "QHP3VKx7Xl66YirpJdsY",
+    "tokoNama": "YANI 2"
+  },
+  {
+    "id": "B9nPVpBBkpV7rzLparZ5",
+    "tokoNama": "TOKO LISA",
+    "total": 0,
+    "createdAt": "2025-10-16T08:03:18.480Z",
+    "catatan": "",
+    "items": [],
+    "tokoId": "d2fNqoVzXHxTmpY3E8v6",
+    "kodeToko": "K1899"
+  },
+  {
+    "id": "BIGD28RWJcIvNkoyvefl",
+    "kodeToko": "K0392",
+    "tokoNama": "ELLA 3 SMK PUTRI BALEKAMBANG",
+    "total": 0,
+    "catatan": "",
+    "createdAt": "2025-10-07T09:59:49.359Z",
+    "items": [],
+    "tokoId": "z3pT9BDTtISnQFgCmOtx"
+  },
+  {
+    "id": "BP7hPrMD2lzs4dPgu63F",
+    "tokoId": "t2gz4up7sN675kePt6Oc",
+    "total": 0,
+    "catatan": "",
+    "kodeToko": "K1315",
+    "createdAt": "2025-11-05T06:11:02.616Z",
+    "tokoNama": "ABDUL MUJIB",
+    "items": []
+  },
+  {
+    "id": "BUqHPPImvQMhBz3Rw7ZG",
+    "kodeToko": "K1323",
+    "items": [],
+    "createdAt": "2025-10-20T05:16:07.819Z",
+    "tokoId": "R1Nb2wQKva33PYzOOokI",
+    "total": 0,
+    "tokoNama": "TOKO PAK MUL",
+    "catatan": ""
+  },
+  {
+    "id": "BVDqGnkuzxaBTPV5XBRI",
+    "catatan": "",
+    "createdAt": "2025-11-08T06:54:24.175Z",
+    "kodeToko": "K1534",
+    "items": [],
+    "tokoId": "HsBqJ8NfGtWtPy4dtOUp",
+    "total": 0,
+    "tokoNama": "TRANSIT MART 2"
+  },
+  {
+    "id": "BVwcpQc82j1aVlybepQ0",
+    "createdAt": "2025-10-09T09:21:16.410Z",
+    "total": 0,
+    "catatan": "",
+    "tokoId": "YfBQlzNngeGfMuvgAEuJ",
+    "tokoNama": "BERKAH SHOLAWAT",
+    "kodeToko": "K1476",
+    "items": []
+  },
+  {
+    "id": "Bk5WjD87TMzP05TjoqBk",
+    "total": 0,
+    "kodeToko": "K1502",
+    "createdAt": "2025-10-06T08:00:05.671Z",
+    "tokoNama": "TOKO RIZKY OS",
+    "items": [],
+    "tokoId": "cBXhRkwzErSSQ2yHFz8H",
+    "catatan": ""
+  },
+  {
+    "id": "BmeZjqIA5OCELVuL4bWU",
+    "catatan": "",
+    "kodeToko": "K2015",
+    "tokoNama": "SDN 1 BAKALAN ( TOKO SEMBAKO AHLIS )",
+    "tokoId": "Djb9VhTmktwIGcPkALLf",
+    "createdAt": "2025-10-31T03:52:03.000Z",
+    "items": [],
+    "total": 0
+  },
+  {
+    "id": "BrotJjxu9tckEU9XEI19",
+    "catatan": "",
+    "kodeToko": "K0991",
+    "total": 0,
+    "tokoId": "e3G6RcX2g2UHxpjV4Pem",
+    "items": [],
+    "createdAt": "2025-11-01T04:51:44.468Z",
+    "tokoNama": "PONPES MAYONG/ AL ISHOM"
+  },
+  {
+    "id": "Bx67Ch6HLUeTt4Cn7AFf",
+    "items": [],
+    "total": 0,
+    "createdAt": "2025-10-09T03:00:22.171Z",
+    "catatan": "",
+    "tokoId": "8k5mHDdqhzvAFdnkqWei",
+    "tokoNama": "SMK ISLAM AL HIKMAH MAYONG",
+    "kodeToko": "K1387"
+  },
+  {
+    "id": "C6S6OCxIPakfk4fH9CFw",
+    "kodeToko": "K0991",
+    "tokoId": "e3G6RcX2g2UHxpjV4Pem",
+    "createdAt": "2025-11-08T05:41:32.174Z",
+    "total": 0,
+    "tokoNama": "PONPES MAYONG/ AL ISHOM",
+    "catatan": "",
+    "items": []
+  },
+  {
+    "id": "CDdG8mepslwOyHRBTipg",
+    "total": 0,
+    "tokoNama": "RONDHI ARDIYANTO",
+    "kodeToko": "K0936",
+    "items": [],
+    "createdAt": "2025-10-27T04:35:57.402Z",
+    "catatan": "",
+    "tokoId": "rZ5BOP8Og7Zb2P9x4xE6"
+  },
+  {
+    "id": "CVB29uMGJDNvMFwDqKGm",
+    "kodeToko": "K0462",
+    "tokoId": "wa6cy9OSn1Nt8nknPGk4",
+    "createdAt": "2025-10-16T06:47:26.904Z",
+    "tokoNama": "YANI",
+    "items": [],
+    "total": 0,
+    "catatan": ""
+  },
+  {
+    "id": "CiiAZRTEgyCoyc7dy0TG",
+    "tokoId": "z3pT9BDTtISnQFgCmOtx",
+    "tokoNama": "ELLA 3 SMK PUTRI BALEKAMBANG",
+    "createdAt": "2025-10-14T09:44:24.865Z",
+    "catatan": "",
+    "items": [],
+    "kodeToko": "K0392",
+    "total": 0
+  },
+  {
+    "id": "Cu0MncE3lMY4rFFwBaKK",
+    "total": 0,
+    "tokoNama": "SEJAHTERA FROZEN FOOD",
+    "kodeToko": "K1854",
+    "createdAt": "2025-10-02T03:57:22.544Z",
+    "items": [],
+    "catatan": "",
+    "tokoId": "0nchyPCKCX7ahDdo6icy"
+  },
+  {
+    "id": "CwQuVG1fIqUzvZtUvs4S",
+    "createdAt": "2025-10-23T02:17:41.209Z",
+    "kodeToko": "K1387",
+    "total": 0,
+    "catatan": "",
+    "items": [],
+    "tokoId": "8k5mHDdqhzvAFdnkqWei",
+    "tokoNama": "SMK ISLAM AL HIKMAH MAYONG"
+  },
+  {
+    "id": "CzprzIRfGMp0wOOVPFTW",
+    "tokoNama": "PUTRA / ADE ZONE",
+    "kodeToko": "K1480",
+    "createdAt": "2025-10-16T05:32:16.521Z",
+    "total": 0,
+    "items": [],
+    "catatan": "",
+    "tokoId": "36KgS7wC1Qnude8tPEJW"
+  },
+  {
+    "id": "D2e8txCzGE84vz31DWqo",
+    "tokoId": "gHbbLlkgBIfTYKv7O0G6",
+    "tokoNama": "TOSERBA JIWA MART",
+    "kodeToko": "K2008",
+    "total": 0,
+    "items": [],
+    "catatan": "",
+    "createdAt": "2025-10-14T07:34:40.601Z"
+  },
+  {
+    "id": "DLFfWbu2fhXqERxt6hFR",
+    "tokoId": "hWaUvcWJzlPMr3hZZqH7",
+    "catatan": "",
+    "createdAt": "2025-11-06T06:28:03.941Z",
+    "items": [],
+    "total": 0,
+    "tokoNama": "LINAWATI SMU MUH 2",
+    "kodeToko": "K1197"
+  },
+  {
+    "id": "DgMUP4FdxBwQQtvOkfzQ",
+    "createdAt": "2025-10-16T04:00:42.104Z",
+    "tokoId": "IrbkzdFUGCvAzQv01tks",
+    "catatan": "",
+    "items": [],
+    "tokoNama": "KANTIN SMA AL HIKMAH",
+    "total": 0,
+    "kodeToko": "K0525"
+  },
+  {
+    "id": "Dgmk0WvovulN7u5AgSh1",
+    "total": 0,
+    "createdAt": "2025-10-12T04:09:13.590Z",
+    "items": [],
+    "tokoId": "YPpBOMPT2aukjCk1wvxw",
+    "tokoNama": "ABIYAN CAKE",
+    "catatan": "",
+    "kodeToko": "K1613"
+  },
+  {
+    "id": "DhqmOZizyAgm6RG83jaN",
+    "total": 0,
+    "items": [],
+    "tokoNama": "MBAK IS",
+    "createdAt": "2025-11-01T03:33:03.014Z",
+    "catatan": "",
+    "kodeToko": "K0485",
+    "tokoId": "Sd6g46vJ9IKhkDW5DXlf"
+  },
+  {
+    "id": "Dov8AS3MQnyEOUemmt5l",
+    "tokoNama": "AISYA",
+    "items": [],
+    "tokoId": "4m6k3Lx6PkBmmkEOUFc1",
+    "createdAt": "2025-10-27T06:05:33.759Z",
+    "total": 0,
+    "catatan": "",
+    "kodeToko": "K1128"
+  },
+  {
+    "id": "E2XZTiPnL92BCcmoKVpS",
+    "kodeToko": "K1498",
+    "items": [],
+    "tokoId": "7l4t8ictEySaPyXnKMDa",
+    "catatan": "",
+    "tokoNama": "RATU WALI",
+    "total": 0,
+    "createdAt": "2025-11-08T05:41:25.902Z"
+  },
+  {
+    "id": "E4CcA8O6TAp0jv0MrwKN",
+    "kodeToko": "K1943",
+    "total": 0,
+    "tokoNama": "TOKO BU MUSRIFAH",
+    "createdAt": "2025-10-21T09:06:37.407Z",
+    "catatan": "",
+    "tokoId": "1JROdrCwYQFtHPCZ63RC",
+    "items": []
+  },
+  {
+    "id": "EHr3rpJAXt2pBOfT9H50",
+    "createdAt": "2025-10-21T02:47:27.922Z",
+    "total": 0,
+    "items": [],
+    "tokoNama": "TOKO HALIMAH",
+    "tokoId": "xLheMxVZ8I1BWrwmFw48",
+    "catatan": "",
+    "kodeToko": "K1607"
+  },
+  {
+    "id": "EK45RKYHRPow4dY3ohxj",
+    "total": 0,
+    "kodeToko": "K1916",
+    "items": [],
+    "catatan": "",
+    "tokoId": "tdeA3VNFi7t8G3VWRUm6",
+    "tokoNama": "TOKO SAUDARA",
+    "createdAt": "2025-10-08T05:44:38.337Z"
+  },
+  {
+    "id": "ESrBJ1QDyNnGgDgEcJAu",
+    "catatan": "",
+    "tokoId": "jVJBm18ggKRwQ9dO6sPu",
+    "items": [],
+    "tokoNama": "MUSYAFAK",
+    "kodeToko": "K0512",
+    "total": 0,
+    "createdAt": "2025-11-07T07:04:13.000Z"
+  },
+  {
+    "id": "EcIJoJiBsILSTByAiCvZ",
+    "kodeToko": "K1154",
+    "items": [],
+    "tokoId": "pfBZeBBflEj9cMD0uZa2",
+    "createdAt": "2025-10-08T10:24:34.097Z",
+    "tokoNama": "TOKO ALI",
+    "catatan": "",
+    "total": 0
+  },
+  {
+    "id": "EddJmAnYJIFdqR8u5e7Z",
+    "catatan": "",
+    "total": 0,
+    "tokoId": "xzGm4L1aBwzxJUEjFEWG",
+    "kodeToko": "K1332",
+    "items": [],
+    "createdAt": "2025-10-23T02:06:19.881Z",
+    "tokoNama": "SD NEGERI 2 PELEMKEREP MAYONG"
+  },
+  {
+    "id": "Epzg9bOx9XI9JpaVIxdb",
+    "tokoId": "z3pT9BDTtISnQFgCmOtx",
+    "kodeToko": "K0392",
+    "tokoNama": "ELLA 3 SMK PUTRI BALEKAMBANG",
+    "catatan": "",
+    "total": 0,
+    "createdAt": "2025-10-21T09:08:10.280Z",
+    "items": []
+  },
+  {
+    "id": "ErGBck3Ayvst4amqbllj",
+    "catatan": "",
+    "createdAt": "2025-10-22T10:07:12.857Z",
+    "kodeToko": "K0661",
+    "tokoId": "I2ckekmi55nhDdQ2RGZn",
+    "items": [],
+    "total": 0,
+    "tokoNama": "KHUDIN"
+  },
+  {
+    "id": "EvigGd4gHMokPoqAw8Nv",
+    "tokoId": "bEH9JBG9XfbqU2R8PKNC",
+    "items": [],
+    "tokoNama": "MUNTATIAH",
+    "createdAt": "2025-10-08T03:24:24.100Z",
+    "kodeToko": "K1366",
+    "total": 0,
+    "catatan": ""
+  },
+  {
+    "id": "F0mMOqw1hoyzYmGKBv4U",
+    "tokoId": "yUpqWUQuZmgdXeW3bt5N",
+    "total": 0,
+    "tokoNama": "MUHKAFI",
+    "kodeToko": "K1832",
+    "createdAt": "2025-10-06T08:16:34.658Z",
+    "items": [],
+    "catatan": ""
+  },
+  {
+    "id": "F0n8HNM609XE139j9ReD",
+    "catatan": "",
+    "createdAt": "2025-10-14T03:11:59.757Z",
+    "total": 0,
+    "tokoNama": "MBAK YUYUN",
+    "kodeToko": "K0379",
+    "tokoId": "xp0ZRBc7iUKQ0VDFMW5Y",
+    "items": []
+  },
+  {
+    "id": "FD0FCsF1WsGQXfsxEPeu",
+    "catatan": "",
+    "tokoId": "B432NajzpIiYQHMjsajM",
+    "createdAt": "2025-10-11T05:51:12.763Z",
+    "items": [],
+    "kodeToko": "K0721",
+    "tokoNama": "ALIYA CELL",
+    "total": 0
+  },
+  {
+    "id": "FDDE1JdYCeTWN63LJhbz",
+    "tokoNama": "MADURA BUNDA",
+    "catatan": "",
+    "total": 0,
+    "tokoId": "9pGAxSxQpP97NFr46tWJ",
+    "kodeToko": "K2077",
+    "createdAt": "2025-10-03T05:10:43.980Z",
+    "items": []
+  },
+  {
+    "id": "FJUVG10YfrIKeEKfQ4oz",
+    "items": [],
+    "catatan": "",
+    "createdAt": "2025-10-11T03:28:53.233Z",
+    "tokoId": "kHooCaS0ksQrVzljSVVi",
+    "kodeToko": "K1923",
+    "tokoNama": "WAKHIDATUS SHOLEKHAH",
+    "total": 0
+  },
+  {
+    "id": "FVR5ikw92FXN0tcJeZOE",
+    "items": [],
+    "total": 0,
+    "catatan": "",
+    "tokoNama": "TOKO HAPSARI",
+    "createdAt": "2025-10-09T03:46:21.082Z",
+    "kodeToko": "K1936",
+    "tokoId": "ZwFykP7rgzkf1aJM6g3n"
+  },
+  {
+    "id": "FaxfH3wIqOauBgFtEdq6",
+    "kodeToko": "K2021",
+    "items": [],
+    "catatan": "",
+    "tokoNama": "WINARNO",
+    "tokoId": "9uWRqV8KbynkKmi3nulk",
+    "total": 0,
+    "createdAt": "2025-10-24T17:00:00.000Z"
+  },
+  {
+    "id": "FrJVftJxKWtcg2OonbiE",
+    "createdAt": "2025-10-17T04:00:09.904Z",
+    "kodeToko": "K0502",
+    "catatan": "",
+    "tokoNama": "DEWI",
+    "tokoId": "prsjnt4eZWb4sKtsXAOd",
+    "items": [],
+    "total": 0
+  },
+  {
+    "id": "GnfooWfaMyaSBFgtvldn",
+    "tokoNama": "SUMUK CELL",
+    "kodeToko": "K0504",
+    "items": [],
+    "catatan": "",
+    "createdAt": "2025-10-03T06:16:25.463Z",
+    "tokoId": "97dQ3fc5oJLPHPNSZvPe",
+    "total": 0
+  },
+  {
+    "id": "GqqOIgsRAYsiAGsbUA4h",
+    "createdAt": "2025-10-04T06:44:58.869Z",
+    "kodeToko": "K1555",
+    "tokoId": "Al3wNMsqeYtsyijq1Fvh",
+    "tokoNama": "KOPERASI AL ALAWY",
+    "catatan": "",
+    "total": 0,
+    "items": []
+  },
+  {
+    "id": "GrEB2PGDOV8L44XNpoUn",
+    "items": [],
+    "total": 0,
+    "tokoNama": "NIKMAT SEMBAKO",
+    "kodeToko": "K1543",
+    "createdAt": "2025-11-07T03:26:14.087Z",
+    "tokoId": "ZPG57TQu3HgMHFcjJS94",
+    "catatan": ""
+  },
+  {
+    "id": "GtM8bUyiBqFX9yc7BVqt",
+    "createdAt": "2025-11-10T10:09:34.794Z",
+    "items": [],
+    "tokoNama": "SAMILATUN KHASANAH",
+    "catatan": "",
+    "total": 0,
+    "tokoId": "Yqbds11ik7n7cnIbAlyj",
+    "kodeToko": "K1945"
+  },
+  {
+    "id": "H3szl6UGHFKSkTnxK52k",
+    "kodeToko": "K0367",
+    "total": 0,
+    "tokoId": "XiCglP9CSUbM0jrjNHny",
+    "tokoNama": "TIGA SAUDARA",
+    "catatan": "",
+    "createdAt": "2025-10-06T08:45:16.648Z",
+    "items": []
+  },
+  {
+    "id": "H4w7ql4qnB7XYWmgqJ3u",
+    "items": [],
+    "tokoNama": "TOKO PAK MUL",
+    "tokoId": "R1Nb2wQKva33PYzOOokI",
+    "catatan": "",
+    "kodeToko": "K1323",
+    "createdAt": "2025-10-06T05:48:59.091Z",
+    "total": 0
+  },
+  {
+    "id": "H7mkXjQ6mWYtb1txtAbb",
+    "catatan": "",
+    "tokoNama": "SD 1 BUARAN MAYONG",
+    "kodeToko": "K1751",
+    "total": 0,
+    "createdAt": "2025-10-28T04:39:14.572Z",
+    "items": [],
+    "tokoId": "NKsOqczLvbzUQOrPcTvY"
+  },
+  {
+    "id": "HCniS07snWXNFIv2x2Ci",
+    "items": [],
+    "kodeToko": "K1018",
+    "total": 0,
+    "tokoId": "QHP3VKx7Xl66YirpJdsY",
+    "createdAt": "2025-10-30T06:38:48.961Z",
+    "catatan": "",
+    "tokoNama": "YANI 2"
+  },
+  {
+    "id": "HLg1iZf81uHTVF5nXqOz",
+    "createdAt": "2025-11-07T06:33:57.000Z",
+    "kodeToko": "K0504",
+    "tokoId": "97dQ3fc5oJLPHPNSZvPe",
+    "items": [],
+    "tokoNama": "SUMUK CELL",
+    "total": 0,
+    "catatan": ""
+  },
+  {
+    "id": "HPJMIKsf0cqIeSUH4jHW",
+    "tokoId": "uyiOKpYICdUeSfb42aOn",
+    "kodeToko": "K1528",
+    "createdAt": "2025-10-15T09:17:57.236Z",
+    "items": [],
+    "tokoNama": "TOKO SOCHIBATUL MUNAWAROH",
+    "catatan": "",
+    "total": 0
+  },
+  {
+    "id": "HU917UHOS5yrPwjEt8Mr",
+    "kodeToko": "K0462",
+    "createdAt": "2025-10-23T08:09:06.200Z",
+    "total": 0,
+    "catatan": "",
+    "tokoNama": "YANI",
+    "items": [],
+    "tokoId": "wa6cy9OSn1Nt8nknPGk4"
+  },
+  {
+    "id": "HW0SENl8GneMjuZiKxTy",
+    "tokoId": "R1Nb2wQKva33PYzOOokI",
+    "total": 0,
+    "items": [],
+    "catatan": "",
+    "tokoNama": "TOKO PAK MUL",
+    "createdAt": "2025-11-10T05:55:14.323Z",
+    "kodeToko": "K1323"
+  },
+  {
+    "id": "HWTtf7l91kyfAxPVeGhh",
+    "createdAt": "2025-11-04T05:58:32.916Z",
+    "total": 0,
+    "items": [],
+    "tokoId": "aYAbEMlBicLREQd8m70C",
+    "tokoNama": "MARYATI",
+    "catatan": "",
+    "kodeToko": "K0378"
+  },
+  {
+    "id": "HmE8mCLxKEuFH4poVHel",
+    "tokoId": "yBsQQkZjVb4f23z50jbC",
+    "createdAt": "2025-10-28T07:02:54.271Z",
+    "items": [],
+    "total": 0,
+    "kodeToko": "K1127",
+    "tokoNama": "ULFA KHASANAH",
+    "catatan": ""
+  },
+  {
+    "id": "HrEbLbi1iYcKqKOnqRRb",
+    "createdAt": "2025-11-06T04:33:51.089Z",
+    "items": [],
+    "kodeToko": "K2005",
+    "tokoNama": "FARIDA ERYANTI",
+    "catatan": "",
+    "tokoId": "jNgDfhGZ4mVvt8VJrRX7",
+    "total": 0
+  },
+  {
+    "id": "HwTOqylLM6rdwvp3O0kt",
+    "createdAt": "2025-10-15T05:37:36.363Z",
+    "items": [],
+    "tokoId": "OoHRaxncqsL1ElG0jLeK",
+    "tokoNama": "TOKO VANIA",
+    "catatan": "",
+    "total": 0,
+    "kodeToko": "K1868"
+  },
+  {
+    "id": "I0qrbWKNDVcuDuO8jCP1",
+    "tokoNama": "NUR AFIDAH",
+    "items": [],
+    "kodeToko": "K1278",
+    "createdAt": "2025-11-04T04:13:05.501Z",
+    "tokoId": "O8g9w3lNqdo3pRpC2pwY",
+    "total": 0,
+    "catatan": ""
+  },
+  {
+    "id": "I62rUGxWsJN7RPUK5EMO",
+    "catatan": "",
+    "kodeToko": "K1599",
+    "total": 0,
+    "tokoNama": "TOKO ZUMAEROH",
+    "tokoId": "S3sXgtgCOOvXYK2lhUtV",
+    "createdAt": "2025-11-10T04:10:47.218Z",
+    "items": []
+  },
+  {
+    "id": "ILG2tqIkR7Md649Mz7kZ",
+    "items": [],
+    "createdAt": "2025-10-30T05:23:25.665Z",
+    "catatan": "",
+    "total": 0,
+    "kodeToko": "K2005",
+    "tokoId": "jNgDfhGZ4mVvt8VJrRX7",
+    "tokoNama": "FARIDA ERYANTI"
+  },
+  {
+    "id": "IRrTQhoqoWuhY0ReAcW8",
+    "total": 0,
+    "items": [],
+    "catatan": "",
+    "kodeToko": "K1868",
+    "createdAt": "2025-10-22T04:42:43.237Z",
+    "tokoId": "OoHRaxncqsL1ElG0jLeK",
+    "tokoNama": "TOKO VANIA"
+  },
+  {
+    "id": "IVquiMQloRffYAwi6EgF",
+    "catatan": "",
+    "createdAt": "2025-11-10T04:55:15.724Z",
+    "kodeToko": "K0936",
+    "items": [],
+    "tokoId": "rZ5BOP8Og7Zb2P9x4xE6",
+    "total": 0,
+    "tokoNama": "RONDHI ARDIYANTO"
+  },
+  {
+    "id": "IcwWkFvPlDhG4V22und5",
+    "tokoNama": "NUR AFIDAH",
+    "total": 0,
+    "createdAt": "2025-10-07T04:28:35.279Z",
+    "items": [],
+    "kodeToko": "K1278",
+    "catatan": "",
+    "tokoId": "O8g9w3lNqdo3pRpC2pwY"
+  },
+  {
+    "id": "Ir9BOPyYDFMAaMorLZrG",
+    "total": 0,
+    "tokoId": "prsjnt4eZWb4sKtsXAOd",
+    "tokoNama": "DEWI",
+    "kodeToko": "K0502",
+    "catatan": "",
+    "createdAt": "2025-11-07T03:26:19.951Z",
+    "items": []
+  },
+  {
+    "id": "IrCHOmDvDYgHIqMXVHq5",
+    "total": 0,
+    "tokoNama": "TOKO SOCHIBATUL MUNAWAROH",
+    "kodeToko": "K1528",
+    "tokoId": "uyiOKpYICdUeSfb42aOn",
+    "items": [],
+    "catatan": "",
+    "createdAt": "2025-10-29T06:48:28.888Z"
+  },
+  {
+    "id": "JEdG5tQqLBKRTeSEZFZE",
+    "tokoNama": "RESTU",
+    "tokoId": "ZpXCeOmAOnXDVw7mocUq",
+    "total": 0,
+    "createdAt": "2025-11-04T05:36:46.602Z",
+    "catatan": "",
+    "kodeToko": "K0743",
+    "items": []
+  },
+  {
+    "id": "JFcwi4FStLyiPMbL3SiW",
+    "tokoId": "Wd4tMZL3Gh5AME7jGCqL",
+    "kodeToko": "K1512",
+    "catatan": "",
+    "tokoNama": "TOKO RENASYA",
+    "createdAt": "2025-10-09T03:27:11.223Z",
+    "total": 0,
+    "items": []
+  },
+  {
+    "id": "JJVGQVzsIZ6eAOUmuhVm",
+    "tokoNama": "NUR AFIDAH",
+    "tokoId": "O8g9w3lNqdo3pRpC2pwY",
+    "kodeToko": "K1278",
+    "items": [],
+    "total": 0,
+    "catatan": "",
+    "createdAt": "2025-10-21T05:05:44.847Z"
+  },
+  {
+    "id": "JJxBAZnCDssRmfj9uDot",
+    "kodeToko": "K1149",
+    "createdAt": "2025-10-20T09:29:14.375Z",
+    "total": 0,
+    "items": [],
+    "tokoNama": "TIGA SAUDARA 2",
+    "tokoId": "ahRcxXhTEcb9lxNWNaut",
+    "catatan": ""
+  },
+  {
+    "id": "JORXmAOCoqH1IY7ObMXn",
+    "catatan": "",
+    "tokoNama": "TOKO VIANA",
+    "tokoId": "878SE6zfogSZSvQEzaQC",
+    "createdAt": "2025-11-05T06:12:48.506Z",
+    "kodeToko": "K1911",
+    "total": 0,
+    "items": []
+  },
+  {
+    "id": "JkAD07wXR1n46s62I6ZQ",
+    "tokoNama": "MJ CELL",
+    "createdAt": "2025-10-10T07:12:04.903Z",
+    "total": 0,
+    "tokoId": "2zobAduRXbA1IyykFf5n",
+    "kodeToko": "K0441",
+    "items": [],
+    "catatan": ""
+  },
+  {
+    "id": "JtSIJgfEw7MMV3S5iKas",
+    "kodeToko": "K0743",
+    "createdAt": "2025-10-28T06:27:04.983Z",
+    "tokoId": "ZpXCeOmAOnXDVw7mocUq",
+    "total": 0,
+    "tokoNama": "RESTU",
+    "catatan": "",
+    "items": []
+  },
+  {
+    "id": "Jtle4XJH02ESOHPoXR4O",
+    "items": [],
+    "kodeToko": "K1540",
+    "createdAt": "2025-11-03T07:42:07.542Z",
+    "total": 0,
+    "tokoId": "SXfUg2IX86MSmv6tQUfp",
+    "tokoNama": "REZEKI LANCAR",
+    "catatan": ""
+  },
+  {
+    "id": "JwUWnzYVGRKvF9GTItA1",
+    "tokoId": "tdeA3VNFi7t8G3VWRUm6",
+    "kodeToko": "K1916",
+    "createdAt": "2025-10-15T04:32:22.308Z",
+    "catatan": "",
+    "tokoNama": "TOKO SAUDARA",
+    "items": [],
+    "total": 0
+  },
+  {
+    "id": "K3dvi32ycFt3Tba08kXA",
+    "total": 0,
+    "createdAt": "2025-10-23T04:18:47.109Z",
+    "tokoNama": "PUTRA / ADE ZONE",
+    "items": [],
+    "kodeToko": "K1480",
+    "catatan": "",
+    "tokoId": "36KgS7wC1Qnude8tPEJW"
+  },
+  {
+    "id": "K4yWbmISG9H2YCpVY4Nu",
+    "total": 0,
+    "catatan": "",
+    "items": [],
+    "createdAt": "2025-11-07T02:47:22.249Z",
+    "tokoId": "dFJRnjEcCGZjVJ3vtZTF",
+    "tokoNama": "SD IT AL HUSNA 2",
+    "kodeToko": "K1759"
+  },
+  {
+    "id": "KE16Bppkp5YdXrY8PAN7",
+    "kodeToko": "K1286",
+    "catatan": "",
+    "tokoId": "MBtynOjLtaD7KngRrvOo",
+    "items": [],
+    "createdAt": "2025-11-01T03:07:06.182Z",
+    "tokoNama": "RIYADLUL QUR'AN",
+    "total": 0
+  },
+  {
+    "id": "KGQPHlXUt35gylko413v",
+    "kodeToko": "K1179",
+    "items": [],
+    "tokoNama": "TOKO ANDI",
+    "catatan": "",
+    "tokoId": "NbD8s7PxFM7LcFShRs3Q",
+    "total": 0,
+    "createdAt": "2025-10-22T08:53:52.646Z"
+  },
+  {
+    "id": "KHcIjAe3qV0L6IQ00Xvr",
+    "tokoNama": "TOKO ALI",
+    "createdAt": "2025-10-22T06:14:53.647Z",
+    "kodeToko": "K1154",
+    "total": 0,
+    "items": [],
+    "catatan": "",
+    "tokoId": "pfBZeBBflEj9cMD0uZa2"
+  },
+  {
+    "id": "KfTlow74B6e4aDnr9Am1",
+    "createdAt": "2025-11-03T09:10:50.818Z",
+    "kodeToko": "K0367",
+    "tokoId": "XiCglP9CSUbM0jrjNHny",
+    "catatan": "",
+    "tokoNama": "TIGA SAUDARA",
+    "total": 0,
+    "items": []
+  },
+  {
+    "id": "KwW3ylghnV2VGjPzHdVx",
+    "tokoNama": "STICOM",
+    "total": 0,
+    "createdAt": "2025-11-07T04:37:55.059Z",
+    "catatan": "",
+    "tokoId": "ewv2xw7GgJtJXR8nPfQw",
+    "kodeToko": "K0511",
+    "items": []
+  },
+  {
+    "id": "L71xIiJpyjGE7fzh5hNd",
+    "items": [],
+    "createdAt": "2025-10-28T04:39:32.212Z",
+    "catatan": "",
+    "kodeToko": "K1484",
+    "tokoNama": "SIDO MULYO",
+    "tokoId": "qBgHRkFD88KqnN8yy52I",
+    "total": 0
+  },
+  {
+    "id": "LHuyBox93Kl3F6ie2Ovs",
+    "tokoId": "ZE2ppkrg8ZR49fnJZeOY",
+    "items": [],
+    "tokoNama": "SUMBER MULYA",
+    "total": 0,
+    "kodeToko": "K1535",
+    "catatan": "",
+    "createdAt": "2025-10-25T07:09:47.861Z"
+  },
+  {
+    "id": "LHyDb6t0LzuRyKXU2Qzp",
+    "kodeToko": "K1315",
+    "createdAt": "2025-10-15T09:40:04.953Z",
+    "tokoId": "t2gz4up7sN675kePt6Oc",
+    "items": [],
+    "total": 0,
+    "catatan": "",
+    "tokoNama": "ABDUL MUJIB"
+  },
+  {
+    "id": "LN3PNqYkFX9xQY6LZIiv",
+    "kodeToko": "K0742",
+    "total": 0,
+    "tokoId": "ICWLSSwzVvanVCAZdUih",
+    "createdAt": "2025-10-29T08:43:23.199Z",
+    "catatan": "",
+    "tokoNama": "KUSRIYAH",
+    "items": []
+  },
+  {
+    "id": "LNb2ej1Yl9T6n1FEc5wG",
+    "kodeToko": "K0462",
+    "catatan": "",
+    "createdAt": "2025-10-30T05:42:04.000Z",
+    "total": 0,
+    "tokoNama": "YANI",
+    "items": [],
+    "tokoId": "wa6cy9OSn1Nt8nknPGk4"
+  },
+  {
+    "id": "LTbT8RJRQTCCqUAvcKxh",
+    "total": 0,
+    "tokoId": "IXBiyQspfEdWbNBMZp91",
+    "items": [],
+    "tokoNama": "NYAH JIT",
+    "kodeToko": "K1708",
+    "catatan": "",
+    "createdAt": "2025-10-11T08:33:06.259Z"
+  },
+  {
+    "id": "LbAva2YhwUkoNJVutMLG",
+    "kodeToko": "K1656",
+    "createdAt": "2025-10-31T03:12:35.111Z",
+    "catatan": "",
+    "tokoId": "4RrFtYEGtIzcVvzYWaMY",
+    "tokoNama": "SD IT AL HUSNA PELEMKEREP",
+    "items": [],
+    "total": 0
+  },
+  {
+    "id": "Le79llzVRB4rmG6eaD5O",
+    "createdAt": "2025-10-02T06:19:10.622Z",
+    "total": 0,
+    "catatan": "",
+    "tokoNama": "LAKSITA SWALAYAN",
+    "items": [],
+    "kodeToko": "K2101",
+    "tokoId": "pfVW6jSIplI2WXaQvEB7"
+  },
+  {
+    "id": "Lhxs5tpVTbAnlaiy6ZaL",
+    "tokoId": "Djb9VhTmktwIGcPkALLf",
+    "catatan": "",
+    "total": 0,
+    "items": [],
+    "createdAt": "2025-10-17T08:36:26.967Z",
+    "tokoNama": "SDN 1 BAKALAN ( TOKO SEMBAKO AHLIS )",
+    "kodeToko": "K2015"
+  },
+  {
+    "id": "LmaapgewJH72FHfyYfsT",
+    "tokoNama": "RATU WALI",
+    "total": 0,
+    "kodeToko": "K1498",
+    "createdAt": "2025-10-11T05:14:22.916Z",
+    "catatan": "",
+    "tokoId": "7l4t8ictEySaPyXnKMDa",
+    "items": []
+  },
+  {
+    "id": "MO7Cv1Ojfge0RQu9NBwO",
+    "createdAt": "2025-10-23T02:59:00.834Z",
+    "total": 0,
+    "tokoNama": "TOKO HAPSARI",
+    "items": [],
+    "kodeToko": "K1936",
+    "tokoId": "ZwFykP7rgzkf1aJM6g3n",
+    "catatan": ""
+  },
+  {
+    "id": "MXIW8HdGFV4al3YQOFoa",
+    "tokoId": "BYxFMWDMPNQaGNvbV341",
+    "total": 0,
+    "kodeToko": "K0365",
+    "catatan": "",
+    "createdAt": "2025-10-01T03:52:36.139Z",
+    "tokoNama": "TATA MANDIRI",
+    "items": []
+  },
+  {
+    "id": "Md4mOP3Qt8JaCwyFaMUU",
+    "kodeToko": "K2066",
+    "tokoId": "WbtoNXx8lwUgS8s1ojLR",
+    "catatan": "",
+    "tokoNama": "BU ISTIANAH ( MTS URWATIL WATSQO )",
+    "items": [],
+    "total": 0,
+    "createdAt": "2025-10-13T02:47:07.599Z"
+  },
+  {
+    "id": "Mm8pBm1pwODgPXTRdw48",
+    "createdAt": "2025-10-29T03:21:11.478Z",
+    "kodeToko": "K1500",
+    "tokoId": "VktFHlWljj8CqZVnsjtM",
+    "items": [],
+    "tokoNama": "TOKO SHERLY",
+    "catatan": "",
+    "total": 0
+  },
+  {
+    "id": "Mx93OmR6772PVzYXNv88",
+    "items": [],
+    "kodeToko": "K1816",
+    "total": 0,
+    "catatan": "",
+    "tokoNama": "TOKO RAHMAT",
+    "createdAt": "2025-10-17T07:52:26.245Z",
+    "tokoId": "hrGSsYjRN0DC2i3QPnxO"
+  },
+  {
+    "id": "NAyLroORQDA7pVaPrjzk",
+    "tokoId": "OoHRaxncqsL1ElG0jLeK",
+    "total": 0,
+    "items": [],
+    "catatan": "",
+    "createdAt": "2025-11-05T06:12:27.320Z",
+    "tokoNama": "TOKO VANIA",
+    "kodeToko": "K1868"
+  },
+  {
+    "id": "NBv38TU07scufC83g6Ek",
+    "total": 0,
+    "tokoId": "LrDGivjSfm58oJ7eILXz",
+    "catatan": "",
+    "createdAt": "2025-10-16T08:54:41.363Z",
+    "tokoNama": "WARUNG MADURA AL-AMIN 2",
+    "items": [],
+    "kodeToko": "K1649"
+  },
+  {
+    "id": "NEpbSxIM0rPh3jKxGYNd",
+    "kodeToko": "K1899",
+    "catatan": "",
+    "tokoId": "d2fNqoVzXHxTmpY3E8v6",
+    "createdAt": "2025-10-23T09:37:51.527Z",
+    "total": 0,
+    "items": [],
+    "tokoNama": "TOKO LISA"
+  },
+  {
+    "id": "NLhRWdhnbAxwr8NP4ksW",
+    "total": 0,
+    "catatan": "",
+    "createdAt": "2025-11-03T04:15:03.590Z",
+    "tokoId": "R1Nb2wQKva33PYzOOokI",
+    "tokoNama": "TOKO PAK MUL",
+    "kodeToko": "K1323",
+    "items": []
+  },
+  {
+    "id": "NZvosZ1E2wifadZhcYpm",
+    "catatan": "",
+    "tokoNama": "ENDANG RISTIYOWATI",
+    "total": 0,
+    "createdAt": "2025-10-03T08:47:08.009Z",
+    "items": [],
+    "kodeToko": "K0532",
+    "tokoId": "f2Z73egCvMj4PXs56DKE"
+  },
+  {
+    "id": "NaMIBTjN5d6OpqCg1esp",
+    "total": 0,
+    "tokoNama": "TOSERBA JIWA MART",
+    "tokoId": "gHbbLlkgBIfTYKv7O0G6",
+    "catatan": "",
+    "createdAt": "2025-10-21T07:58:00.328Z",
+    "items": [],
+    "kodeToko": "K2008"
+  },
+  {
+    "id": "Nbuc3AYb1YE9cTw5LzBh",
+    "catatan": "",
+    "tokoNama": "SD IT AL HUSNA PELEMKEREP",
+    "total": 0,
+    "createdAt": "2025-10-03T04:21:51.344Z",
+    "items": [],
+    "kodeToko": "K1656",
+    "tokoId": "4RrFtYEGtIzcVvzYWaMY"
+  },
+  {
+    "id": "NeLDqSVOoWbPAWDk5eoN",
+    "tokoId": "usLxLxZs3KRwiDECcgTd",
+    "catatan": "",
+    "items": [],
+    "tokoNama": "SUPARNO",
+    "total": 0,
+    "createdAt": "2025-10-29T06:22:50.747Z",
+    "kodeToko": "K0390"
+  },
+  {
+    "id": "NikWCQOACS3ZJEcCvIan",
+    "catatan": "",
+    "total": 0,
+    "tokoId": "cBXhRkwzErSSQ2yHFz8H",
+    "kodeToko": "K1502",
+    "createdAt": "2025-10-20T07:44:40.990Z",
+    "items": [],
+    "tokoNama": "TOKO RIZKY OS"
+  },
+  {
+    "id": "NkhQRRSI1WMzSszCVHKm",
+    "catatan": "",
+    "total": 0,
+    "tokoId": "TTn9hWhaS5l9V1auHGCk",
+    "tokoNama": "MBAK MUNA",
+    "items": [],
+    "createdAt": "2025-10-31T03:15:55.912Z",
+    "kodeToko": "K1970"
+  },
+  {
+    "id": "NmHzDRpkpG2TfnPd10hM",
+    "createdAt": "2025-10-23T07:49:25.941Z",
+    "items": [],
+    "tokoNama": "Toko Koss Mart",
+    "total": 0,
+    "kodeToko": "K2014",
+    "catatan": "",
+    "tokoId": "lNRFpK00n4trF3j94v5p"
+  },
+  {
+    "id": "NtV8MVuSqz5xw0TPV5qD",
+    "tokoNama": "FARIDA ERYANTI",
+    "items": [],
+    "catatan": "",
+    "tokoId": "jNgDfhGZ4mVvt8VJrRX7",
+    "total": 0,
+    "createdAt": "2025-10-23T07:49:37.696Z",
+    "kodeToko": "K2005"
+  },
+  {
+    "id": "NzSR7Lfq64OaCkJXoSTX",
+    "tokoNama": "TOSERBA JIWA MART",
+    "tokoId": "gHbbLlkgBIfTYKv7O0G6",
+    "items": [],
+    "catatan": "",
+    "kodeToko": "K2008",
+    "createdAt": "2025-11-04T07:02:54.353Z",
+    "total": 0
+  },
+  {
+    "id": "OHF6mRSDA97HrUYO4zoy",
+    "total": 0,
+    "kodeToko": "K1993",
+    "items": [],
+    "createdAt": "2025-10-03T08:41:47.854Z",
+    "catatan": "",
+    "tokoNama": "APOTEK PUTRA PRIMA",
+    "tokoId": "n16DsU1bfxJ6le0HcELZ"
+  },
+  {
+    "id": "OQMbbuMlLmkkjTx6KnZp",
+    "catatan": "",
+    "createdAt": "2025-10-14T09:16:12.665Z",
+    "tokoNama": "ILMA JAYA",
+    "total": 0,
+    "kodeToko": "K1118",
+    "tokoId": "1pS2Vw8a9fu0UurNB4v7",
+    "items": []
+  },
+  {
+    "id": "Ok8aDAa8wNfyQDWTW8kl",
+    "total": 0,
+    "tokoNama": "SD IT AL HUSNA PELEMKEREP",
+    "catatan": "",
+    "kodeToko": "K1656",
+    "items": [],
+    "tokoId": "4RrFtYEGtIzcVvzYWaMY",
+    "createdAt": "2025-10-11T05:04:46.207Z"
+  },
+  {
+    "id": "OtaMxBvUvWfUYxhQAqi9",
+    "total": 0,
+    "items": [],
+    "createdAt": "2025-10-06T03:19:25.234Z",
+    "tokoId": "Yqbds11ik7n7cnIbAlyj",
+    "tokoNama": "SAMILATUN KHASANAH",
+    "catatan": "",
+    "kodeToko": "K1945"
+  },
+  {
+    "id": "PB2KfSDjbp8Y4BHNaWRX",
+    "tokoId": "4RrFtYEGtIzcVvzYWaMY",
+    "total": 0,
+    "catatan": "",
+    "tokoNama": "SD IT AL HUSNA PELEMKEREP",
+    "items": [],
+    "kodeToko": "K1656",
+    "createdAt": "2025-11-07T03:01:22.421Z"
+  },
+  {
+    "id": "PEJTxT3ZNI381v9gwvPQ",
+    "catatan": "",
+    "kodeToko": "K0676",
+    "createdAt": "2025-10-16T08:54:34.066Z",
+    "tokoId": "W5T0mkGuUhrS8Xv4nxtZ",
+    "items": [],
+    "tokoNama": "SUDARTO",
+    "total": 0
+  },
+  {
+    "id": "PN5Qpf9H9m8AkzquRNnH",
+    "tokoId": "hX7OpXJoabbPtqfEEJTI",
+    "kodeToko": "K0458",
+    "catatan": "",
+    "items": [],
+    "total": 0,
+    "tokoNama": "KANTIN PKU MUHAMMADYAH MAYONG",
+    "createdAt": "2025-10-03T08:43:44.415Z"
+  },
+  {
+    "id": "PdyqIfbaMNhwupW5gvHg",
+    "items": [],
+    "catatan": "",
+    "total": 0,
+    "tokoId": "NKsOqczLvbzUQOrPcTvY",
+    "createdAt": "2025-10-07T05:10:17.158Z",
+    "kodeToko": "K1751",
+    "tokoNama": "SD 1 BUARAN MAYONG"
+  },
+  {
+    "id": "PfB8MVfNLs9gt6jFXzxJ",
+    "tokoNama": "DEWI",
+    "createdAt": "2025-10-10T04:19:53.400Z",
+    "catatan": "",
+    "kodeToko": "K0502",
+    "total": 0,
+    "tokoId": "prsjnt4eZWb4sKtsXAOd",
+    "items": []
+  },
+  {
+    "id": "PflNME49uEfBtRYGbNa7",
+    "catatan": "",
+    "items": [],
+    "tokoNama": "AL HUSNA 5 PANCUR",
+    "tokoId": "ofWTyzpsse8zoCymsmtO",
+    "total": 0,
+    "kodeToko": "K1919",
+    "createdAt": "2025-10-20T06:11:09.448Z"
+  },
+  {
+    "id": "Ph23Dixumx2oMqnxrGlm",
+    "tokoId": "uyiOKpYICdUeSfb42aOn",
+    "items": [],
+    "catatan": "",
+    "kodeToko": "K1528",
+    "tokoNama": "TOKO SOCHIBATUL MUNAWAROH",
+    "total": 0,
+    "createdAt": "2025-10-08T07:44:26.566Z"
+  },
+  {
+    "id": "PltR9zmAUBrDDYSAWBBr",
+    "items": [],
+    "tokoNama": "MUNTATIAH",
+    "total": 0,
+    "kodeToko": "K1366",
+    "createdAt": "2025-10-22T04:02:21.312Z",
+    "tokoId": "bEH9JBG9XfbqU2R8PKNC",
+    "catatan": ""
+  },
+  {
+    "id": "PxDdC6MntceCNLIWLn3z",
+    "total": 0,
+    "items": [],
+    "tokoId": "rwANC5lfSRpAKV2HzJBj",
+    "kodeToko": "K1982",
+    "createdAt": "2025-10-25T03:53:51.757Z",
+    "tokoNama": "NUR YONO",
+    "catatan": ""
+  },
+  {
+    "id": "PzosPpALqmDgIZITNLh0",
+    "kodeToko": "K1613",
+    "catatan": "",
+    "tokoId": "YPpBOMPT2aukjCk1wvxw",
+    "tokoNama": "ABIYAN CAKE",
+    "createdAt": "2025-10-18T06:44:48.936Z",
+    "items": [],
+    "total": 0
+  },
+  {
+    "id": "Q0UqxxiSzxLX5GdPeraH",
+    "catatan": "",
+    "tokoNama": "TOKO SAUDARA",
+    "createdAt": "2025-10-01T03:20:09.823Z",
+    "kodeToko": "K1916",
+    "items": [],
+    "tokoId": "tdeA3VNFi7t8G3VWRUm6",
+    "total": 0
+  },
+  {
+    "id": "QHY5Ao9c56HEeKJk0KlM",
+    "createdAt": "2025-10-17T06:56:27.021Z",
+    "tokoNama": "SD IT AL ANWAR",
+    "kodeToko": "K1658",
+    "total": 0,
+    "tokoId": "aKeHRY72jQ8R7GmJIMNH",
+    "catatan": "",
+    "items": []
+  },
+  {
+    "id": "QMJzsmNOEmO41NbOVFgS",
+    "kodeToko": "K0936",
+    "catatan": "",
+    "items": [],
+    "tokoId": "rZ5BOP8Og7Zb2P9x4xE6",
+    "createdAt": "2025-10-20T04:26:11.349Z",
+    "total": 0,
+    "tokoNama": "RONDHI ARDIYANTO"
+  },
+  {
+    "id": "QcEzgXXUYMj9S5EApJAq",
+    "createdAt": "2025-10-21T08:42:14.253Z",
+    "items": [],
+    "tokoId": "ImE48v9OEwbSNMRIb16y",
+    "total": 0,
+    "tokoNama": "MADUN",
+    "catatan": "",
+    "kodeToko": "K0373"
+  },
+  {
+    "id": "Qin1ScUIeKBOlTk4crIh",
+    "tokoNama": "TOKO INDANAH",
+    "items": [],
+    "total": 0,
+    "kodeToko": "K1513",
+    "catatan": "Event kardus : Free chocomalt 2 Box",
+    "createdAt": "2025-10-15T08:01:30.070Z",
+    "tokoId": "X4G4Mm97geyTM8hWkcGe"
+  },
+  {
+    "id": "QoC38UPQLY8vQ8htbJHe",
+    "createdAt": "2025-10-29T06:01:18.457Z",
+    "tokoId": "517lFqCrv4ylnAybXBuH",
+    "catatan": "",
+    "kodeToko": "K1367",
+    "items": [],
+    "tokoNama": "ENDANG SRI WAHYUNI",
+    "total": 0
+  },
+  {
+    "id": "Qz28Vf2FtYFTKPO5X2fP",
+    "total": 0,
+    "kodeToko": "K1928",
+    "tokoId": "gTE9rpKizzrf2b3XMEkU",
+    "tokoNama": "MI ASSALAM SINGOROJO",
+    "catatan": "",
+    "createdAt": "2025-10-29T03:20:57.994Z",
+    "items": []
+  },
+  {
+    "id": "RE2fkz0zPzyOm3Z5o1pE",
+    "items": [],
+    "tokoId": "sSufgeU8YIyZrAOZbEO6",
+    "kodeToko": "K0526",
+    "createdAt": "2025-10-16T04:39:06.624Z",
+    "total": 0,
+    "tokoNama": "SISWANTO",
+    "catatan": ""
+  },
+  {
+    "id": "RINSBK5QA9eFNB3ObPhA",
+    "kodeToko": "K1969",
+    "tokoId": "IQtU1AxfLTPqglkim04O",
+    "tokoNama": "TOKO ANUGERAH",
+    "total": 0,
+    "items": [],
+    "catatan": "",
+    "createdAt": "2025-10-20T03:42:18.881Z"
+  },
+  {
+    "id": "RMt9xzCX7LqRtFaRH9cs",
+    "total": 0,
+    "catatan": "",
+    "tokoId": "usLxLxZs3KRwiDECcgTd",
+    "createdAt": "2025-10-22T09:01:48.648Z",
+    "kodeToko": "K0390",
+    "tokoNama": "SUPARNO",
+    "items": []
+  },
+  {
+    "id": "ROxIWn1VI9GjNGu7vFID",
+    "items": [],
+    "tokoNama": "KANTIN PKU MUHAMMADYAH MAYONG",
+    "tokoId": "hX7OpXJoabbPtqfEEJTI",
+    "catatan": "",
+    "createdAt": "2025-10-31T07:57:19.749Z",
+    "total": 0,
+    "kodeToko": "K0458"
+  },
+  {
+    "id": "RWkugwvKY1K7pnJ0bIk0",
+    "kodeToko": "K1787",
+    "items": [],
+    "tokoNama": "SD 3 BUNGU",
+    "createdAt": "2025-10-20T04:27:38.907Z",
+    "catatan": "",
+    "total": 0,
+    "tokoId": "nhuEhSvTkbCX7F1rYyfg"
+  },
+  {
+    "id": "RntXpIg3Ona3qpqniYLG",
+    "catatan": "",
+    "tokoNama": "TOKO RENASYA",
+    "createdAt": "2025-10-23T02:39:36.655Z",
+    "total": 0,
+    "tokoId": "Wd4tMZL3Gh5AME7jGCqL",
+    "kodeToko": "K1512",
+    "items": []
+  },
+  {
+    "id": "S8bVIwS3C2YpoSP6WLOn",
+    "catatan": "",
+    "total": 0,
+    "tokoNama": "MADUN",
+    "kodeToko": "K0373",
+    "createdAt": "2025-10-28T07:40:05.000Z",
+    "tokoId": "ImE48v9OEwbSNMRIb16y",
+    "items": []
+  },
+  {
+    "id": "SFcQVq7mTQXq2LuEWkgw",
+    "tokoId": "eLh6QEH4U1yPXyxJUerC",
+    "tokoNama": "MUNAWAROH",
+    "kodeToko": "K1121",
+    "total": 0,
+    "createdAt": "2025-10-13T05:56:38.595Z",
+    "items": [],
+    "catatan": ""
+  },
+  {
+    "id": "SMQR0G2GgiDIHyV0EgSp",
+    "total": 0,
+    "tokoNama": "TOKO SOCHIBATUL MUNAWAROH",
+    "createdAt": "2025-11-04T09:51:56.194Z",
+    "items": [],
+    "catatan": "",
+    "kodeToko": "K1528",
+    "tokoId": "uyiOKpYICdUeSfb42aOn"
+  },
+  {
+    "id": "SOBgv7v4MMl8a290P6zH",
+    "kodeToko": "K1482",
+    "items": [],
+    "total": 0,
+    "tokoId": "Bs2oePYU0B48Em6U0NdQ",
+    "createdAt": "2025-10-08T08:36:16.336Z",
+    "catatan": "",
+    "tokoNama": "BERKAH SAFAR"
+  },
+  {
+    "id": "SUSGNba0mNx6cZ0p89iT",
+    "kodeToko": "K1555",
+    "total": 0,
+    "tokoId": "Al3wNMsqeYtsyijq1Fvh",
+    "createdAt": "2025-11-08T05:00:39.245Z",
+    "items": [],
+    "catatan": "",
+    "tokoNama": "KOPERASI AL-ALAWY"
+  },
+  {
+    "id": "SmXKJJUicCcl9kZsfTNA",
+    "tokoNama": "ELLA 2 KANTIN MTS BALEKAMBANG",
+    "items": [],
+    "catatan": "",
+    "createdAt": "2025-10-21T03:55:07.511Z",
+    "kodeToko": "K0391",
+    "tokoId": "j5OQBnhs4A8lXEY9aNI4",
+    "total": 0
+  },
+  {
+    "id": "Sr0RNRcyvh3O9TbrbuKQ",
+    "tokoNama": "NYAH JIT",
+    "createdAt": "2025-10-04T08:29:10.402Z",
+    "kodeToko": "K1708",
+    "tokoId": "IXBiyQspfEdWbNBMZp91",
+    "items": [],
+    "total": 0,
+    "catatan": ""
+  },
+  {
+    "id": "Sy253fuLtRadX4GSUUF9",
+    "tokoId": "z3pT9BDTtISnQFgCmOtx",
+    "catatan": "",
+    "kodeToko": "K0392",
+    "items": [],
+    "total": 0,
+    "createdAt": "2025-10-28T09:42:14.171Z",
+    "tokoNama": "ELLA 3 SMK PUTRI BALEKAMBANG"
+  },
+  {
+    "id": "T1pgDbRziXtk9nBDeFt1",
+    "items": [],
+    "tokoNama": "TOKO SOCHIBATUL MUNAWAROH",
+    "total": 0,
+    "createdAt": "2025-10-01T08:20:42.527Z",
+    "tokoId": "uyiOKpYICdUeSfb42aOn",
+    "catatan": "",
+    "kodeToko": "K1528"
+  },
+  {
+    "id": "T274uCSDVSs8WiI3kKu7",
+    "tokoId": "prsjnt4eZWb4sKtsXAOd",
+    "catatan": "",
+    "createdAt": "2025-10-31T04:35:17.878Z",
+    "kodeToko": "K0502",
+    "total": 0,
+    "tokoNama": "DEWI",
+    "items": []
+  },
+  {
+    "id": "T5JwfvtocnXUDHseFkvO",
+    "createdAt": "2025-10-20T09:18:48.082Z",
+    "total": 0,
+    "kodeToko": "K1945",
+    "items": [],
+    "tokoId": "Yqbds11ik7n7cnIbAlyj",
+    "catatan": "",
+    "tokoNama": "SAMILATUN KHASANAH"
+  },
+  {
+    "id": "T8F9zvhJdTBQHo8NMO0g",
+    "catatan": "",
+    "kodeToko": "K1982",
+    "items": [],
+    "createdAt": "2025-10-11T06:30:46.546Z",
+    "total": 0,
+    "tokoNama": "NUR YONO",
+    "tokoId": "rwANC5lfSRpAKV2HzJBj"
+  },
+  {
+    "id": "TAPur5VZ4CtwplmM035z",
+    "catatan": "",
+    "tokoId": "Un8CXZKfqVE45zerIgis",
+    "tokoNama": "TOKO WAHYUDI",
+    "total": 0,
+    "items": [],
+    "createdAt": "2025-10-15T06:49:00.007Z",
+    "kodeToko": "K1586"
+  },
+  {
+    "id": "TDGqPQDYslORbAVoCKDs",
+    "tokoId": "rwANC5lfSRpAKV2HzJBj",
+    "total": 0,
+    "items": [],
+    "catatan": "",
+    "createdAt": "2025-10-18T04:41:15.169Z",
+    "kodeToko": "K1982",
+    "tokoNama": "NUR YONO"
+  },
+  {
+    "id": "TDeQLDADgnJhF58cOrKC",
+    "catatan": "",
+    "total": 0,
+    "kodeToko": "K1367",
+    "tokoId": "517lFqCrv4ylnAybXBuH",
+    "createdAt": "2025-10-15T06:12:46.231Z",
+    "tokoNama": "ENDANG SRI WAHYUNI",
+    "items": []
+  },
+  {
+    "id": "TGeKozYKKd5DdGxcGKFr",
+    "createdAt": "2025-10-13T08:47:43.032Z",
+    "catatan": "",
+    "total": 0,
+    "items": [],
+    "tokoId": "P3S3LmNnq4sCQ7YUieWO",
+    "tokoNama": "APOTEK PANCUR",
+    "kodeToko": "K0352"
+  },
+  {
+    "id": "THO3RhDV4WKmJjas2ovh",
+    "items": [],
+    "tokoId": "ICWLSSwzVvanVCAZdUih",
+    "createdAt": "2025-11-05T05:03:10.149Z",
+    "tokoNama": "KUSRIYAH",
+    "total": 0,
+    "catatan": "",
+    "kodeToko": "K0742"
+  },
+  {
+    "id": "Th9awSdnOvPkWr9MFg7K",
+    "items": [],
+    "catatan": "",
+    "createdAt": "2025-10-27T08:15:39.026Z",
+    "kodeToko": "K1832",
+    "total": 0,
+    "tokoId": "yUpqWUQuZmgdXeW3bt5N",
+    "tokoNama": "MUHKAFI"
+  },
+  {
+    "id": "U04iTtid78J3N7g18hJJ",
+    "total": 0,
+    "items": [],
+    "createdAt": "2025-10-18T06:38:44.034Z",
+    "kodeToko": "K1708",
+    "tokoId": "IXBiyQspfEdWbNBMZp91",
+    "tokoNama": "NYAH JIT",
+    "catatan": ""
+  },
+  {
+    "id": "U2koL8ybsBzACaHsAeKF",
+    "items": [],
+    "tokoNama": "WIWIK",
+    "catatan": "",
+    "createdAt": "2025-10-14T05:21:18.480Z",
+    "total": 0,
+    "kodeToko": "K0424",
+    "tokoId": "B8hPBUTijMD2pKkhKEoc"
+  },
+  {
+    "id": "UY4kzB5cKfjVtlriV5PB",
+    "items": [],
+    "catatan": "",
+    "createdAt": "2025-10-03T02:48:46.748Z",
+    "kodeToko": "K0502",
+    "tokoNama": "DEWI",
+    "total": 0,
+    "tokoId": "prsjnt4eZWb4sKtsXAOd"
+  },
+  {
+    "id": "UcCd24svpdtIOLfXwhOa",
+    "kodeToko": "K1513",
+    "tokoNama": "TOKO INDANAH",
+    "catatan": "",
+    "tokoId": "X4G4Mm97geyTM8hWkcGe",
+    "items": [],
+    "total": 0,
+    "createdAt": "2025-11-05T05:21:54.624Z"
+  },
+  {
+    "id": "V30oYmxGEx4iMFQqbZ3m",
+    "tokoId": "nhuEhSvTkbCX7F1rYyfg",
+    "createdAt": "2025-10-27T04:36:07.583Z",
+    "items": [],
+    "catatan": "",
+    "kodeToko": "K1787",
+    "tokoNama": "SD 3 BUNGU",
+    "total": 0
+  },
+  {
+    "id": "V8WzbXeYaUFeF8raDOxW",
+    "total": 0,
+    "items": [],
+    "tokoNama": "WIWIK",
+    "catatan": "",
+    "createdAt": "2025-10-28T05:22:36.361Z",
+    "tokoId": "B8hPBUTijMD2pKkhKEoc",
+    "kodeToko": "K0424"
+  },
+  {
+    "id": "V8mPrfW6NPjeyEE4Svkc",
+    "total": 0,
+    "tokoNama": "ABIYAN CAKE",
+    "items": [],
+    "createdAt": "2025-10-24T17:00:00.000Z",
+    "kodeToko": "K1613",
+    "catatan": "",
+    "tokoId": "YPpBOMPT2aukjCk1wvxw"
+  },
+  {
+    "id": "VA8K0PWwJfkxZjA4YDMk",
+    "tokoNama": "ILMA JAYA",
+    "tokoId": "1pS2Vw8a9fu0UurNB4v7",
+    "createdAt": "2025-10-28T09:36:46.618Z",
+    "kodeToko": "K1118",
+    "total": 0,
+    "items": [],
+    "catatan": ""
+  },
+  {
+    "id": "VEmABARU9dAYjn6KDFI9",
+    "total": 0,
+    "kodeToko": "K0512",
+    "tokoNama": "MUSYAFAK",
+    "items": [],
+    "tokoId": "jVJBm18ggKRwQ9dO6sPu",
+    "createdAt": "2025-10-25T05:46:57.683Z",
+    "catatan": ""
+  },
+  {
+    "id": "VHx3iU9AtUe57BzJYAIY",
+    "tokoId": "O8g9w3lNqdo3pRpC2pwY",
+    "catatan": "",
+    "createdAt": "2025-10-28T04:39:25.024Z",
+    "total": 0,
+    "tokoNama": "NUR AFIDAH",
+    "kodeToko": "K1278",
+    "items": []
+  },
+  {
+    "id": "VITZTbvFKRoFUgRSUJmp",
+    "total": 0,
+    "createdAt": "2025-11-07T15:02:25.277Z",
+    "items": [],
+    "kodeToko": "K1854",
+    "tokoNama": "SEJAHTERA FROZEN FOOD",
+    "catatan": "",
+    "tokoId": "0nchyPCKCX7ahDdo6icy"
+  },
+  {
+    "id": "VS1sWmxNoTeChUmCClPl",
+    "kodeToko": "K0441",
+    "total": 0,
+    "createdAt": "2025-10-03T05:45:08.695Z",
+    "tokoNama": "MJ CELL",
+    "tokoId": "2zobAduRXbA1IyykFf5n",
+    "items": [],
+    "catatan": ""
+  },
+  {
+    "id": "VmvWxXgRUTgemCSEP8ZT",
+    "total": 0,
+    "createdAt": "2025-10-06T09:26:47.813Z",
+    "tokoId": "P3S3LmNnq4sCQ7YUieWO",
+    "kodeToko": "K0352",
+    "catatan": "",
+    "tokoNama": "APOTEK PANCUR",
+    "items": []
+  },
+  {
+    "id": "VnMQwQq8Z9JADLiUuV6u",
+    "total": 0,
+    "tokoNama": "NOR AMIN MAHMUD",
+    "kodeToko": "K1987",
+    "catatan": "",
+    "tokoId": "CfKdWWsPbcqw3KjtwI29",
+    "items": [],
+    "createdAt": "2025-10-21T05:21:36.893Z"
+  },
+  {
+    "id": "VnjB0DAaizU885hPHyli",
+    "tokoNama": "TOKO MBAK RINI",
+    "tokoId": "6pw30ZdwX1mjmVnAvMaL",
+    "catatan": "",
+    "kodeToko": "K1725",
+    "total": 0,
+    "createdAt": "2025-10-01T07:45:32.943Z",
+    "items": []
+  },
+  {
+    "id": "W67nSaAOxmkreDn3ibFQ",
+    "tokoId": "LjHKUWJDhaxyFOLArIdi",
+    "items": [],
+    "total": 0,
+    "catatan": "",
+    "createdAt": "2025-10-09T09:02:55.031Z",
+    "tokoNama": "SAMI JF MART",
+    "kodeToko": "K1298"
+  },
+  {
+    "id": "W8uwL5zwbZjocA2utxZM",
+    "kodeToko": "K1498",
+    "total": 0,
+    "catatan": "",
+    "tokoId": "7l4t8ictEySaPyXnKMDa",
+    "items": [],
+    "createdAt": "2025-11-01T04:38:19.403Z",
+    "tokoNama": "RATU WALI"
+  },
+  {
+    "id": "WQyM8tXMfkMtr3kgMFC3",
+    "kodeToko": "K1987",
+    "tokoId": "CfKdWWsPbcqw3KjtwI29",
+    "createdAt": "2025-10-28T05:22:42.000Z",
+    "tokoNama": "NOR AMIN MAHMUD",
+    "catatan": "",
+    "total": 0,
+    "items": []
+  },
+  {
+    "id": "WVLaDUx21ZxyZlXaDAC2",
+    "items": [],
+    "tokoId": "R1Nb2wQKva33PYzOOokI",
+    "catatan": "",
+    "total": 0,
+    "createdAt": "2025-10-27T04:36:39.817Z",
+    "kodeToko": "K1323",
+    "tokoNama": "TOKO PAK MUL"
+  },
+  {
+    "id": "WxhBR44bJDVOL4yaxaux",
+    "total": 0,
+    "tokoNama": "ABDUL MUJIB",
+    "kodeToko": "K1315",
+    "tokoId": "t2gz4up7sN675kePt6Oc",
+    "catatan": "",
+    "createdAt": "2025-10-01T09:03:55.359Z",
+    "items": []
+  },
+  {
+    "id": "XiQulVoOrOVFR25rYYrC",
+    "total": 0,
+    "tokoNama": "ALHUSNA MART",
+    "tokoId": "i3vRFtdn75Z0P1RiyJus",
+    "kodeToko": "K0439",
+    "items": [],
+    "createdAt": "2025-10-17T09:46:33.979Z",
+    "catatan": ""
+  },
+  {
+    "id": "XoRHqiEA6ZkoNDVfkujJ",
+    "catatan": "",
+    "total": 0,
+    "tokoNama": "RATU WALI",
+    "items": [],
+    "kodeToko": "K1498",
+    "tokoId": "7l4t8ictEySaPyXnKMDa",
+    "createdAt": "2025-10-04T07:06:32.245Z"
+  },
+  {
+    "id": "XzeNvKWaV8dfT5P12Yt9",
+    "catatan": "Order dibuat dari halaman Order: ",
+    "items": [],
+    "tokoId": "hHf2x3hxQleMEMp5aLvO",
+    "createdAt": "2025-10-05T15:03:40.650Z",
+    "kodeToko": "K2002",
+    "total": 0,
+    "tokoNama": "ALMA MART"
+  },
+  {
+    "id": "Y3OvBF1QhC2VEGLEI8eA",
+    "createdAt": "2025-10-07T04:46:21.005Z",
+    "tokoId": "CfKdWWsPbcqw3KjtwI29",
+    "total": 0,
+    "items": [],
+    "tokoNama": "NOR AMIN MAHMUD",
+    "kodeToko": "K1987",
+    "catatan": ""
+  },
+  {
+    "id": "YC14BZYJsR5HNX8gH2qS",
+    "tokoId": "OBIPITnGgdtvp0zkVSIL",
+    "total": 0,
+    "tokoNama": "MUSTAQIM",
+    "items": [],
+    "catatan": "",
+    "createdAt": "2025-10-27T07:51:04.363Z",
+    "kodeToko": "K1352"
+  },
+  {
+    "id": "YHSE12jFVwxQRqi1ouIJ",
+    "catatan": "",
+    "tokoNama": "ELLA 2 KANTIN MTS BALEKAMBANG",
+    "kodeToko": "K0391",
+    "total": 0,
+    "items": [],
+    "tokoId": "j5OQBnhs4A8lXEY9aNI4",
+    "createdAt": "2025-11-04T07:21:23.378Z"
+  },
+  {
+    "id": "YRojML5lL4ctzgT1UHVe",
+    "tokoNama": "MBAK YUYUN",
+    "total": 0,
+    "createdAt": "2025-10-07T02:50:30.958Z",
+    "catatan": "",
+    "items": [],
+    "kodeToko": "K0379",
+    "tokoId": "xp0ZRBc7iUKQ0VDFMW5Y"
+  },
+  {
+    "id": "YSfs8ldOsGYsnQtRWO4q",
+    "items": [],
+    "catatan": "",
+    "kodeToko": "K1649",
+    "total": 0,
+    "tokoNama": "WARUNG MADURA AL-AMIN 2",
+    "createdAt": "2025-10-30T06:14:53.673Z",
+    "tokoId": "LrDGivjSfm58oJ7eILXz"
+  },
+  {
+    "id": "YVpQaTZRiBWBoZB6ZJr8",
+    "items": [],
+    "catatan": "",
+    "tokoId": "R1Nb2wQKva33PYzOOokI",
+    "total": 0,
+    "tokoNama": "TOKO PAK MUL",
+    "kodeToko": "K1323",
+    "createdAt": "2025-10-13T05:16:44.513Z"
+  },
+  {
+    "id": "Yi3I7OBy6EeYyPO4Mi1S",
+    "tokoId": "97dQ3fc5oJLPHPNSZvPe",
+    "tokoNama": "SUMUK CELL",
+    "items": [],
+    "kodeToko": "K0504",
+    "catatan": "",
+    "total": 0,
+    "createdAt": "2025-10-10T05:59:11.263Z"
+  },
+  {
+    "id": "Yk17G0s4BGH12c9o16Zw",
+    "tokoId": "n16DsU1bfxJ6le0HcELZ",
+    "total": 0,
+    "items": [],
+    "catatan": "",
+    "createdAt": "2025-10-09T07:01:29.769Z",
+    "kodeToko": "K1993",
+    "tokoNama": "APOTEK PUTRA PRIMA"
+  },
+  {
+    "id": "YoSgaCLL3tfMqnk18oe8",
+    "total": 0,
+    "createdAt": "2025-10-01T07:01:22.605Z",
+    "catatan": "",
+    "tokoId": "ICWLSSwzVvanVCAZdUih",
+    "kodeToko": "K0742",
+    "items": [],
+    "tokoNama": "KUSRIYAH"
+  },
+  {
+    "id": "YySfFgpFff4ojDu1AUfF",
+    "tokoId": "S3sXgtgCOOvXYK2lhUtV",
+    "items": [],
+    "catatan": "",
+    "tokoNama": "ZUMAEROH",
+    "kodeToko": "K1599",
+    "total": 0,
+    "createdAt": "2025-10-06T04:04:05.861Z"
+  },
+  {
+    "id": "Z9qdDVXZCJQmGg1QKdxK",
+    "total": 0,
+    "createdAt": "2025-09-30T15:50:47.045Z",
+    "catatan": "",
+    "tokoId": "bg5QtWE4C8JBbd7ZjClA",
+    "tokoNama": "FC RIFKI MUSLIM",
+    "kodeToko": "K1876",
+    "items": []
+  },
+  {
+    "id": "ZQD6iSAwZp76JBR1V0cA",
+    "tokoNama": "TOKO ALI",
+    "items": [],
+    "createdAt": "2025-10-01T09:46:18.825Z",
+    "catatan": "",
+    "total": 0,
+    "tokoId": "pfBZeBBflEj9cMD0uZa2",
+    "kodeToko": "K1154"
+  },
+  {
+    "id": "ZVeNjDaPhICCaSJHlnWq",
+    "tokoNama": "TOSERBA JIWA MART",
+    "total": 0,
+    "tokoId": "gHbbLlkgBIfTYKv7O0G6",
+    "catatan": "",
+    "items": [],
+    "createdAt": "2025-10-28T07:30:00.426Z",
+    "kodeToko": "K2008"
+  },
+  {
+    "id": "ZaMD8jYtqsWvUPpo3FGP",
+    "items": [],
+    "kodeToko": "K0441",
+    "createdAt": "2025-11-07T08:35:35.203Z",
+    "total": 0,
+    "tokoNama": "MJ CELL",
+    "tokoId": "2zobAduRXbA1IyykFf5n",
+    "catatan": ""
+  },
+  {
+    "id": "a0R1YeS29ScNF5hq9U2f",
+    "total": 0,
+    "kodeToko": "K1334",
+    "createdAt": "2025-10-29T08:23:30.000Z",
+    "tokoId": "xXcBnRjwrKPQNBumnzm6",
+    "catatan": "",
+    "items": [],
+    "tokoNama": "MASRUKIN"
+  },
+  {
+    "id": "a12qLwUFswihMnpMkvF3",
+    "tokoId": "d2fNqoVzXHxTmpY3E8v6",
+    "tokoNama": "TOKO LISA",
+    "total": 0,
+    "kodeToko": "K1899",
+    "catatan": "",
+    "createdAt": "2025-10-09T10:33:36.075Z",
+    "items": []
+  },
+  {
+    "id": "a1ruZSYPUX4AKm1ZPc4L",
+    "tokoNama": "MASRUKIN",
+    "tokoId": "xXcBnRjwrKPQNBumnzm6",
+    "items": [],
+    "kodeToko": "K1334",
+    "catatan": "",
+    "createdAt": "2025-10-07T06:49:32.438Z",
+    "total": 0
+  },
+  {
+    "id": "aLQA9SsrhTXsyGmn5Xbz",
+    "tokoNama": "KHUDIN",
+    "kodeToko": "K0661",
+    "catatan": "",
+    "total": 0,
+    "items": [],
+    "createdAt": "2025-10-01T09:44:01.581Z",
+    "tokoId": "I2ckekmi55nhDdQ2RGZn"
+  },
+  {
+    "id": "aTIaTdSVKuTXlnGoZbLa",
+    "items": [],
+    "total": 0,
+    "catatan": "",
+    "createdAt": "2025-10-30T08:39:19.722Z",
+    "tokoNama": "ENDANG RISTIYOWATI",
+    "kodeToko": "K0532",
+    "tokoId": "f2Z73egCvMj4PXs56DKE"
+  },
+  {
+    "id": "aTfQ4nCg8uZC3jkBlfLW",
+    "total": 0,
+    "kodeToko": "K1500",
+    "createdAt": "2025-10-15T04:32:14.672Z",
+    "items": [],
+    "tokoNama": "TOKO SHERLY",
+    "tokoId": "VktFHlWljj8CqZVnsjtM",
+    "catatan": ""
+  },
+  {
+    "id": "afehOeIZ5j6V3gOC7cQE",
+    "tokoNama": "Toko Koss Mart",
+    "tokoId": "lNRFpK00n4trF3j94v5p",
+    "total": 0,
+    "kodeToko": "K2014",
+    "catatan": "",
+    "items": [],
+    "createdAt": "2025-10-09T07:24:39.511Z"
+  },
+  {
+    "id": "agilLCFGbPhlJJrfTthj",
+    "tokoId": "SXfUg2IX86MSmv6tQUfp",
+    "createdAt": "2025-10-06T06:15:18.067Z",
+    "tokoNama": "REZEKI LANCAR",
+    "items": [],
+    "catatan": "",
+    "kodeToko": "K1540",
+    "total": 0
+  },
+  {
+    "id": "apSazkN54GhVOXauDkqC",
+    "tokoNama": "TOSERBA JIWA MART",
+    "createdAt": "2025-10-07T08:15:14.317Z",
+    "kodeToko": "K2008",
+    "items": [],
+    "total": 0,
+    "tokoId": "gHbbLlkgBIfTYKv7O0G6",
+    "catatan": ""
+  },
+  {
+    "id": "aq7LhKfFJJzvNdOaeh1a",
+    "tokoId": "ZE2ppkrg8ZR49fnJZeOY",
+    "items": [],
+    "total": 0,
+    "tokoNama": "SUMBER MULYA",
+    "createdAt": "2025-10-11T08:34:34.117Z",
+    "kodeToko": "K1535",
+    "catatan": ""
+  },
+  {
+    "id": "b0xH6p39tTa8NbPpV4IC",
+    "tokoId": "ahRcxXhTEcb9lxNWNaut",
+    "createdAt": "2025-10-13T08:09:09.994Z",
+    "total": 0,
+    "items": [],
+    "kodeToko": "K1149",
+    "tokoNama": "TIGA SAUDARA 2",
+    "catatan": ""
+  },
+  {
+    "id": "b0z3cMRHnycwlGFVKJmI",
+    "catatan": "",
+    "kodeToko": "K0375",
+    "tokoId": "6XnHlhaup6RQesAHfOFv",
+    "items": [],
+    "createdAt": "2025-11-04T03:11:05.433Z",
+    "total": 0,
+    "tokoNama": "AL-FALAH"
+  },
+  {
+    "id": "bJfqyU0AfIhQfdMXcdx3",
+    "kodeToko": "K1018",
+    "items": [],
+    "catatan": "",
+    "createdAt": "2025-10-16T07:20:18.290Z",
+    "total": 0,
+    "tokoNama": "YANI 2",
+    "tokoId": "QHP3VKx7Xl66YirpJdsY"
+  },
+  {
+    "id": "bMEhweoyuVLDRMAZLCKV",
+    "kodeToko": "K0742",
+    "items": [],
+    "tokoId": "ICWLSSwzVvanVCAZdUih",
+    "catatan": "",
+    "createdAt": "2025-10-08T09:26:27.247Z",
+    "total": 0,
+    "tokoNama": "KUSRIYAH"
+  },
+  {
+    "id": "bTYBeV36HRBn7X8hn0iz",
+    "createdAt": "2025-10-01T04:24:28.188Z",
+    "tokoNama": "TOKO SHERLY",
+    "tokoId": "VktFHlWljj8CqZVnsjtM",
+    "catatan": "",
+    "total": 0,
+    "items": [],
+    "kodeToko": "K1500"
+  },
+  {
+    "id": "bVNOpUkKjL1mTQl7GMAU",
+    "tokoNama": "TOKO VIANA",
+    "catatan": "",
+    "items": [],
+    "kodeToko": "K1911",
+    "tokoId": "878SE6zfogSZSvQEzaQC",
+    "total": 0,
+    "createdAt": "2025-10-22T05:36:55.077Z"
+  },
+  {
+    "id": "bdBPEq4Nk810cbr6Xzb2",
+    "createdAt": "2025-09-30T15:54:59.104Z",
+    "tokoId": "7dHRay9lYvtsQBmfQUzz",
+    "total": 0,
+    "tokoNama": "ANNISA MEDINI",
+    "catatan": "",
+    "kodeToko": "K0416",
+    "items": []
+  },
+  {
+    "id": "belnfMepRmdglfQseSrj",
+    "createdAt": "2025-10-06T03:32:40.446Z",
+    "total": 0,
+    "catatan": "",
+    "items": [],
+    "kodeToko": "K1969",
+    "tokoId": "IQtU1AxfLTPqglkim04O",
+    "tokoNama": "TOKO ANUGERAH"
+  },
+  {
+    "id": "besjghZxYvMIPNXE3DUh",
+    "createdAt": "2025-10-18T04:02:14.654Z",
+    "tokoId": "Sd6g46vJ9IKhkDW5DXlf",
+    "kodeToko": "K0485",
+    "tokoNama": "MBAK IS",
+    "items": [],
+    "catatan": "",
+    "total": 0
+  },
+  {
+    "id": "bgzoLMtzBhSODm6q2bWG",
+    "items": [],
+    "createdAt": "2025-10-14T04:22:59.444Z",
+    "tokoNama": "NOR AMIN MAHMUD",
+    "tokoId": "CfKdWWsPbcqw3KjtwI29",
+    "catatan": "",
+    "kodeToko": "K1987",
+    "total": 0
+  },
+  {
+    "id": "btMbAY02zkyg4iIyrXPf",
+    "createdAt": "2025-10-16T04:38:51.659Z",
+    "catatan": "",
+    "total": 0,
+    "items": [],
+    "kodeToko": "K1197",
+    "tokoId": "hWaUvcWJzlPMr3hZZqH7",
+    "tokoNama": "LINAWATI SMU MUH 2"
+  },
+  {
+    "id": "cEFzRqxVulEgg7Qb7VkI",
+    "createdAt": "2025-10-03T03:03:45.254Z",
+    "catatan": "",
+    "tokoId": "ZPG57TQu3HgMHFcjJS94",
+    "items": [],
+    "kodeToko": "K1543",
+    "tokoNama": "NIKMAT SEMBAKO",
+    "total": 0
+  },
+  {
+    "id": "cG0upNkncO4nUs5Ez7Y0",
+    "total": 0,
+    "tokoId": "AkprBUTUqD1gZOpeqLQy",
+    "items": [],
+    "tokoNama": "AMIN",
+    "createdAt": "2025-10-18T03:21:57.693Z",
+    "kodeToko": "K0503",
+    "catatan": ""
+  },
+  {
+    "id": "cLv1kUrKq2d1dHPugWA9",
+    "total": 0,
+    "items": [],
+    "kodeToko": "K0512",
+    "tokoNama": "MUSYAFAK",
+    "createdAt": "2025-10-31T06:04:04.340Z",
+    "catatan": "",
+    "tokoId": "jVJBm18ggKRwQ9dO6sPu"
+  },
+  {
+    "id": "cRTAcEZdCgkFm6TvCGKT",
+    "tokoId": "eLh6QEH4U1yPXyxJUerC",
+    "total": 0,
+    "tokoNama": "MUNAWAROH",
+    "items": [],
+    "createdAt": "2025-10-20T06:28:11.119Z",
+    "kodeToko": "K1121",
+    "catatan": ""
+  },
+  {
+    "id": "cWGDIlGhpUTmbhKbsesc",
+    "kodeToko": "K0415",
+    "tokoId": "KvDkcBJqJzsLvbm3pmuR",
+    "total": 0,
+    "items": [],
+    "catatan": "",
+    "tokoNama": "JAYA PLASTIK",
+    "createdAt": "2025-09-30T15:51:54.107Z"
+  },
+  {
+    "id": "cWV9l135RtsryHBaQV9w",
+    "total": 0,
+    "createdAt": "2025-10-08T08:50:06.748Z",
+    "items": [],
+    "tokoNama": "TOKO ANDI",
+    "tokoId": "NbD8s7PxFM7LcFShRs3Q",
+    "catatan": "",
+    "kodeToko": "K1179"
+  },
+  {
+    "id": "cZ4lVdWP86tQ8Zaw2US2",
+    "items": [],
+    "tokoId": "1pS2Vw8a9fu0UurNB4v7",
+    "kodeToko": "K1118",
+    "tokoNama": "ILMA JAYA",
+    "catatan": "",
+    "total": 0,
+    "createdAt": "2025-11-04T03:39:59.000Z"
+  },
+  {
+    "id": "chB8b8AbGjE0mmTpey3W",
+    "tokoId": "97dQ3fc5oJLPHPNSZvPe",
+    "catatan": "",
+    "total": 0,
+    "items": [],
+    "tokoNama": "SUMUK CELL",
+    "kodeToko": "K0504",
+    "createdAt": "2025-10-17T06:52:25.482Z"
+  },
+  {
+    "id": "ct0CKQXwOHDBIqP5ctjI",
+    "catatan": "",
+    "tokoId": "cBXhRkwzErSSQ2yHFz8H",
+    "tokoNama": "TOKO RIZKY OS",
+    "items": [],
+    "createdAt": "2025-11-03T08:32:00.000Z",
+    "kodeToko": "K1502",
+    "total": 0
+  },
+  {
+    "id": "ctOZ2aMJlKv2sW8OTQ8O",
+    "items": [],
+    "total": 0,
+    "tokoId": "7eLpiuXvWvr11bxaDZWz",
+    "tokoNama": "MBAK IMA",
+    "kodeToko": "K0740",
+    "createdAt": "2025-10-11T03:45:18.775Z",
+    "catatan": ""
+  },
+  {
+    "id": "dQPk6Gcwf8zvMwgtS5iV",
+    "total": 0,
+    "createdAt": "2025-10-25T07:32:05.393Z",
+    "tokoNama": "ALIYA CELL",
+    "catatan": "",
+    "kodeToko": "K0721",
+    "items": [],
+    "tokoId": "B432NajzpIiYQHMjsajM"
+  },
+  {
+    "id": "diPd9fWgHcVo15Qjgfb3",
+    "createdAt": "2025-10-27T03:13:15.025Z",
+    "total": 0,
+    "tokoNama": "TOKO ANUGERAH",
+    "kodeToko": "K1969",
+    "items": [],
+    "tokoId": "IQtU1AxfLTPqglkim04O",
+    "catatan": ""
+  },
+  {
+    "id": "djRD9HuvWgbwH9RRqfm4",
+    "kodeToko": "K1352",
+    "total": 0,
+    "catatan": "",
+    "tokoId": "OBIPITnGgdtvp0zkVSIL",
+    "items": [],
+    "createdAt": "2025-10-06T07:13:13.417Z",
+    "tokoNama": "MUSTAQIM"
+  },
+  {
+    "id": "dvvr3TC9UsBdVJoNiBnG",
+    "createdAt": "2025-10-15T09:00:30.495Z",
+    "tokoNama": "SUPARNO",
+    "catatan": "",
+    "kodeToko": "K0390",
+    "items": [],
+    "tokoId": "usLxLxZs3KRwiDECcgTd",
+    "total": 0
+  },
+  {
+    "id": "e0k2H4d9qAPHEC01i2sx",
+    "createdAt": "2025-11-06T03:28:25.000Z",
+    "tokoId": "Wd4tMZL3Gh5AME7jGCqL",
+    "kodeToko": "K1512",
+    "items": [],
+    "catatan": "",
+    "total": 0,
+    "tokoNama": "TOKO RENASYA"
+  },
+  {
+    "id": "e4SfQN2EVqE8igymck25",
+    "catatan": "",
+    "items": [],
+    "total": 0,
+    "createdAt": "2025-10-04T03:44:59.754Z",
+    "tokoNama": "RIYADLUR QURAN",
+    "tokoId": "MBtynOjLtaD7KngRrvOo",
+    "kodeToko": "K1286"
+  },
+  {
+    "id": "e7UrOzJ1fsFwQPkOUSaO",
+    "tokoId": "rZ5BOP8Og7Zb2P9x4xE6",
+    "catatan": "",
+    "tokoNama": "RONDHI ARDIYANTO",
+    "total": 0,
+    "kodeToko": "K0936",
+    "createdAt": "2025-11-03T04:14:51.030Z",
+    "items": []
+  },
+  {
+    "id": "eFeRWr0G2XM4q49qDBd1",
+    "tokoNama": "ENDANG RISTIYOWATI",
+    "total": 0,
+    "createdAt": "2025-10-17T04:30:55.374Z",
+    "items": [],
+    "catatan": "",
+    "kodeToko": "K0532",
+    "tokoId": "f2Z73egCvMj4PXs56DKE"
+  },
+  {
+    "id": "eM9aZcw1Yktsll8oeD52",
+    "tokoId": "gTE9rpKizzrf2b3XMEkU",
+    "total": 0,
+    "items": [],
+    "createdAt": "2025-10-08T03:27:33.142Z",
+    "catatan": "",
+    "tokoNama": "MI ASSALAM SINGOROJO",
+    "kodeToko": "K1928"
+  },
+  {
+    "id": "eNmOf1kTPD6wUXiPb9S7",
+    "catatan": "",
+    "tokoNama": "MBAK IS",
+    "tokoId": "Sd6g46vJ9IKhkDW5DXlf",
+    "createdAt": "2025-10-11T03:29:02.494Z",
+    "items": [],
+    "kodeToko": "K0485",
+    "total": 0
+  },
+  {
+    "id": "eR7SNB0LcPCd4iIG52DN",
+    "catatan": "",
+    "createdAt": "2025-11-06T03:45:54.312Z",
+    "items": [],
+    "tokoNama": "TOKO HAPSARI",
+    "kodeToko": "K1936",
+    "total": 0,
+    "tokoId": "ZwFykP7rgzkf1aJM6g3n"
+  },
+  {
+    "id": "eV2ToSUkVOHhT41BhJA6",
+    "catatan": "",
+    "tokoId": "kHooCaS0ksQrVzljSVVi",
+    "tokoNama": "WAKHIDATUS SHOLEKHAH",
+    "total": 0,
+    "kodeToko": "K1923",
+    "createdAt": "2025-10-18T03:52:47.609Z",
+    "items": []
+  },
+  {
+    "id": "eYClmg7LbVhPbh3E8BnD",
+    "createdAt": "2025-11-05T05:02:49.971Z",
+    "tokoNama": "TOKO ANDI",
+    "catatan": "",
+    "kodeToko": "K1179",
+    "items": [],
+    "tokoId": "NbD8s7PxFM7LcFShRs3Q",
+    "total": 0
+  },
+  {
+    "id": "eeetlf0QXvu1QeqngUR9",
+    "tokoNama": "SAMI JF MART",
+    "kodeToko": "K1298",
+    "catatan": "",
+    "tokoId": "LjHKUWJDhaxyFOLArIdi",
+    "createdAt": "2025-10-02T08:11:32.794Z",
+    "items": [],
+    "total": 0
+  },
+  {
+    "id": "ehQKaEy8fEIJSGgfXJyN",
+    "items": [],
+    "total": 0,
+    "kodeToko": "K1352",
+    "createdAt": "2025-11-10T06:48:42.388Z",
+    "catatan": "",
+    "tokoId": "OBIPITnGgdtvp0zkVSIL",
+    "tokoNama": "MUSTAQIM"
+  },
+  {
+    "id": "epPRMtHrQOmtAvCli9Or",
+    "kodeToko": "K1409",
+    "tokoNama": "TOKO BINTANI MART",
+    "total": 0,
+    "catatan": "",
+    "createdAt": "2025-10-01T04:36:36.888Z",
+    "tokoId": "Hfn7DH6eAWCVrAkmczwl",
+    "items": []
+  },
+  {
+    "id": "etxKawcyKyHIemtkCZ0B",
+    "tokoNama": "TRANSIT MART 2",
+    "catatan": "",
+    "tokoId": "HsBqJ8NfGtWtPy4dtOUp",
+    "createdAt": "2025-10-17T09:46:44.816Z",
+    "kodeToko": "K1534",
+    "total": 0,
+    "items": []
+  },
+  {
+    "id": "eukO5zrd7fjmcU448IH8",
+    "items": [],
+    "catatan": "",
+    "total": 0,
+    "tokoNama": "TOKO VIANA",
+    "createdAt": "2025-10-15T04:55:34.513Z",
+    "kodeToko": "K1911",
+    "tokoId": "878SE6zfogSZSvQEzaQC"
+  },
+  {
+    "id": "fP2Gy376DYzqXQ1yMSe4",
+    "tokoNama": "AISYA",
+    "catatan": "",
+    "tokoId": "4m6k3Lx6PkBmmkEOUFc1",
+    "createdAt": "2025-10-13T06:50:53.266Z",
+    "items": [],
+    "kodeToko": "K1128",
+    "total": 0
+  },
+  {
+    "id": "fSpmV8Q3YylwR9MeDZng",
+    "catatan": "",
+    "createdAt": "2025-10-29T05:30:49.000Z",
+    "tokoNama": "TOKO VIANA",
+    "tokoId": "878SE6zfogSZSvQEzaQC",
+    "total": 0,
+    "kodeToko": "K1911",
+    "items": []
+  },
+  {
+    "id": "fUqwSdV09TSHenFtCsFA",
+    "tokoId": "615zUNcqDmWisXG92rkP",
+    "kodeToko": "K1533",
+    "total": 0,
+    "catatan": "",
+    "tokoNama": "TOKO M ANIQ ALFARUQI",
+    "createdAt": "2025-10-27T07:12:55.383Z",
+    "items": []
+  },
+  {
+    "id": "fZLEEAUoQvVWbaEKqwu3",
+    "tokoNama": "TOKO SRI ZAETUN",
+    "kodeToko": "K1815",
+    "tokoId": "anWcVyyLevHAMDFssCz3",
+    "items": [],
+    "createdAt": "2025-09-30T15:54:33.784Z",
+    "total": 0,
+    "catatan": ""
+  },
+  {
+    "id": "faXYPvk3ugpWIxvULeEg",
+    "kodeToko": "K0441",
+    "createdAt": "2025-10-31T07:39:02.000Z",
+    "catatan": "",
+    "tokoId": "2zobAduRXbA1IyykFf5n",
+    "tokoNama": "MJ CELL",
+    "total": 0,
+    "items": []
+  },
+  {
+    "id": "fjYBMeu0roSFE7FsOYd8",
+    "tokoNama": "SD IT AL ANWAR",
+    "kodeToko": "K1658",
+    "items": [],
+    "tokoId": "aKeHRY72jQ8R7GmJIMNH",
+    "createdAt": "2025-11-07T07:50:36.161Z",
+    "total": 0,
+    "catatan": ""
+  },
+  {
+    "id": "fkEJftukwQxVuxS9Vw8s",
+    "catatan": "",
+    "total": 0,
+    "tokoNama": "MARYATI",
+    "kodeToko": "K0378",
+    "items": [],
+    "tokoId": "aYAbEMlBicLREQd8m70C",
+    "createdAt": "2025-10-07T09:55:44.504Z"
+  },
+  {
+    "id": "fuDUf6jd22FUr0YpZ6bF",
+    "catatan": "",
+    "createdAt": "2025-10-22T08:00:17.680Z",
+    "items": [],
+    "kodeToko": "K1725",
+    "tokoNama": "TOKO MBAK RINI",
+    "tokoId": "6pw30ZdwX1mjmVnAvMaL",
+    "total": 0
+  },
+  {
+    "id": "fvJigzaFiqhvF9JspsCZ",
+    "items": [],
+    "createdAt": "2025-10-22T02:47:13.628Z",
+    "catatan": "",
+    "total": 0,
+    "tokoNama": "MI ASSALAM SINGOROJO",
+    "tokoId": "gTE9rpKizzrf2b3XMEkU",
+    "kodeToko": "K1928"
+  },
+  {
+    "id": "gCA87HrPDq0EWEyo8iW0",
+    "kodeToko": "K1928",
+    "total": 0,
+    "tokoNama": "MI ASSALAM SINGOROJO",
+    "items": [],
+    "catatan": "",
+    "tokoId": "gTE9rpKizzrf2b3XMEkU",
+    "createdAt": "2025-10-01T03:01:52.352Z"
+  },
+  {
+    "id": "gHixv2lvVUyHCTDwfZQV",
+    "items": [],
+    "kodeToko": "K2014",
+    "createdAt": "2025-10-16T06:18:07.544Z",
+    "total": 0,
+    "tokoNama": "Toko Koss Mart",
+    "tokoId": "lNRFpK00n4trF3j94v5p",
+    "catatan": ""
+  },
+  {
+    "id": "gIalyW9YJpvpXZ33d82l",
+    "items": [],
+    "kodeToko": "K1592",
+    "tokoId": "6eCwQnclAdFyzGLDlNMc",
+    "tokoNama": "ASMARA CELL",
+    "total": 0,
+    "catatan": "",
+    "createdAt": "2025-09-30T15:54:46.623Z"
+  },
+  {
+    "id": "gK1wOWeWsddwxEQ4xyP7",
+    "total": 0,
+    "kodeToko": "K0676",
+    "tokoNama": "SUDARTO",
+    "createdAt": "2025-10-02T05:16:15.936Z",
+    "items": [],
+    "catatan": "",
+    "tokoId": "W5T0mkGuUhrS8Xv4nxtZ"
+  },
+  {
+    "id": "gjtKlXAsQ3ImHUzWGlvd",
+    "tokoId": "WbtoNXx8lwUgS8s1ojLR",
+    "tokoNama": "BU ISTIANAH ( MTS URWATIL WATSQO )",
+    "items": [],
+    "total": 0,
+    "catatan": "",
+    "createdAt": "2025-11-03T02:36:40.791Z",
+    "kodeToko": "K2066"
+  },
+  {
+    "id": "gmwwNLOrx3W8f97anVrP",
+    "tokoId": "6pw30ZdwX1mjmVnAvMaL",
+    "total": 0,
+    "catatan": "",
+    "tokoNama": "TOKO MBAK RINI",
+    "items": [],
+    "createdAt": "2025-10-08T07:44:48.423Z",
+    "kodeToko": "K1725"
+  },
+  {
+    "id": "h1HQrj8KolkLCocfIPwm",
+    "tokoNama": "YANI 2",
+    "kodeToko": "K1018",
+    "total": 0,
+    "catatan": "",
+    "createdAt": "2025-10-02T04:35:31.964Z",
+    "tokoId": "QHP3VKx7Xl66YirpJdsY",
+    "items": []
+  },
+  {
+    "id": "hQ6xPidZNyVN4RebdGae",
+    "total": 0,
+    "catatan": "",
+    "tokoId": "IXBiyQspfEdWbNBMZp91",
+    "tokoNama": "NYAH JIT",
+    "kodeToko": "K1708",
+    "items": [],
+    "createdAt": "2025-11-01T05:39:53.799Z"
+  },
+  {
+    "id": "hWQhkLI36JW6DnOttO0c",
+    "total": 0,
+    "createdAt": "2025-10-03T09:14:11.623Z",
+    "items": [],
+    "tokoNama": "MUSYAFAK",
+    "catatan": "",
+    "tokoId": "jVJBm18ggKRwQ9dO6sPu",
+    "kodeToko": "K0512"
+  },
+  {
+    "id": "heOXpjqnZbzfvzHYc8pg",
+    "createdAt": "2025-11-05T03:21:10.759Z",
+    "items": [],
+    "total": 0,
+    "tokoId": "VktFHlWljj8CqZVnsjtM",
+    "tokoNama": "TOKO SHERLY",
+    "catatan": "",
+    "kodeToko": "K1500"
+  },
+  {
+    "id": "hem85huDpw5umyyMG4RH",
+    "catatan": "",
+    "tokoId": "HsBqJ8NfGtWtPy4dtOUp",
+    "createdAt": "2025-10-30T17:00:00.000Z",
+    "items": [],
+    "kodeToko": "K1534",
+    "total": 0,
+    "tokoNama": "TRANSIT MART 2"
+  },
+  {
+    "id": "hyBfFCoOs23XUOnowXr2",
+    "createdAt": "2025-11-05T03:04:15.452Z",
+    "tokoNama": "MI ASSALAM SINGOROJO",
+    "catatan": "",
+    "kodeToko": "K1928",
+    "total": 0,
+    "tokoId": "gTE9rpKizzrf2b3XMEkU",
+    "items": []
+  },
+  {
+    "id": "i0IwYNJ4PfjXnjWzUdgB",
+    "total": 0,
+    "tokoId": "jNgDfhGZ4mVvt8VJrRX7",
+    "createdAt": "2025-10-09T08:46:39.460Z",
+    "kodeToko": "K2005",
+    "catatan": "",
+    "tokoNama": "FARIDA ERYANTI",
+    "items": []
+  },
+  {
+    "id": "i6k9JOg3uclfyO3oMqH7",
+    "total": 0,
+    "tokoId": "B432NajzpIiYQHMjsajM",
+    "tokoNama": "ALIYA CELL",
+    "createdAt": "2025-10-04T08:07:39.371Z",
+    "items": [],
+    "catatan": "",
+    "kodeToko": "K0721"
+  },
+  {
+    "id": "iAzNsvORINLHTjQw5JYJ",
+    "items": [],
+    "tokoNama": "TOKO ANUGERAH",
+    "catatan": "",
+    "kodeToko": "K1969",
+    "createdAt": "2025-11-10T10:26:28.325Z",
+    "tokoId": "IQtU1AxfLTPqglkim04O",
+    "total": 0
+  },
+  {
+    "id": "iK0WEYAzNOZpJqu2Lms5",
+    "total": 0,
+    "tokoNama": "MBAK YUYUN",
+    "createdAt": "2025-10-28T03:13:49.000Z",
+    "kodeToko": "K0379",
+    "tokoId": "xp0ZRBc7iUKQ0VDFMW5Y",
+    "catatan": "",
+    "items": []
+  },
+  {
+    "id": "iVvIiMdDcU2Y6hfKW736",
+    "items": [],
+    "total": 0,
+    "tokoNama": "SISWANTO",
+    "tokoId": "sSufgeU8YIyZrAOZbEO6",
+    "createdAt": "2025-10-23T03:37:07.871Z",
+    "catatan": "",
+    "kodeToko": "K0526"
+  },
+  {
+    "id": "iewRg9j6LJGMko5G2oe2",
+    "items": [],
+    "tokoNama": "ALIYA CELL",
+    "kodeToko": "K0721",
+    "total": 0,
+    "createdAt": "2025-11-08T07:22:49.000Z",
+    "catatan": "",
+    "tokoId": "B432NajzpIiYQHMjsajM"
+  },
+  {
+    "id": "ifZZRWqgG0HvVL13Fm52",
+    "tokoNama": "TOKO KOBER",
+    "catatan": "",
+    "total": 0,
+    "items": [],
+    "kodeToko": "K1571",
+    "tokoId": "42f4rMSZhOHXH6oYOXMn",
+    "createdAt": "2025-11-07T06:54:06.824Z"
+  },
+  {
+    "id": "isS0zWjuC5xZCSbe5vST",
+    "tokoId": "aYAbEMlBicLREQd8m70C",
+    "kodeToko": "K0378",
+    "total": 0,
+    "catatan": "",
+    "tokoNama": "MARYATI",
+    "items": [],
+    "createdAt": "2025-10-21T06:41:15.150Z"
+  },
+  {
+    "id": "iu8zQGLw1PTqlo59S7w5",
+    "total": 0,
+    "kodeToko": "K1945",
+    "catatan": "",
+    "items": [],
+    "createdAt": "2025-10-13T09:39:12.045Z",
+    "tokoId": "Yqbds11ik7n7cnIbAlyj",
+    "tokoNama": "SAMILATUN KHASANAH"
+  },
+  {
+    "id": "jMS3y1GNOzUrYt7zBz0p",
+    "tokoNama": "APOTEK PUTRA PRIMA",
+    "kodeToko": "K1993",
+    "catatan": "",
+    "tokoId": "n16DsU1bfxJ6le0HcELZ",
+    "total": 0,
+    "createdAt": "2025-10-17T08:11:11.352Z",
+    "items": []
+  },
+  {
+    "id": "jNmIcNW1dgEtejlt7d5Q",
+    "tokoId": "7xXpzkyryOEVARIJWA8V",
+    "total": 0,
+    "createdAt": "2025-10-03T03:34:24.849Z",
+    "tokoNama": "SUKATI",
+    "kodeToko": "K0467",
+    "catatan": "",
+    "items": []
+  },
+  {
+    "id": "jTFAiqqVkLAeijohDZW3",
+    "total": 0,
+    "createdAt": "2025-10-06T10:22:21.151Z",
+    "kodeToko": "K1149",
+    "tokoId": "ahRcxXhTEcb9lxNWNaut",
+    "items": [],
+    "catatan": "",
+    "tokoNama": "TIGA SAUDARA 2"
+  },
+  {
+    "id": "jWVt0d7YuuVAx2EWJwFQ",
+    "createdAt": "2025-10-31T05:39:17.000Z",
+    "catatan": "",
+    "items": [],
+    "tokoNama": "SUMUK CELL",
+    "kodeToko": "K0504",
+    "tokoId": "97dQ3fc5oJLPHPNSZvPe",
+    "total": 0
+  },
+  {
+    "id": "jcKUFCnOqtLmvS3J1uD8",
+    "items": [],
+    "kodeToko": "K0379",
+    "createdAt": "2025-10-21T03:12:52.761Z",
+    "tokoId": "xp0ZRBc7iUKQ0VDFMW5Y",
+    "catatan": "",
+    "total": 0,
+    "tokoNama": "MBAK YUYUN"
+  },
+  {
+    "id": "jiqxqun8Pgip2sJ3mjhG",
+    "total": 0,
+    "catatan": "",
+    "tokoId": "Wd4tMZL3Gh5AME7jGCqL",
+    "kodeToko": "K1512",
+    "tokoNama": "TOKO RENASYA",
+    "createdAt": "2025-10-02T08:05:14.875Z",
+    "items": []
+  },
+  {
+    "id": "jxS5qHJJyWA1M7M9DdQs",
+    "createdAt": "2025-10-08T05:44:13.075Z",
+    "tokoId": "VktFHlWljj8CqZVnsjtM",
+    "items": [],
+    "tokoNama": "TOKO SHERLY",
+    "total": 0,
+    "kodeToko": "K1500",
+    "catatan": ""
+  },
+  {
+    "id": "k6KQ1oOT1OdTlW0R99Fa",
+    "createdAt": "2025-10-02T08:39:34.220Z",
+    "tokoId": "i3vRFtdn75Z0P1RiyJus",
+    "kodeToko": "K0439",
+    "tokoNama": "ALHUSNA MART",
+    "total": 0,
+    "catatan": "",
+    "items": []
+  },
+  {
+    "id": "kAf38WG3Yyw9HZ9dIVhW",
+    "tokoId": "rwANC5lfSRpAKV2HzJBj",
+    "createdAt": "2025-11-01T03:52:52.000Z",
+    "items": [],
+    "total": 0,
+    "catatan": "",
+    "kodeToko": "K1982",
+    "tokoNama": "NUR YONO"
+  },
+  {
+    "id": "kENpmLZ8AwWMQs1BFkLb",
+    "kodeToko": "K1788",
+    "tokoNama": "SD 3 BUARAN",
+    "tokoId": "ebebnNTVsoHmjsVzpaxp",
+    "catatan": "",
+    "total": 0,
+    "items": [],
+    "createdAt": "2025-10-21T03:15:40.842Z"
+  },
+  {
+    "id": "kNz4OhgitzQ972j80YbN",
+    "total": 0,
+    "tokoNama": "BU ISTIANAH ( MTS URWATIL WATSQO )",
+    "tokoId": "WbtoNXx8lwUgS8s1ojLR",
+    "catatan": "",
+    "items": [],
+    "createdAt": "2025-11-10T04:09:46.549Z",
+    "kodeToko": "K2066"
+  },
+  {
+    "id": "kS671MjXSbNSDic2RLrh",
+    "createdAt": "2025-11-04T03:10:58.273Z",
+    "items": [],
+    "tokoId": "xp0ZRBc7iUKQ0VDFMW5Y",
+    "tokoNama": "MBAK YUYUN",
+    "kodeToko": "K0379",
+    "catatan": "",
+    "total": 0
+  },
+  {
+    "id": "kZqYuTa8bBY2bBTvNCdO",
+    "tokoId": "Un8CXZKfqVE45zerIgis",
+    "tokoNama": "TOKO WAHYUDI",
+    "catatan": "",
+    "createdAt": "2025-10-22T05:55:01.261Z",
+    "kodeToko": "K1586",
+    "total": 0,
+    "items": []
+  },
+  {
+    "id": "keVIkM47XOzXQOWNZSE5",
+    "catatan": "",
+    "tokoId": "W5T0mkGuUhrS8Xv4nxtZ",
+    "total": 0,
+    "items": [],
+    "createdAt": "2025-10-10T03:34:22.553Z",
+    "tokoNama": "SUDARTO",
+    "kodeToko": "K0676"
+  },
+  {
+    "id": "kmQrya6SQ4Bs4zxWMVLM",
+    "catatan": "",
+    "tokoNama": "MADURA BUNDA",
+    "tokoId": "9pGAxSxQpP97NFr46tWJ",
+    "items": [],
+    "kodeToko": "K2077",
+    "total": 0,
+    "createdAt": "2025-11-06T08:25:57.998Z"
+  },
+  {
+    "id": "kn3MOQPYHNiq21NYdeU0",
+    "total": 0,
+    "kodeToko": "K1649",
+    "items": [],
+    "createdAt": "2025-10-10T03:11:29.206Z",
+    "tokoId": "LrDGivjSfm58oJ7eILXz",
+    "catatan": "",
+    "tokoNama": "WARUNG MADURA AL-AMIN 2"
+  },
+  {
+    "id": "kn4kn9IJLWuOA1HLswFf",
+    "catatan": "",
+    "createdAt": "2025-10-10T09:47:27.678Z",
+    "total": 0,
+    "tokoNama": "MBAK MUNA",
+    "tokoId": "TTn9hWhaS5l9V1auHGCk",
+    "items": [],
+    "kodeToko": "K1970"
+  },
+  {
+    "id": "lAgJlMvr2gBEQqI9Bp0x",
+    "tokoId": "aYAbEMlBicLREQd8m70C",
+    "tokoNama": "MARYATI",
+    "catatan": "",
+    "items": [],
+    "createdAt": "2025-10-14T06:31:04.665Z",
+    "kodeToko": "K0378",
+    "total": 0
+  },
+  {
+    "id": "lHVQ47bVjOe5J7nr98De",
+    "total": 0,
+    "tokoNama": "MBAK IMA",
+    "catatan": "",
+    "kodeToko": "K0740",
+    "items": [],
+    "tokoId": "7eLpiuXvWvr11bxaDZWz",
+    "createdAt": "2025-10-18T05:02:22.540Z"
+  },
+  {
+    "id": "lWhZfTGb0xyuvwfz21lm",
+    "kodeToko": "K1387",
+    "catatan": "",
+    "tokoId": "8k5mHDdqhzvAFdnkqWei",
+    "total": 0,
+    "tokoNama": "SMK ISLAM AL HIKMAH MAYONG",
+    "createdAt": "2025-10-16T02:52:10.041Z",
+    "items": []
+  },
+  {
+    "id": "lp81urrBZFd5JYgfiymw",
+    "kodeToko": "K1513",
+    "catatan": "",
+    "tokoId": "X4G4Mm97geyTM8hWkcGe",
+    "total": 0,
+    "items": [],
+    "tokoNama": "TOKO INDANAH",
+    "createdAt": "2025-10-08T08:18:41.014Z"
+  },
+  {
+    "id": "lr8J90WYZBXDItJwKrc0",
+    "catatan": "",
+    "items": [],
+    "total": 0,
+    "tokoNama": "KANTIN SMA AL HIKMAH",
+    "tokoId": "IrbkzdFUGCvAzQv01tks",
+    "kodeToko": "K0525",
+    "createdAt": "2025-10-09T04:55:31.212Z"
+  },
+  {
+    "id": "m5qcXK2yIktFw1lGikQu",
+    "tokoNama": "ULFA KHASANAH",
+    "items": [],
+    "catatan": "",
+    "total": 0,
+    "kodeToko": "K1127",
+    "tokoId": "yBsQQkZjVb4f23z50jbC",
+    "createdAt": "2025-10-07T06:40:51.633Z"
+  },
+  {
+    "id": "m677izkcAKKmsHMhK1qM",
+    "catatan": "",
+    "kodeToko": "K0424",
+    "tokoId": "B8hPBUTijMD2pKkhKEoc",
+    "createdAt": "2025-10-07T05:36:55.038Z",
+    "total": 0,
+    "tokoNama": "WIWIK",
+    "items": []
+  },
+  {
+    "id": "mBtxRBMpJAHn7FvmYj5n",
+    "total": 0,
+    "tokoId": "aKeHRY72jQ8R7GmJIMNH",
+    "catatan": "",
+    "tokoNama": "SD IT AL ANWAR",
+    "kodeToko": "K1658",
+    "items": [],
+    "createdAt": "2025-10-04T05:24:53.797Z"
+  },
+  {
+    "id": "mEmLahDgfiyVOp7Hpha5",
+    "catatan": "",
+    "items": [],
+    "tokoId": "ZPG57TQu3HgMHFcjJS94",
+    "total": 0,
+    "createdAt": "2025-10-17T03:02:29.624Z",
+    "tokoNama": "NIKMAT SEMBAKO",
+    "kodeToko": "K1543"
+  },
+  {
+    "id": "mR68PGCNNlNZsdx9wNEy",
+    "tokoNama": "ELLA 2 KANTIN MTS BALEKAMBANG",
+    "kodeToko": "K0391",
+    "createdAt": "2025-10-07T03:20:08.800Z",
+    "total": 0,
+    "catatan": "",
+    "items": [],
+    "tokoId": "j5OQBnhs4A8lXEY9aNI4"
+  },
+  {
+    "id": "mUvD7pbGF6WxPLE42tm1",
+    "catatan": "",
+    "total": 0,
+    "kodeToko": "K0467",
+    "createdAt": "2025-10-09T07:00:49.659Z",
+    "items": [],
+    "tokoId": "7xXpzkyryOEVARIJWA8V",
+    "tokoNama": "SUKATI"
+  },
+  {
+    "id": "mYqy0zrqgvJNsRg5gRwa",
+    "tokoId": "P3S3LmNnq4sCQ7YUieWO",
+    "total": 0,
+    "tokoNama": "APOTEK PANCUR",
+    "items": [],
+    "catatan": "",
+    "createdAt": "2025-10-20T08:22:52.500Z",
+    "kodeToko": "K0352"
+  },
+  {
+    "id": "mdPAFt5eoFgendlirZ5c",
+    "tokoId": "hHf2x3hxQleMEMp5aLvO",
+    "tokoNama": "ALMA MART",
+    "catatan": "",
+    "items": [],
+    "createdAt": "2025-10-31T07:57:26.823Z",
+    "total": 0,
+    "kodeToko": "K2002"
+  },
+  {
+    "id": "mzcu2aeVWgCmmBSWLnJx",
+    "tokoNama": "WINARNO",
+    "createdAt": "2025-10-03T04:41:11.719Z",
+    "tokoId": "9uWRqV8KbynkKmi3nulk",
+    "items": [],
+    "catatan": "",
+    "total": 0,
+    "kodeToko": "K2021"
+  },
+  {
+    "id": "n4pJ2fVUzegHakz0l3lJ",
+    "total": 0,
+    "catatan": "",
+    "tokoNama": "ALMA MART",
+    "tokoId": "hHf2x3hxQleMEMp5aLvO",
+    "items": [],
+    "kodeToko": "K2002",
+    "createdAt": "2025-10-03T01:39:52.908Z"
+  },
+  {
+    "id": "n8RYa22fybcDLJjy6KD4",
+    "tokoNama": "SD IT AL HUSNA 2",
+    "items": [],
+    "kodeToko": "K1759",
+    "total": 0,
+    "createdAt": "2025-10-04T06:08:47.766Z",
+    "catatan": "",
+    "tokoId": "dFJRnjEcCGZjVJ3vtZTF"
+  },
+  {
+    "id": "nAJmjzKnitvqpyLvEhXO",
+    "tokoNama": "NICE SWALAYAN",
+    "items": [],
+    "tokoId": "aR8hwBYkMccoUYlxzjC7",
+    "createdAt": "2025-11-06T08:27:40.901Z",
+    "kodeToko": "K2144",
+    "total": 0,
+    "catatan": ""
+  },
+  {
+    "id": "nFejL1UotkDNPaB0QefA",
+    "tokoId": "aKeHRY72jQ8R7GmJIMNH",
+    "catatan": "",
+    "total": 0,
+    "tokoNama": "SD IT AL ANWAR",
+    "items": [],
+    "kodeToko": "K1658",
+    "createdAt": "2025-10-31T07:38:54.775Z"
+  },
+  {
+    "id": "nLb4yr4ERliZzFVP1qIY",
+    "kodeToko": "K1555",
+    "items": [],
+    "catatan": "",
+    "createdAt": "2025-11-01T04:08:27.265Z",
+    "total": 0,
+    "tokoId": "Al3wNMsqeYtsyijq1Fvh",
+    "tokoNama": "KOPERASI AL-ALAWY"
+  },
+  {
+    "id": "nOXtFt0cnNgpqgeO98HH",
+    "tokoId": "e68oBFx4bdKYumNQmbTj",
+    "items": [],
+    "total": 0,
+    "catatan": "",
+    "kodeToko": "K1357",
+    "createdAt": "2025-09-30T15:51:17.197Z",
+    "tokoNama": "LAKUMI SWALAYAN"
+  },
+  {
+    "id": "nOhH2c7mi9hPwZdROPDK",
+    "items": [],
+    "tokoId": "OBIPITnGgdtvp0zkVSIL",
+    "tokoNama": "MUSTAQIM",
+    "createdAt": "2025-10-13T07:03:27.747Z",
+    "kodeToko": "K1352",
+    "total": 0,
+    "catatan": ""
+  },
+  {
+    "id": "niFFInzUsQgL0fLvCfej",
+    "items": [],
+    "createdAt": "2025-10-17T06:56:20.450Z",
+    "total": 0,
+    "catatan": "",
+    "kodeToko": "K1571",
+    "tokoId": "42f4rMSZhOHXH6oYOXMn",
+    "tokoNama": "TOKO KOBER"
+  },
+  {
+    "id": "nlNZiAWtkifadU5j072a",
+    "catatan": "",
+    "kodeToko": "K1993",
+    "total": 0,
+    "tokoId": "n16DsU1bfxJ6le0HcELZ",
+    "createdAt": "2025-10-31T03:18:56.308Z",
+    "items": [],
+    "tokoNama": "APOTEK PUTRA PRIMA"
+  },
+  {
+    "id": "nn1T4G6D9Pm8WVK7nafu",
+    "total": 0,
+    "createdAt": "2025-10-13T17:00:00.000Z",
+    "kodeToko": "K1607",
+    "items": [],
+    "tokoId": "xLheMxVZ8I1BWrwmFw48",
+    "catatan": "",
+    "tokoNama": "TOKO HALIMAH"
+  },
+  {
+    "id": "nqh1nb5ptphx8PbS0h9U",
+    "createdAt": "2025-10-13T07:44:13.738Z",
+    "kodeToko": "K1502",
+    "items": [],
+    "tokoId": "cBXhRkwzErSSQ2yHFz8H",
+    "total": 0,
+    "catatan": "",
+    "tokoNama": "TOKO RIZKY OS"
+  },
+  {
+    "id": "nsYCck1tfeJeF79Ye9jW",
+    "tokoNama": "TOKO INDANAH",
+    "tokoId": "X4G4Mm97geyTM8hWkcGe",
+    "createdAt": "2025-10-01T07:26:26.772Z",
+    "total": 0,
+    "catatan": "",
+    "items": [],
+    "kodeToko": "K1513"
+  },
+  {
+    "id": "o1ZBzQT1m57ELFporYNl",
+    "kodeToko": "K1286",
+    "catatan": "",
+    "tokoNama": "RIYADLUL QUR'AN",
+    "tokoId": "MBtynOjLtaD7KngRrvOo",
+    "total": 0,
+    "items": [],
+    "createdAt": "2025-10-25T03:27:32.043Z"
+  },
+  {
+    "id": "o2TBR6zGXB1d6K78pMQg",
+    "tokoId": "Ia1jpq30ooBs6e6ZuLq8",
+    "catatan": "",
+    "items": [],
+    "total": 0,
+    "kodeToko": "K1912",
+    "createdAt": "2025-09-30T15:51:39.745Z",
+    "tokoNama": "WR MADURA KHUMAIROH 2"
+  },
+  {
+    "id": "oEFElKLflqE65HINZbIL",
+    "total": 0,
+    "createdAt": "2025-09-30T15:46:57.160Z",
+    "kodeToko": "K2111",
+    "tokoNama": "TOKO LARIS MANIS",
+    "tokoId": "YsnM07B6W88r9GApCX92",
+    "catatan": "",
+    "items": []
+  },
+  {
+    "id": "oZiPrfn5JYEWhgib6Hsn",
+    "kodeToko": "K1352",
+    "catatan": "",
+    "tokoId": "OBIPITnGgdtvp0zkVSIL",
+    "total": 0,
+    "tokoNama": "MUSTAQIM",
+    "createdAt": "2025-11-03T08:01:43.993Z",
+    "items": []
+  },
+  {
+    "id": "oigj101LDN3LQjBqi8vO",
+    "catatan": "",
+    "tokoId": "2zobAduRXbA1IyykFf5n",
+    "items": [],
+    "kodeToko": "K0441",
+    "createdAt": "2025-10-17T06:56:37.272Z",
+    "tokoNama": "MJ CELL",
+    "total": 0
+  },
+  {
+    "id": "osS5qD1mIrgDRktH7UfV",
+    "items": [],
+    "kodeToko": "K1751",
+    "total": 0,
+    "tokoNama": "SD 1 BUARAN MAYONG",
+    "catatan": "",
+    "tokoId": "NKsOqczLvbzUQOrPcTvY",
+    "createdAt": "2025-10-21T03:55:18.843Z"
+  },
+  {
+    "id": "p0e5lQEOarJjryE9YScz",
+    "tokoNama": "MUSTAQIM",
+    "createdAt": "2025-10-20T06:59:17.018Z",
+    "items": [],
+    "total": 0,
+    "kodeToko": "K1352",
+    "catatan": "",
+    "tokoId": "OBIPITnGgdtvp0zkVSIL"
+  },
+  {
+    "id": "p4fn44UsBJD6ksOzLbFf",
+    "catatan": "",
+    "tokoId": "qBgHRkFD88KqnN8yy52I",
+    "createdAt": "2025-10-14T05:41:16.169Z",
+    "items": [],
+    "tokoNama": "SIDO MULYO",
+    "total": 0,
+    "kodeToko": "K1484"
+  },
+  {
+    "id": "p6lseOpwYK1gfeLEbMxy",
+    "catatan": "",
+    "tokoNama": "TOKO MBAK RINI",
+    "total": 0,
+    "items": [],
+    "kodeToko": "K1725",
+    "tokoId": "6pw30ZdwX1mjmVnAvMaL",
+    "createdAt": "2025-11-05T09:56:36.610Z"
+  },
+  {
+    "id": "pHVzCF99G3S3F7Sh3JPj",
+    "tokoNama": "SUPARNO",
+    "items": [],
+    "total": 0,
+    "kodeToko": "K0390",
+    "catatan": "",
+    "createdAt": "2025-11-05T04:45:37.731Z",
+    "tokoId": "usLxLxZs3KRwiDECcgTd"
+  },
+  {
+    "id": "pNUGTIQ9fIZWquCf5sjk",
+    "tokoNama": "TIGA SAUDARA 2",
+    "createdAt": "2025-11-03T09:35:50.000Z",
+    "tokoId": "ahRcxXhTEcb9lxNWNaut",
+    "kodeToko": "K1149",
+    "items": [],
+    "catatan": "",
+    "total": 0
+  },
+  {
+    "id": "q6KfxUXG1qieXIEUerKx",
+    "catatan": "",
+    "tokoId": "xLheMxVZ8I1BWrwmFw48",
+    "items": [],
+    "kodeToko": "K1607",
+    "createdAt": "2025-11-04T02:45:32.088Z",
+    "total": 0,
+    "tokoNama": "TOKO HALIMAH"
+  },
+  {
+    "id": "qFJ6E22YLEoYe5JNVPOF",
+    "items": [],
+    "tokoNama": "STICOM",
+    "tokoId": "ewv2xw7GgJtJXR8nPfQw",
+    "catatan": "",
+    "kodeToko": "K0511",
+    "total": 0,
+    "createdAt": "2025-10-17T04:50:30.273Z"
+  },
+  {
+    "id": "qIYFmnAvjd7jiA24Isyb",
+    "createdAt": "2025-11-08T03:31:36.688Z",
+    "items": [],
+    "catatan": "",
+    "total": 0,
+    "tokoId": "kHooCaS0ksQrVzljSVVi",
+    "tokoNama": "WAKHIDATUS SHOLEKHAH",
+    "kodeToko": "K1923"
+  },
+  {
+    "id": "qOdkSMwFkdzTMNhZ7O61",
+    "kodeToko": "K1916",
+    "createdAt": "2025-10-22T03:03:49.343Z",
+    "items": [],
+    "catatan": "",
+    "tokoId": "tdeA3VNFi7t8G3VWRUm6",
+    "tokoNama": "TOKO SAUDARA",
+    "total": 0
+  },
+  {
+    "id": "qY0eJva0DBHHzmgYhzZT",
+    "createdAt": "2025-10-31T06:03:36.236Z",
+    "total": 0,
+    "catatan": "",
+    "tokoId": "42f4rMSZhOHXH6oYOXMn",
+    "tokoNama": "TOKO KOBER",
+    "kodeToko": "K1571",
+    "items": []
+  },
+  {
+    "id": "qingfgOLobjgM86A5HmI",
+    "kodeToko": "K1454",
+    "createdAt": "2025-09-30T15:50:23.003Z",
+    "tokoNama": "TOKO UD TANI H.PARDI & PATMI",
+    "catatan": "",
+    "total": 0,
+    "tokoId": "IH0j3u6zMVijvCybTcaD",
+    "items": []
+  },
+  {
+    "id": "r8DBywi7ZzKarY8Wer4l",
+    "tokoNama": "SD 3 BUARAN",
+    "createdAt": "2025-10-07T05:06:27.080Z",
+    "kodeToko": "K1788",
+    "tokoId": "ebebnNTVsoHmjsVzpaxp",
+    "items": [],
+    "total": 0,
+    "catatan": ""
+  },
+  {
+    "id": "rGD7oPqvbtGNbwWiwfOZ",
+    "total": 0,
+    "tokoId": "4RrFtYEGtIzcVvzYWaMY",
+    "kodeToko": "K1656",
+    "tokoNama": "SD IT AL HUSNA PELEMKEREP",
+    "createdAt": "2025-10-17T07:42:20.631Z",
+    "catatan": "",
+    "items": []
+  },
+  {
+    "id": "rJwJoR5nXi8rTEzIe9f5",
+    "items": [],
+    "createdAt": "2025-11-03T07:46:01.959Z",
+    "tokoId": "eLh6QEH4U1yPXyxJUerC",
+    "kodeToko": "K1121",
+    "tokoNama": "MUNAWAROH",
+    "total": 0,
+    "catatan": ""
+  },
+  {
+    "id": "rXXNM557E0pJKy9Mrhn9",
+    "items": [],
+    "tokoId": "uyiOKpYICdUeSfb42aOn",
+    "total": 0,
+    "createdAt": "2025-10-22T07:36:34.228Z",
+    "catatan": "",
+    "kodeToko": "K1528",
+    "tokoNama": "TOKO SOCHIBATUL MUNAWAROH"
+  },
+  {
+    "id": "rZ2SFTb17CtdbNh8Alm4",
+    "catatan": "",
+    "tokoId": "7xXpzkyryOEVARIJWA8V",
+    "total": 0,
+    "items": [],
+    "createdAt": "2025-10-30T04:32:37.402Z",
+    "kodeToko": "K0467",
+    "tokoNama": "SUKATI"
+  },
+  {
+    "id": "ruw257Ke6DfjTqDTF2RC",
+    "items": [],
+    "kodeToko": "K1969",
+    "catatan": "",
+    "total": 0,
+    "tokoNama": "TOKO ANUGERAH",
+    "tokoId": "IQtU1AxfLTPqglkim04O",
+    "createdAt": "2025-10-13T03:20:16.021Z"
+  },
+  {
+    "id": "s1pBom5fbQE4Bh5DP66b",
+    "createdAt": "2025-10-25T03:52:02.280Z",
+    "kodeToko": "K0485",
+    "total": 0,
+    "items": [],
+    "catatan": "",
+    "tokoNama": "MBAK IS",
+    "tokoId": "Sd6g46vJ9IKhkDW5DXlf"
+  },
+  {
+    "id": "s1stNnOwim9eC604O00N",
+    "kodeToko": "K0526",
+    "tokoNama": "SISWANTO",
+    "createdAt": "2025-10-09T05:44:32.937Z",
+    "total": 0,
+    "items": [],
+    "tokoId": "sSufgeU8YIyZrAOZbEO6",
+    "catatan": ""
+  },
+  {
+    "id": "s6X5RCdsjvXve4vjFkHx",
+    "tokoNama": "RATU WALI",
+    "createdAt": "2025-10-18T05:46:37.755Z",
+    "items": [],
+    "catatan": "",
+    "total": 0,
+    "kodeToko": "K1498",
+    "tokoId": "7l4t8ictEySaPyXnKMDa"
+  },
+  {
+    "id": "sEF2TEbuRuoCSwgQMxvQ",
+    "total": 0,
+    "catatan": "",
+    "tokoNama": "TOKO ANDI",
+    "tokoId": "NbD8s7PxFM7LcFShRs3Q",
+    "createdAt": "2025-10-29T09:19:22.042Z",
+    "items": [],
+    "kodeToko": "K1179"
+  },
+  {
+    "id": "sFEjIcFHLYVZbRirWEsY",
+    "tokoId": "O8g9w3lNqdo3pRpC2pwY",
+    "createdAt": "2025-10-14T04:46:34.512Z",
+    "catatan": "",
+    "items": [],
+    "tokoNama": "NUR AFIDAH",
+    "kodeToko": "K1278",
+    "total": 0
+  },
+  {
+    "id": "sjDCE6mZWDvTOlav2awC",
+    "items": [],
+    "createdAt": "2025-11-06T04:20:11.000Z",
+    "total": 0,
+    "tokoId": "lNRFpK00n4trF3j94v5p",
+    "tokoNama": "Toko Koss Mart",
+    "kodeToko": "K2014",
+    "catatan": ""
+  },
+  {
+    "id": "syLsBAt4adATNOdFiBTC",
+    "items": [],
+    "createdAt": "2025-11-06T05:15:52.912Z",
+    "tokoNama": "WARUNG MADURA AL-AMIN 2",
+    "kodeToko": "K1649",
+    "total": 0,
+    "tokoId": "LrDGivjSfm58oJ7eILXz",
+    "catatan": ""
+  },
+  {
+    "id": "t0GeY1KD97ACtneO5C11",
+    "createdAt": "2025-10-04T05:27:47.901Z",
+    "total": 0,
+    "items": [],
+    "tokoNama": "MBAK IS",
+    "catatan": "",
+    "kodeToko": "K0485",
+    "tokoId": "Sd6g46vJ9IKhkDW5DXlf"
+  },
+  {
+    "id": "t41kvzcEc1pzjRbgX5oj",
+    "items": [],
+    "tokoNama": "BERKAH SAFAR",
+    "kodeToko": "K1482",
+    "catatan": "",
+    "createdAt": "2025-11-05T05:02:44.403Z",
+    "tokoId": "Bs2oePYU0B48Em6U0NdQ",
+    "total": 0
+  },
+  {
+    "id": "tC2HuBDFi8jhndVfC5S4",
+    "tokoNama": "SD IT AL HUSNA 2",
+    "items": [],
+    "catatan": "",
+    "tokoId": "dFJRnjEcCGZjVJ3vtZTF",
+    "createdAt": "2025-10-31T03:18:49.271Z",
+    "kodeToko": "K1759",
+    "total": 0
+  },
+  {
+    "id": "tegEwtBOL1H1WeUxwmKf",
+    "kodeToko": "K0503",
+    "tokoId": "AkprBUTUqD1gZOpeqLQy",
+    "createdAt": "2025-11-01T03:02:30.276Z",
+    "catatan": "",
+    "tokoNama": "TOKO IBU AMIN",
+    "total": 0,
+    "items": []
+  },
+  {
+    "id": "tlVJaI6TJCaPfYnsPhJa",
+    "tokoId": "sSufgeU8YIyZrAOZbEO6",
+    "items": [],
+    "tokoNama": "SISWANTO",
+    "total": 0,
+    "catatan": "",
+    "createdAt": "2025-11-06T06:57:14.031Z",
+    "kodeToko": "K0526"
+  },
+  {
+    "id": "tlpXm2WYVbRkpkSnAWR7",
+    "createdAt": "2025-10-23T08:36:11.692Z",
+    "kodeToko": "K1018",
+    "catatan": "",
+    "total": 0,
+    "tokoNama": "YANI 2",
+    "tokoId": "QHP3VKx7Xl66YirpJdsY",
+    "items": []
+  },
+  {
+    "id": "tsPuBTLZOTAXuu01bfo2",
+    "tokoNama": "BU ISTIANAH ( MTS URWATIL WATSQO )",
+    "total": 0,
+    "kodeToko": "K2066",
+    "items": [],
+    "tokoId": "WbtoNXx8lwUgS8s1ojLR",
+    "createdAt": "2025-10-15T08:35:39.202Z",
+    "catatan": ""
+  },
+  {
+    "id": "tsdvmwQVr1oxvEneMAT4",
+    "kodeToko": "K1607",
+    "items": [],
+    "tokoId": "xLheMxVZ8I1BWrwmFw48",
+    "tokoNama": "TOKO HALIMAH",
+    "total": 0,
+    "createdAt": "2025-10-28T03:09:07.479Z",
+    "catatan": ""
+  },
+  {
+    "id": "tuWVJeWkxnj0msnQIsF9",
+    "items": [],
+    "total": 0,
+    "createdAt": "2025-10-23T04:45:11.444Z",
+    "catatan": "",
+    "tokoId": "7xXpzkyryOEVARIJWA8V",
+    "kodeToko": "K0467",
+    "tokoNama": "SUKATI"
+  },
+  {
+    "id": "tuzDgj8Iga6YekhwQk5Q",
+    "kodeToko": "K1366",
+    "tokoNama": "MUNTATIAH",
+    "total": 0,
+    "catatan": "",
+    "items": [],
+    "tokoId": "bEH9JBG9XfbqU2R8PKNC",
+    "createdAt": "2025-11-05T03:50:46.000Z"
+  },
+  {
+    "id": "txvEpoqPXMRxICPZhUgy",
+    "createdAt": "2025-11-03T07:48:27.087Z",
+    "kodeToko": "K1832",
+    "total": 0,
+    "tokoNama": "MUHKAFI",
+    "items": [],
+    "tokoId": "yUpqWUQuZmgdXeW3bt5N",
+    "catatan": ""
+  },
+  {
+    "id": "tyddlj7pOTXb9YlStE7t",
+    "total": 0,
+    "tokoId": "gTE9rpKizzrf2b3XMEkU",
+    "kodeToko": "K1928",
+    "catatan": "",
+    "items": [],
+    "tokoNama": "MI ASSALAM SINGOROJO",
+    "createdAt": "2025-10-15T03:58:34.022Z"
+  },
+  {
+    "id": "uBUulvoWcqoqv2ymENy1",
+    "catatan": "",
+    "createdAt": "2025-11-06T06:00:52.667Z",
+    "items": [],
+    "kodeToko": "K1018",
+    "tokoNama": "YANI 2",
+    "tokoId": "QHP3VKx7Xl66YirpJdsY",
+    "total": 0
+  },
+  {
+    "id": "uEGl2Ry50MhOk2RvflUc",
+    "catatan": "",
+    "total": 0,
+    "createdAt": "2025-10-09T04:16:00.820Z",
+    "items": [],
+    "kodeToko": "K1197",
+    "tokoNama": "LINAWATI SMU MUH 2",
+    "tokoId": "hWaUvcWJzlPMr3hZZqH7"
+  },
+  {
+    "id": "uGCMs6oBYX4mHC8GUjAf",
+    "catatan": "",
+    "tokoNama": "LAKSITA SWALAYAN",
+    "createdAt": "2025-10-30T07:15:19.670Z",
+    "kodeToko": "K2101",
+    "total": 0,
+    "tokoId": "pfVW6jSIplI2WXaQvEB7",
+    "items": []
+  },
+  {
+    "id": "uf9VxZXIN4CiZnBrCv2C",
+    "tokoNama": "SDN 1 BAKALAN ( TOKO SEMBAKO AHLIS )",
+    "items": [],
+    "kodeToko": "K2015",
+    "catatan": "",
+    "total": 0,
+    "createdAt": "2025-10-10T03:07:58.916Z",
+    "tokoId": "Djb9VhTmktwIGcPkALLf"
+  },
+  {
+    "id": "uiiNtHeVA0SESGsVDAhg",
+    "createdAt": "2025-10-04T04:42:48.424Z",
+    "tokoNama": "NUR YONO",
+    "items": [],
+    "catatan": "",
+    "kodeToko": "K1982",
+    "tokoId": "rwANC5lfSRpAKV2HzJBj",
+    "total": 0
+  },
+  {
+    "id": "uvytzL0iz20lDqdbhRD5",
+    "kodeToko": "K0352",
+    "items": [],
+    "catatan": "",
+    "total": 0,
+    "tokoNama": "APOTEK PANCUR",
+    "createdAt": "2025-10-27T09:38:21.000Z",
+    "tokoId": "P3S3LmNnq4sCQ7YUieWO"
+  },
+  {
+    "id": "v4dOPZMUCBONYwFBbeEz",
+    "kodeToko": "K1128",
+    "items": [],
+    "tokoId": "4m6k3Lx6PkBmmkEOUFc1",
+    "createdAt": "2025-10-20T06:28:03.575Z",
+    "total": 0,
+    "catatan": "",
+    "tokoNama": "AISYA"
+  },
+  {
+    "id": "vSQ3KV4pPqdnt2nj16tX",
+    "tokoId": "WbtoNXx8lwUgS8s1ojLR",
+    "catatan": "",
+    "tokoNama": "BU ISTIANAH ( MTS URWATIL WATSQO )",
+    "kodeToko": "K2066",
+    "total": 0,
+    "items": [],
+    "createdAt": "2025-10-08T09:26:32.980Z"
+  },
+  {
+    "id": "vVvGJWBOn82onEiBs1cU",
+    "createdAt": "2025-10-01T05:36:09.319Z",
+    "kodeToko": "K1586",
+    "catatan": "",
+    "tokoId": "Un8CXZKfqVE45zerIgis",
+    "total": 0,
+    "items": [],
+    "tokoNama": "TOKO WAHYUDI"
+  },
+  {
+    "id": "vYg66xV90wKxR3ditCuy",
+    "createdAt": "2025-10-14T04:01:56.563Z",
+    "total": 0,
+    "tokoNama": "SD 1 BUARAN MAYONG",
+    "items": [],
+    "tokoId": "NKsOqczLvbzUQOrPcTvY",
+    "kodeToko": "K1751",
+    "catatan": ""
+  },
+  {
+    "id": "vbN2nzAFgBwLm6gL81PD",
+    "tokoId": "rZ5BOP8Og7Zb2P9x4xE6",
+    "createdAt": "2025-10-13T03:43:24.854Z",
+    "total": 0,
+    "kodeToko": "K0936",
+    "items": [],
+    "catatan": "",
+    "tokoNama": "RONDHI ARDIYANTO"
+  },
+  {
+    "id": "vbeNcDX7hkTSVFV6gnio",
+    "kodeToko": "K1540",
+    "catatan": "",
+    "tokoId": "SXfUg2IX86MSmv6tQUfp",
+    "total": 0,
+    "tokoNama": "REZEKI LANCAR",
+    "createdAt": "2025-10-13T05:34:38.469Z",
+    "items": []
+  },
+  {
+    "id": "vrxX32It8DpuNWnbIjzl",
+    "total": 0,
+    "kodeToko": "K1816",
+    "items": [],
+    "catatan": "",
+    "createdAt": "2025-10-25T06:02:41.106Z",
+    "tokoId": "hrGSsYjRN0DC2i3QPnxO",
+    "tokoNama": "TOKO RAHMAT"
+  },
+  {
+    "id": "vte8lfo4BKANxMXzrQ5Q",
+    "items": [],
+    "tokoNama": "STICOM",
+    "kodeToko": "K0511",
+    "createdAt": "2025-10-10T04:33:29.510Z",
+    "total": 0,
+    "tokoId": "ewv2xw7GgJtJXR8nPfQw",
+    "catatan": ""
+  },
+  {
+    "id": "vuGUHXpCsf239iIJ0fgx",
+    "tokoNama": "TOKO WAHYUDI",
+    "items": [],
+    "catatan": "",
+    "tokoId": "Un8CXZKfqVE45zerIgis",
+    "total": 0,
+    "kodeToko": "K1586",
+    "createdAt": "2025-10-08T05:35:18.210Z"
+  },
+  {
+    "id": "vy3uUfhse0LwhKYwSA5j",
+    "tokoNama": "NIHAYAH",
+    "total": 0,
+    "catatan": "",
+    "createdAt": "2025-09-30T15:47:41.522Z",
+    "kodeToko": "K1422",
+    "tokoId": "a7BPFmbAjENxbAhs7RiN",
+    "items": []
+  },
+  {
+    "id": "vybzRL7OOrGBHFBKdfaS",
+    "total": 0,
+    "tokoId": "cBXhRkwzErSSQ2yHFz8H",
+    "createdAt": "2025-10-27T08:51:49.000Z",
+    "tokoNama": "TOKO RIZKY OS",
+    "items": [],
+    "kodeToko": "K1502",
+    "catatan": ""
+  },
+  {
+    "id": "wFHYbDIeGw7i7302S78A",
+    "catatan": "",
+    "items": [],
+    "tokoId": "36KgS7wC1Qnude8tPEJW",
+    "total": 0,
+    "createdAt": "2025-10-03T05:09:49.216Z",
+    "tokoNama": "PUTRA / ADE ZONE",
+    "kodeToko": "K1480"
+  },
+  {
+    "id": "wSB3aXLC4FBUE7eUNIay",
+    "createdAt": "2025-11-03T07:42:20.145Z",
+    "kodeToko": "K1533",
+    "items": [],
+    "tokoId": "615zUNcqDmWisXG92rkP",
+    "catatan": "",
+    "total": 0,
+    "tokoNama": "TOKO M ANIQ ALFARUQI"
+  },
+  {
+    "id": "wbuUHUQdTHiXpJma9nCh",
+    "kodeToko": "K1409",
+    "tokoId": "Hfn7DH6eAWCVrAkmczwl",
+    "createdAt": "2025-11-05T09:15:35.991Z",
+    "items": [],
+    "tokoNama": "TOKO BINTANI MART",
+    "catatan": "",
+    "total": 0
+  },
+  {
+    "id": "wlQqCYuXyvxC582TJQzg",
+    "catatan": "",
+    "tokoId": "UwdRliDTCsIK7mN3UplU",
+    "kodeToko": "K1877",
+    "createdAt": "2025-10-02T07:25:02.432Z",
+    "items": [],
+    "total": 0,
+    "tokoNama": "KANTOR PWI"
+  },
+  {
+    "id": "woUhcBoQU26lqTY4TpYl",
+    "kodeToko": "K0424",
+    "createdAt": "2025-10-21T05:52:08.325Z",
+    "catatan": "",
+    "tokoId": "B8hPBUTijMD2pKkhKEoc",
+    "total": 0,
+    "tokoNama": "WIWIK",
+    "items": []
+  },
+  {
+    "id": "wpMa9dwKdYk3EZVxq2tc",
+    "total": 0,
+    "tokoNama": "PUTRA / ADE ZONE",
+    "items": [],
+    "createdAt": "2025-10-09T06:11:24.935Z",
+    "catatan": "",
+    "tokoId": "36KgS7wC1Qnude8tPEJW",
+    "kodeToko": "K1480"
+  },
+  {
+    "id": "wzNnzEPEokbE8uqfhIRQ",
+    "kodeToko": "K1387",
+    "tokoId": "8k5mHDdqhzvAFdnkqWei",
+    "tokoNama": "SMK ISLAM AL HIKMAH MAYONG",
+    "items": [],
+    "total": 0,
+    "createdAt": "2025-10-30T03:24:28.764Z",
+    "catatan": ""
+  },
+  {
+    "id": "wzl0aOUcfwujH4KtX8PI",
+    "kodeToko": "K1534",
+    "items": [],
+    "tokoId": "HsBqJ8NfGtWtPy4dtOUp",
+    "total": 0,
+    "catatan": "",
+    "tokoNama": "TRANSIT MART 2",
+    "createdAt": "2025-10-03T05:12:18.513Z"
+  },
+  {
+    "id": "xMBR4fpykJ4sckS4jIKK",
+    "kodeToko": "K1832",
+    "createdAt": "2025-10-20T07:23:49.273Z",
+    "catatan": "",
+    "tokoId": "yUpqWUQuZmgdXeW3bt5N",
+    "tokoNama": "MUHKAFI",
+    "items": [],
+    "total": 0
+  },
+  {
+    "id": "xOrt14rwuUbcXoZOdJpV",
+    "createdAt": "2025-11-05T06:52:13.938Z",
+    "catatan": "",
+    "items": [],
+    "tokoId": "Un8CXZKfqVE45zerIgis",
+    "kodeToko": "K1586",
+    "tokoNama": "TOKO WAHYUDI",
+    "total": 0
+  },
+  {
+    "id": "xPY321z3ijJqvvCZu9hz",
+    "catatan": "",
+    "total": 0,
+    "tokoId": "BYxFMWDMPNQaGNvbV341",
+    "items": [],
+    "tokoNama": "TATA MANDIRI",
+    "kodeToko": "K0366",
+    "createdAt": "2025-11-05T04:31:56.921Z"
+  },
+  {
+    "id": "xTDdr4nQWRTS49rQQ3YO",
+    "createdAt": "2025-10-20T06:11:16.843Z",
+    "kodeToko": "K1533",
+    "catatan": "",
+    "total": 0,
+    "tokoNama": "TOKO M ANIQ ALFARUQI",
+    "items": [],
+    "tokoId": "615zUNcqDmWisXG92rkP"
+  },
+  {
+    "id": "xgLMOtvQ7MIEZO1emOrL",
+    "items": [],
+    "kodeToko": "K1409",
+    "tokoId": "Hfn7DH6eAWCVrAkmczwl",
+    "createdAt": "2025-10-08T10:22:59.748Z",
+    "total": 0,
+    "tokoNama": "TOKO BINTANI MART",
+    "catatan": ""
+  },
+  {
+    "id": "xvAbOVFQ5TwTWlnBSlWN",
+    "createdAt": "2025-10-10T08:00:56.659Z",
+    "items": [],
+    "catatan": "",
+    "kodeToko": "K1816",
+    "tokoNama": "TOKO RAHMAT",
+    "tokoId": "hrGSsYjRN0DC2i3QPnxO",
+    "total": 0
+  },
+  {
+    "id": "yED8ZNeiIOpQSCaQUe3t",
+    "total": 0,
+    "createdAt": "2025-11-05T06:52:20.336Z",
+    "catatan": "",
+    "items": [],
+    "kodeToko": "K1154",
+    "tokoId": "pfBZeBBflEj9cMD0uZa2",
+    "tokoNama": "TOKO ALI"
+  },
+  {
+    "id": "yHZrg2IThvRLNFyKPSDp",
+    "tokoNama": "MUHKAFI",
+    "catatan": "",
+    "tokoId": "yUpqWUQuZmgdXeW3bt5N",
+    "total": 0,
+    "createdAt": "2025-10-13T07:48:12.887Z",
+    "kodeToko": "K1832",
+    "items": []
+  },
+  {
+    "id": "yJmd8FCXWGmAsIfySHpT",
+    "catatan": "",
+    "kodeToko": "K0462",
+    "items": [],
+    "tokoId": "wa6cy9OSn1Nt8nknPGk4",
+    "total": 0,
+    "createdAt": "2025-10-02T04:05:34.573Z",
+    "tokoNama": "YANI"
+  },
+  {
+    "id": "yOi3QLfwi7OJ4mCwfzCZ",
+    "catatan": "",
+    "kodeToko": "K0661",
+    "createdAt": "2025-10-08T09:51:53.808Z",
+    "tokoNama": "KHUDIN",
+    "items": [],
+    "tokoId": "I2ckekmi55nhDdQ2RGZn",
+    "total": 0
+  },
+  {
+    "id": "yX1KV65nMmICMDSlvzst",
+    "createdAt": "2025-10-01T08:35:53.041Z",
+    "items": [],
+    "kodeToko": "K0390",
+    "total": 0,
+    "catatan": "",
+    "tokoId": "usLxLxZs3KRwiDECcgTd",
+    "tokoNama": "SUPARNO"
+  },
+  {
+    "id": "ybHFSgp4QaIVbdVDo4Gz",
+    "items": [],
+    "createdAt": "2025-11-04T07:03:05.301Z",
+    "tokoNama": "MADUN",
+    "total": 0,
+    "catatan": "",
+    "kodeToko": "K0373",
+    "tokoId": "ImE48v9OEwbSNMRIb16y"
+  },
+  {
+    "id": "ydMc4R1sGsXQnpmj9G9X",
+    "createdAt": "2025-10-08T05:20:33.140Z",
+    "items": [],
+    "catatan": "",
+    "tokoId": "517lFqCrv4ylnAybXBuH",
+    "kodeToko": "K1367",
+    "tokoNama": "ENDANG SRI WAHYUNI",
+    "total": 0
+  },
+  {
+    "id": "ykLhBJ6VZPjVyYFYsY5Z",
+    "tokoId": "lNRFpK00n4trF3j94v5p",
+    "kodeToko": "K2014",
+    "total": 0,
+    "tokoNama": "TOKO KOSS MART",
+    "items": [],
+    "catatan": "",
+    "createdAt": "2025-10-02T03:30:26.481Z"
+  },
+  {
+    "id": "yti1my6pX59yDgz7RYNR",
+    "tokoNama": "TOKO MBAK RINI",
+    "items": [],
+    "catatan": "",
+    "tokoId": "6pw30ZdwX1mjmVnAvMaL",
+    "createdAt": "2025-10-15T07:15:57.265Z",
+    "total": 0,
+    "kodeToko": "K1725"
+  },
+  {
+    "id": "ytuGiWyWZVaccWWN4h5N",
+    "createdAt": "2025-10-01T05:11:45.912Z",
+    "kodeToko": "K1367",
+    "items": [],
+    "tokoNama": "ENDANG SRI WAHYUNI",
+    "catatan": "",
+    "tokoId": "517lFqCrv4ylnAybXBuH",
+    "total": 0
+  },
+  {
+    "id": "zRgKGKzWTfLBveLIuY4I",
+    "tokoNama": "KHUDIN",
+    "kodeToko": "K0661",
+    "createdAt": "2025-11-04T09:28:32.145Z",
+    "tokoId": "I2ckekmi55nhDdQ2RGZn",
+    "total": 0,
+    "items": [],
+    "catatan": ""
+  },
+  {
+    "id": "zVLxBaoGeQ02Wj0luuqI",
+    "kodeToko": "K1540",
+    "createdAt": "2025-10-27T05:39:26.069Z",
+    "tokoId": "SXfUg2IX86MSmv6tQUfp",
+    "total": 0,
+    "tokoNama": "REZEKI LANCAR",
+    "items": [],
+    "catatan": ""
+  },
+  {
+    "id": "zVVuPjjL8StkXlp4iJYY",
+    "catatan": "",
+    "createdAt": "2025-10-18T07:12:55.388Z",
+    "kodeToko": "K0721",
+    "items": [],
+    "tokoId": "B432NajzpIiYQHMjsajM",
+    "total": 0,
+    "tokoNama": "ALIYA CELL"
+  },
+  {
+    "id": "zgtbso6zj6kKp9Y9Ihb2",
+    "tokoId": "rZ5BOP8Og7Zb2P9x4xE6",
+    "items": [],
+    "total": 0,
+    "catatan": "",
+    "tokoNama": "RONDHI ARDIYANTO",
+    "createdAt": "2025-10-06T05:47:12.754Z",
+    "kodeToko": "K0936"
+  },
+  {
+    "id": "zvN3XJsxI5W7xM5R0haD",
+    "tokoId": "B432NajzpIiYQHMjsajM",
+    "createdAt": "2025-11-01T06:01:16.111Z",
+    "total": 0,
+    "catatan": "",
+    "kodeToko": "K0721",
+    "items": [],
+    "tokoNama": "ALIYA CELL"
+  }
+]

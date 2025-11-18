@@ -1,7 +1,7 @@
 // src/pages/AnalisisTokoPage.jsx
 import { useState, useMemo } from 'react';
 import { ArrowLeft, BarChart2, ArrowDownUp, TrendingDown, TrendingUp, Star, AlertCircle, Package, Calendar } from 'lucide-react';
-import { differenceInDays, parseISO, format } from 'date-fns';
+import { differenceInDays, format } from 'date-fns';
 import { id } from 'date-fns/locale';
 
 export default function AnalisisTokoPage({ tokoList, orderList, kunjunganList, setActivePage }) {
@@ -15,7 +15,7 @@ export default function AnalisisTokoPage({ tokoList, orderList, kunjunganList, s
                 const ordersForToko = orderList.filter((o) => o.tokoId === toko.id);
                 const visitsForToko = kunjunganList.filter((k) => k.tokoId === toko.id);
 
-                const totalRevenue = ordersForToko.reduce((sum, o) => sum + o.total, 0);
+                const totalRevenue = ordersForToko.reduce((sum, o) => sum + Number(o.total || 0), 0);
                 const totalOrders = ordersForToko.length;
                 const totalBox = ordersForToko.reduce((sum, order) => sum + (order.items?.reduce((itemSum, item) => itemSum + (item.qtyBox || 0), 0) || 0), 0);
                 const totalVisits = visitsForToko.length;
@@ -23,8 +23,8 @@ export default function AnalisisTokoPage({ tokoList, orderList, kunjunganList, s
                 const averageOrderValue = totalOrders > 0 ? totalRevenue / totalOrders : 0;
                 const conversionRate = totalVisits > 0 ? (totalOrders / totalVisits) * 100 : 0;
 
-                const lastOrder = ordersForToko.sort((a, b) => b.createdAt.seconds - a.createdAt.seconds)[0];
-                const lastOrderDate = lastOrder ? new Date(lastOrder.createdAt.seconds * 1000) : null;
+                const lastOrder = ordersForToko.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())[0];
+                const lastOrderDate = lastOrder ? new Date(lastOrder.createdAt) : null;
                 const daysSinceLastOrder = lastOrderDate ? differenceInDays(new Date(), lastOrderDate) : Infinity;
 
                 return {

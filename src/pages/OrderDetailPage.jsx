@@ -8,7 +8,7 @@ export default function OrderDetailPage({ toko, orderList, onBack }) {
     // State untuk melacak order mana yang sedang dibuka
     const [expandedOrderId, setExpandedOrderId] = useState(null);
 
-    const orderToko = orderList.filter((o) => o.tokoId === toko.id).sort((a, b) => (b.createdAt?.seconds || 0) - (a.createdAt?.seconds || 0));
+    const orderToko = orderList.filter((o) => o.tokoId === toko.id).sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
 
     // --- Hitung Statistik Ringkasan ---
     const totalOrders = orderToko.length;
@@ -64,7 +64,7 @@ export default function OrderDetailPage({ toko, orderList, onBack }) {
                                 <div className="flex justify-between items-start">
                                     <div className="flex items-center gap-2 text-sm font-semibold text-slate-700">
                                         <Calendar size={14} className="text-purple-600" />
-                                        <span>{order.createdAt?.seconds ? format(new Date(order.createdAt.seconds * 1000), 'EEE, d MMM yyyy, HH:mm', { locale: id }) : 'N/A'}</span>
+                                        <span>{order.createdAt ? format(new Date(order.createdAt), 'EEE, d MMM yyyy, HH:mm', { locale: id }) : 'N/A'}</span>
                                     </div>
                                     <div className="text-right">
                                         <p className="font-bold text-lg text-green-600">Rp{order.total.toLocaleString('id-ID')}</p>

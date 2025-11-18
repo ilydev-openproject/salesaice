@@ -229,8 +229,8 @@ export default function TokoGradePage({ setActivePage, tokoList, orderList, onMo
         const monthlySales = {}; // { tokoId: { 'YYYY-MM': totalBoxes } }
 
         orderList.forEach((order) => {
-            if (!order.createdAt?.seconds) return;
-            const orderDate = new Date(order.createdAt.seconds * 1000);
+            if (!order.createdAt) return;
+            const orderDate = new Date(order.createdAt);
             if (orderDate >= monthStart && orderDate <= monthEnd) {
                 const totalBoxes = order.items?.reduce((sum, item) => sum + item.qtyBox, 0) || 0;
                 monthlySales[order.tokoId] = (monthlySales[order.tokoId] || 0) + totalBoxes;
