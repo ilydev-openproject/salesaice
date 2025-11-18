@@ -26,3 +26,7 @@ dist-ssr
 # Secret files
 *.json
 serviceAccountKey.json
+
+# Secret files
+*.json
+serviceAccountKey.json
