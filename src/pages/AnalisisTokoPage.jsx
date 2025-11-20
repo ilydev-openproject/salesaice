@@ -137,7 +137,7 @@ export default function AnalisisTokoPage({ tokoList, orderList, kunjunganList, s
                                     </div>
                                     <div className="flex justify-between">
                                         <span className="text-slate-500">Avg. Order Value</span>
-                                        <span className="font-bold text-slate-700">Rp{Math.round(toko.averageOrderValue).toLocaleString('id-ID')}</span>
+                                        <span className="font-bold text-slate-700">Rp{(Math.round(toko.averageOrderValue) || 0).toLocaleString('id-ID')}</span>
                                     </div>
                                     <div className="flex justify-between">
                                         <span className="text-slate-500">Konversi Kunjungan</span>

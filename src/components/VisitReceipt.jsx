@@ -45,10 +45,10 @@ const VisitReceipt = React.forwardRef(({ kunjungan }, ref) => {
                                 <div className="flex-grow pr-2">
                                     <p className="font-semibold">{item.nama}</p>
                                     <p className="text-sm text-slate-500">
-                                        {item.qtyBox} box @ Rp{item.hargaPerBox.toLocaleString('id-ID')}
+                                        {item.qtyBox} box @ Rp{Number(item.hargaPerBox || 0).toLocaleString('id-ID')}
                                     </p>
                                 </div>
-                                <p className="font-bold text-base">Rp{item.total.toLocaleString('id-ID')}</p>
+                                <p className="font-bold text-base">Rp{Number(item.total || 0).toLocaleString('id-ID')}</p>
                             </div>
                         ))}
                     </div>
@@ -62,7 +62,7 @@ const VisitReceipt = React.forwardRef(({ kunjungan }, ref) => {
                 <div className="border-t border-dashed border-slate-300 mt-5 pt-4">
                     <div className="flex justify-between font-bold text-xl">
                         <span>TOTAL</span>
-                        <span>Rp{grandTotal.toLocaleString('id-ID')}</span>
+                        <span>Rp{Number(grandTotal).toLocaleString('id-ID')}</span>
                     </div>
                 </div>
             )}

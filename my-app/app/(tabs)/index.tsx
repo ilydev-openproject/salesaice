@@ -1,14 +1,14 @@
 import { StyleSheet, ActivityIndicator, Image, View, ScrollView, TouchableOpacity, RefreshControl } from 'react-native';
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
-import { useAppContext } from '@/context/AppContext';
+import { useAppContext } from '../context/AppContext';
 import React, { useMemo, useState, useCallback } from 'react';
 import { Ionicons } from '@expo/vector-icons';
+import { isSameDay, addDays } from 'date-fns'; // Import helper date-fns
 import { LinearGradient } from 'expo-linear-gradient';
-import AddVisitModal from '@/components/AddVisitModal';
 
 export default function HomeScreen() {
-  const { loading, kunjunganList, orderList, targets, loadData } = useAppContext();
+  const { loading, kunjunganList, orderList, targets, loadData, produkList } = useAppContext();
 
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [isAddVisitModalVisible, setIsAddVisitModalVisible] = useState(false);
@@ -64,20 +64,16 @@ export default function HomeScreen() {
       return visitDate >= todayStart && visitDate <= todayEnd;
     });
 
+    // --- PERBAIKAN LOGIKA ORDER HARI INI (Sesuai Web) ---
     const orderHariIni = orderList.filter((o) => {
       if (!o.createdAt) return false;
-      // Order untuk "Ringkasan Hari Ini" dihitung dari kunjungan yang dilakukan KEMARIN (H-1).
-      const yesterday = new Date();
-      yesterday.setDate(now.getDate() - 1);
-
       const orderDate = new Date(o.createdAt);
-      // Order dihitung jika tanggalnya sama dengan HARI INI, dan dibuat dari kunjungan KEMARIN.
-      // Ini secara efektif mencari order yang dijadwalkan untuk pengiriman hari ini.
-      return orderDate.toDateString() === now.toDateString();
+      // Order hari ini dihitung dari kunjungan hari ini, yang akan dikirim BESOK (H+1)
+      return isSameDay(orderDate, addDays(new Date(), 1));
     });
 
     const totalBoxHariIni = orderHariIni.reduce((sum, item) => sum + (item.items?.reduce((qty, subItem) => qty + subItem.qtyBox, 0) || 0), 0);
-    const totalPendapatanHariIni = orderHariIni.reduce((sum, item) => sum + (item.total || 0), 0);
+    const totalPendapatanHariIni = orderHariIni.reduce((sum, item) => sum + Number(item.total || 0), 0);
 
     return {
       monthly: { totalKunjungan: kunjunganBulanIni.length, totalBox: totalBoxTerjualBulanIni },
@@ -85,34 +81,6 @@ export default function HomeScreen() {
       targetDetails: { progressPersen: progress, sisaTarget: sisa, sisaHariKerja: sisaHari, targetHarian: harian },
     };
   }, [kunjunganList, orderList, targets]);
-
-  const kunjunganTerbaru = useMemo(() => {
-    // Menggabungkan data kunjungan dengan data order yang sesuai
-    return kunjunganList.slice(0, 5).map((kunjungan) => {
-      if (kunjungan.status === 'Order') {
-        const relatedOrders = orderList.filter((order) => { // order.createdAt is also ISO string
-          if (!order.createdAt || !kunjungan.createdAt) return false;
-
-          const visitDate = new Date(kunjungan.createdAt);
-          const orderDate = new Date(order.createdAt);
-
-          // Jika kunjungan hari Sabtu, order dicari H+2 (Senin). Jika hari lain, H+1.
-          const daysToAdd = visitDate.getDay() === 6 ? 2 : 1;
-          const expectedOrderDate = new Date(visitDate);
-          expectedOrderDate.setDate(visitDate.getDate() + daysToAdd);
-
-          return order.tokoId === kunjungan.tokoId && orderDate.toDateString() === expectedOrderDate.toDateString();
-        });
-
-        if (relatedOrders.length > 0) {
-          const total = relatedOrders.reduce((sum, order) => sum + (order.total || 0), 0);
-          const items = relatedOrders.flatMap((order) => order.items || []);
-          return { ...kunjungan, total, items, status: 'Order' };
-        }
-      }
-      return kunjungan;
-    });
-  }, [kunjunganList, orderList]);
 
   const onRefresh = useCallback(async () => {
     setIsRefreshing(true);
@@ -141,9 +109,6 @@ export default function HomeScreen() {
           </ThemedText>
         </View>
         <View style={styles.headerActions}>
-          <TouchableOpacity onPress={() => setIsAddVisitModalVisible(true)}>
-            <Ionicons name="add-circle-outline" size={32} color="#402566" />
-          </TouchableOpacity>
           <Image source={require('@/assets/images/logo.png')} style={styles.logo} />
         </View>
       </ThemedView>
@@ -312,51 +277,7 @@ export default function HomeScreen() {
             </TouchableOpacity>
           </View>
         </View>
-
-        {/* Kunjungan Terbaru */}
-        <View style={styles.section}>
-          <View style={styles.sectionHeader}>
-            <ThemedText type="subtitle" style={styles.sectionTitle}>
-              Kunjungan Terbaru
-            </ThemedText>
-            <Ionicons name="ellipsis-horizontal" size={20} color="#402566" />
-          </View>
-          {kunjunganTerbaru.length > 0 ? (
-            kunjunganTerbaru.map((item) => (
-              <TouchableOpacity key={item.id} style={styles.visitItem}>
-                <View style={styles.visitAvatar}>
-                  <ThemedText style={styles.visitAvatarText}>{(item.namaToko || '?').charAt(0).toUpperCase()}</ThemedText>
-                </View>
-                <View style={styles.visitDetails}>
-                  <ThemedText type="defaultSemiBold">{item.namaToko || 'Toko tidak diketahui'}</ThemedText>
-                  <ThemedText style={styles.visitDate}>
-                    {new Date(item.createdAt).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' })}
-                  </ThemedText>
-                </View>
-                {item.status === 'Order' ? (
-                  <View style={styles.visitOrderInfo}>
-                    <ThemedText style={styles.visitOrderTotal}>Rp{(item.total || 0).toLocaleString('id-ID')}</ThemedText>
-                    <ThemedText style={styles.visitOrderBox}>
-                      {item.items?.reduce((sum, i) => sum + i.qtyBox, 0) || 0} box
-                    </ThemedText>
-                  </View>
-                ) : (
-                  <View style={[styles.visitStatus, styles.statusNoOrder]}>
-                    <ThemedText style={styles.visitStatusText}>Tidak Order</ThemedText>
-                  </View>
-                )}
-              </TouchableOpacity>
-            ))
-          ) : (
-            <ThemedText style={styles.emptyText}>Belum ada aktivitas kunjungan.</ThemedText>
-          )}
-        </View>
       </ScrollView>
-
-      <AddVisitModal
-        visible={isAddVisitModalVisible}
-        onClose={() => setIsAddVisitModalVisible(false)}
-      />
     </ThemedView>
   );
 }
@@ -413,6 +334,7 @@ const styles = StyleSheet.create({
   primaryCardValue: {
     color: '#FFFFFF',
     fontSize: 32,
+    lineHeight: 36, // Perbaikan untuk angka yang terpotong
     fontWeight: 'bold',
   },
   primaryCardLabel: {

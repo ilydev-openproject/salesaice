@@ -226,7 +226,7 @@ export default function HomePage({ daftarToko, kunjunganList = [], orderList = [
                             </p>
                         </div>
                         <div className="bg-green-50 p-2 rounded-lg border border-green-100">
-                            <p className="text-xl font-bold text-green-700">{(lastMonthInsights.totalRevenue / 1000000).toFixed(1)}jt</p>
+                            <p className="text-xl font-bold text-green-700">{(lastMonthInsights.totalRevenue / 1000000).toFixed(1)} jt</p>
                             <p className="text-xs text-green-600 flex items-center justify-center gap-1">
                                 <Wallet size={12} /> Pendapatan
                             </p>
@@ -347,7 +347,7 @@ export default function HomePage({ daftarToko, kunjunganList = [], orderList = [
                     {/* Total Pendapatan */}
                     <div className="bg-white p-3 rounded-lg shadow-sm border border-gray-100 text-center">
                         <Wallet className="mx-auto text-green-500 mb-1" size={20} />
-                        <p className="text-xl font-bold text-slate-800">{(totalPendapatan / 1000).toFixed(1)}k</p>
+                        <p className="text-xl font-bold text-slate-800">Rp{(totalPendapatan || 0).toLocaleString('id-ID')}</p>
                         <p className="text-xs text-slate-500">Pendapatan</p>
                     </div>
                 </div>

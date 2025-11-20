@@ -270,84 +270,28 @@ export default function App() {
                     right: 0,
                     backgroundColor: 'white',
                     display: 'flex',
-                    justifyContent: 'space-around',
-                    padding: '8px 0',
+                    justifyContent: 'space-evenly', // Use space-evenly for better distribution
+                    padding: '8px 0 12px 0', // Add more padding at the bottom for easier access
                     borderTop: '1px solid #eee',
                     maxWidth: '500px',
                     margin: '0 auto',
                     width: '100%',
                     boxShadow: '0 -2px 10px rgba(0,0,0,0.05)',
-                    zIndex: 300, // Memastikan navigasi berada di atas semua layer
+                    zIndex: 300,
                 }}
             >
-                <button
-                    onClick={() => setActivePage('home')}
-                    style={{
-                        display: 'flex',
-                        flexDirection: 'column',
-                        alignItems: 'center',
-                        background: 'none',
-                        border: 'none',
-                        fontSize: '10px',
-                        outline: 'none',
-                        cursor: 'pointer',
-                    }}
-                >
-                    <Home size={18} color={activePage === 'home' ? '#402566' : '#999'} />
-                    <span style={{ marginTop: '2px', color: activePage === 'home' ? '#402566' : '#999' }}>Beranda</span>
-                </button>
-                <button
-                    onClick={() => setActivePage('visit')}
-                    style={{
-                        display: 'flex',
-                        flexDirection: 'column',
-                        alignItems: 'center',
-                        background: 'none',
-                        border: 'none',
-                        fontSize: '10px',
-                        outline: 'none',
-                        cursor: 'pointer',
-                    }}
-                >
-                    <MapPin size={18} color={activePage === 'visit' ? '#402566' : '#999'} />
-                    <span style={{ marginTop: '2px', color: activePage === 'visit' ? '#402566' : '#999' }}>Kunjungan</span>
-                </button>
-                <button
-                    onClick={() => setActivePage('order')}
-                    style={{
-                        display: 'flex',
-                        flexDirection: 'column',
-                        alignItems: 'center',
-                        background: 'none',
-                        border: 'none',
-                        fontSize: '10px',
-                        outline: 'none',
-                        cursor: 'pointer',
-                    }}
-                >
-                    <ShoppingBag size={18} color={activePage === 'order' ? '#402566' : '#999'} />
-                    <span style={{ marginTop: '2px', color: activePage === 'order' ? '#402566' : '#999' }}>Order</span>
-                </button>
-                <button onClick={() => setActivePage('produk')} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', background: 'none', border: 'none', outline: 'none', fontSize: '10px', cursor: 'pointer' }}>
-                    <Package size={18} color={activePage === 'produk' ? '#402566' : '#999'} />
-                    <span style={{ marginTop: '2px', color: activePage === 'produk' ? '#402566' : '#999' }}>Produk</span>
-                </button>
-                <button
-                    onClick={() => setActivePage('toko')}
-                    style={{
-                        display: 'flex',
-                        flexDirection: 'column',
-                        alignItems: 'center',
-                        background: 'none',
-                        border: 'none',
-                        fontSize: '10px',
-                        outline: 'none',
-                        cursor: 'pointer',
-                    }}
-                >
-                    <Store size={18} color={activePage === 'toko' ? '#402566' : '#999'} />
-                    <span style={{ marginTop: '2px', color: activePage === 'toko' ? '#402566' : '#999' }}>Toko</span>
-                </button>
+                {[
+                    { page: 'home', label: 'Beranda', icon: Home },
+                    { page: 'visit', label: 'Kunjungan', icon: MapPin },
+                    { page: 'order', label: 'Order', icon: ShoppingBag },
+                    { page: 'produk', label: 'Produk', icon: Package },
+                    { page: 'toko', label: 'Toko', icon: Store },
+                ].map(({ page, label, icon: Icon }) => (
+                    <button key={page} onClick={() => setActivePage(page)} className={`flex flex-col items-center justify-center gap-1 w-16 transition-all duration-200 ease-in-out transform focus:outline-none ${activePage === page ? 'text-purple-700' : 'text-slate-500 hover:text-purple-600'}`}>
+                        <Icon size={20} strokeWidth={activePage === page ? 2.5 : 2} />
+                        <span className={`text-[10px] font-semibold ${activePage === page ? 'scale-110' : ''}`}>{label}</span>
+                    </button>
+                ))}
             </div>
         </div>
     );

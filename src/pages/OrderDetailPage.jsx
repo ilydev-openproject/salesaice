@@ -45,7 +45,7 @@ export default function OrderDetailPage({ toko, orderList, onBack }) {
                 </div>
                 <div className="bg-purple-50 p-3 rounded-lg shadow-sm border border-purple-100">
                     <Wallet className="mx-auto text-green-500 mb-1" size={20} />
-                    <p className="text-xl font-bold text-slate-800">{(totalRevenue / 1000).toFixed(1)}k</p>
+                    <p className="text-xl font-bold text-slate-800">Rp{(totalRevenue || 0).toLocaleString('id-ID')}</p>
                     <p className="text-xs text-slate-500">Pendapatan</p>
                 </div>
             </div>
@@ -67,7 +67,7 @@ export default function OrderDetailPage({ toko, orderList, onBack }) {
                                         <span>{order.createdAt ? format(new Date(order.createdAt), 'EEE, d MMM yyyy, HH:mm', { locale: id }) : 'N/A'}</span>
                                     </div>
                                     <div className="text-right">
-                                        <p className="font-bold text-lg text-green-600">Rp{order.total.toLocaleString('id-ID')}</p>
+                                        <p className="font-bold text-lg text-green-600">Rp{Number(order.total || 0).toLocaleString('id-ID')}</p>
                                         <p className="text-xs text-slate-500">{order.items.reduce((sum, item) => sum + item.qtyBox, 0)} box</p>
                                     </div>
                                 </div>
@@ -78,10 +78,10 @@ export default function OrderDetailPage({ toko, orderList, onBack }) {
                                                 <div className="flex-grow pr-2">
                                                     <p className="font-semibold text-slate-800">{item.nama}</p>
                                                     <p className="text-xs text-slate-500">
-                                                        {item.qtyBox} box @ Rp{item.hargaPerBox.toLocaleString('id-ID')}
+                                                        {item.qtyBox} box @ Rp{(item.hargaPerBox || 0).toLocaleString('id-ID')}
                                                     </p>
                                                 </div>
-                                                <p className="font-semibold text-slate-800">Rp{item.total.toLocaleString('id-ID')}</p>
+                                                <p className="font-semibold text-slate-800">Rp{Number(item.total || 0).toLocaleString('id-ID')}</p>
                                             </div>
                                         ))}
                                     </div>

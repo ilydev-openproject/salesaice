@@ -170,10 +170,10 @@ export default function ProdukPage({ produkList: initialProdukList, onToggleAvai
                             <h3 className={`font-bold text-slate-800 text-sm leading-tight ${!isAvailable ? 'line-through text-slate-500' : ''}`}>{produk.nama}</h3>
                             <div className="grid grid-cols-2 gap-x-3 gap-y-0.5 text-xs mt-1 text-slate-600">
                                 <span>
-                                    Modal: <span className="font-semibold">Rp{hargaPerBox.toLocaleString('id-ID')}</span>
+                                    Modal: <span className="font-semibold">Rp{Number(hargaPerBox).toLocaleString('id-ID')}</span>
                                 </span>
                                 <span>
-                                    Jual: <span className="font-semibold">Rp{hargaJualPerPcs.toLocaleString('id-ID')}</span>
+                                    Jual: <span className="font-semibold">Rp{Number(hargaJualPerPcs).toLocaleString('id-ID')}</span>
                                 </span>
                                 <span>
                                     Isi: <span className="font-semibold">{isiPerBox}</span>
@@ -186,7 +186,7 @@ export default function ProdukPage({ produkList: initialProdukList, onToggleAvai
                                 </span>
                                 <div className={`text-xs font-bold flex items-center gap-1 ${keuntunganToko >= 0 ? 'text-green-700' : 'text-red-700'}`}>
                                     <TrendingUp size={12} /> Untung:
-                                    <span>Rp{keuntunganToko.toLocaleString('id-ID')}</span>
+                                    <span>Rp{Number(keuntunganToko).toLocaleString('id-ID')}</span>
                                 </div>
                             </div>
                         </div>

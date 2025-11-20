@@ -1,5 +1,5 @@
 import React, { createContext, useState, useEffect, useContext, ReactNode } from 'react';
-import { supabase } from '@/supabase'; // Impor klien Supabase
+import { supabase } from '../lib/supabase'; // Path yang benar ke supabase client
 import { Alert } from 'react-native';
 
 // Definisikan tipe data untuk state kita
@@ -15,6 +15,7 @@ interface AppContextType {
   kunjunganList: any[];
   produkList: any[];
   targets: Target;
+  setProdukList: React.Dispatch<React.SetStateAction<any[]>>;
   loadData: () => Promise<void>;
 }
 
@@ -37,12 +38,12 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
     setLoading(true);
     try {
       // Mengambil data dari Supabase
-      const [tokoResponse, kunjunganResponse, produkResponse, orderResponse, targetResponse] = await Promise.all([
+      const [tokoResponse, kunjunganResponse, produkResponse, orderResponse, configResponse] = await Promise.all([
         supabase.from('toko').select('*'),
         supabase.from('kunjungan').select('*').order('createdAt', { ascending: false }),
         supabase.from('produk').select('*').order('nama', { ascending: true }),
         supabase.from('orders').select('*').order('createdAt', { ascending: false }),
-        supabase.from('config').select('*').eq('id', 'salesTarget').single(),
+        supabase.from('config').select('*').eq('id', 'salesTarget').single(), // Menggunakan nama variabel yang sama dengan web
       ]);
 
       // Cek error untuk setiap response
@@ -50,10 +51,10 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
       if (kunjunganResponse.error) throw kunjunganResponse.error;
       if (produkResponse.error) throw produkResponse.error;
       if (orderResponse.error) throw orderResponse.error;
-      if (targetResponse.error) {
+      if (configResponse.error && configResponse.error.code !== 'PGRST116') {
         console.log('Data target belum ada, menggunakan nilai default.');
-      } else if (targetResponse.data) {
-        setTargets(targetResponse.data as Target);
+      } else if (configResponse.data) {
+        setTargets(configResponse.data as Target);
       }
 
       // Data dari Supabase sudah dalam format array of objects, tidak perlu .docs.map(...)
@@ -77,7 +78,7 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
     loadData();
   }, []);
 
-  const value = { loading, daftarToko, orderList, kunjunganList, produkList, targets, loadData };
+  const value = { loading, daftarToko, orderList, kunjunganList, produkList, targets, setProdukList, loadData };
 
   return <AppContext.Provider value={value}>{children}</AppContext.Provider>;
 };

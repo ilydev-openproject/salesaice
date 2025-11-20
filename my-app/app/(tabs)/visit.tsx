@@ -1,9 +1,10 @@
 import { StyleSheet, FlatList, ActivityIndicator, View, TouchableOpacity, Platform, ScrollView, Modal as RNModal, Button, RefreshControl } from 'react-native';
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
-import { useAppContext } from '@/context/AppContext';
+import { useAppContext } from '@/app/context/AppContext';
 import React, { useMemo, useState, useCallback } from 'react';
 import { Ionicons } from '@expo/vector-icons';
+import { useRouter } from 'expo-router';
 import DateTimePicker, { type DateTimePickerEvent } from '@react-native-community/datetimepicker';
 import AddVisitModal from '@/components/AddVisitModal';
 
@@ -15,6 +16,7 @@ export default function VisitScreen() {
   const [tempDate, setTempDate] = useState(new Date()); // State sementara untuk iOS
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [isAddVisitModalVisible, setIsAddVisitModalVisible] = useState(false);
+  const router = useRouter();
 
   const processedKunjunganList = useMemo(() => {
     const now = new Date();
@@ -40,25 +42,24 @@ export default function VisitScreen() {
 
     // Menggabungkan data kunjungan dengan data order yang sesuai
     return filteredList.map((kunjungan) => {
-      if (kunjungan.status === 'Order') {
-        const relatedOrders = orderList.filter((order) => { // order.createdAt is also ISO string
-          if (!order.createdAt || !kunjungan.createdAt) return false;
+      const relatedOrders = orderList.filter((order) => {
+        if (!order.createdAt || !kunjungan.createdAt) return false;
 
-          const visitDate = new Date(kunjungan.createdAt);
-          const orderDate = new Date(order.createdAt);
+        const visitDate = new Date(kunjungan.createdAt);
+        const orderDate = new Date(order.createdAt);
 
-          const daysToAdd = visitDate.getDay() === 6 ? 2 : 1;
-          const expectedOrderDate = new Date(visitDate);
-          expectedOrderDate.setDate(visitDate.getDate() + daysToAdd);
+        // Logika Next Day: Order dicatat untuk H+1 dari tanggal kunjungan.
+        const daysToAdd = visitDate.getDay() === 6 ? 2 : 1; // Jika Sabtu, H+2 (Senin)
+        const expectedOrderDate = new Date(visitDate);
+        expectedOrderDate.setDate(visitDate.getDate() + daysToAdd);
 
-          return order.tokoId === kunjungan.tokoId && orderDate.toDateString() === expectedOrderDate.toDateString();
-        });
+        return order.tokoId === kunjungan.tokoId && orderDate.toDateString() === expectedOrderDate.toDateString();
+      });
 
-        if (relatedOrders.length > 0) {
-          const total = relatedOrders.reduce((sum, order) => sum + (order.total || 0), 0);
-          const items = relatedOrders.flatMap((order) => order.items || []);
-          return { ...kunjungan, total, items, status: 'Order' };
-        }
+      if (relatedOrders.length > 0) {
+        const total = relatedOrders.reduce((sum, order) => sum + (order.total || 0), 0);
+        const items = relatedOrders.flatMap((order) => order.items || []);
+        return { ...kunjungan, total, items, status: 'Order' };
       }
       return kunjungan;
     });
@@ -148,7 +149,7 @@ export default function VisitScreen() {
         data={processedKunjunganList}
         keyExtractor={(item) => item.id}
         renderItem={({ item }) => (
-          <TouchableOpacity key={item.id} style={styles.visitItem}>
+          <TouchableOpacity key={item.id} style={styles.visitItem} onPress={() => router.push({ pathname: '/edit-visit', params: { id: item.id } })}>
             <View style={styles.visitAvatar}>
               <ThemedText style={styles.visitAvatarText}>{(item.tokoNama || '?').charAt(0).toUpperCase()}</ThemedText>
             </View>
@@ -297,10 +298,10 @@ const styles = StyleSheet.create({
     padding: 12,
     borderRadius: 12,
     marginBottom: 8,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.05,
-    shadowRadius: 3,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.08,
+    shadowRadius: 4,
     elevation: 2,
   },
   visitAvatar: {

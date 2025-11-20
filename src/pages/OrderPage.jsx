@@ -695,7 +695,7 @@ export default function OrderPage({ setActivePage, orderList, tokoList, produkLi
                                                 <p className="text-[10px] text-slate-500 mt-0.5">{order.createdAt && !isNaN(new Date(order.createdAt.replace(' ', 'T'))) ? new Date(order.createdAt.replace(' ', 'T')).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' }) : 'Waktu Invalid'}</p>
                                             </div>
                                             <div className="text-right pr-5">
-                                                <p className={`font-bold text-xs ${order.total > 0 ? 'text-green-600' : 'text-slate-500'}`}>Rp{order.total.toLocaleString('id-ID')}</p>
+                                                <p className={`font-bold text-xs ${order.total > 0 ? 'text-green-600' : 'text-slate-500'}`}>Rp{(order.total || 0).toLocaleString('id-ID')}</p>
                                                 <p className="text-[10px] text-slate-500 mt-0.5">{totalBoxes} box</p>
                                             </div>
                                         </div>
@@ -1026,7 +1026,7 @@ export default function OrderPage({ setActivePage, orderList, tokoList, produkLi
                             </form>
 
                             {/* Footer dengan styling modern */}
-                            <div className="bg-white/80 backdrop-blur-sm py-2 px-3 border-t border-gray-200">
+                            <div className="bg-white/80 backdrop-blur-sm py-3 px-4 border-t border-gray-200">
                                 <div className="bg-gradient-to-r from-purple-50 via-indigo-50 to-blue-50 p-3 rounded-xl border border-purple-200/50 mb-3 shadow-sm relative overflow-hidden">
                                     {/* Decorative background elements */}
                                     <div className="absolute top-0 right-0 w-20 h-20 bg-purple-200/30 rounded-full -translate-y-10 translate-x-10"></div>
@@ -1045,11 +1045,11 @@ export default function OrderPage({ setActivePage, orderList, tokoList, produkLi
                                                 <div className="w-2 h-2 bg-indigo-500 rounded-full animate-pulse"></div>
                                                 Total Belanja
                                             </span>
-                                            <span className="bg-gradient-to-r from-purple-600 to-indigo-600 text-white px-3 py-1.5 rounded-lg shadow-md transition-all duration-300">Rp{getGrandTotal().toLocaleString('id-ID')}</span>
+                                            <span className="bg-gradient-to-r from-purple-600 to-indigo-600 text-white px-3 py-1.5 rounded-lg shadow-md transition-all duration-300">Rp{(getGrandTotal() || 0).toLocaleString('id-ID')}</span>
                                         </div>
                                     </div>
                                 </div>
-                                <button type="submit" form="order-form" disabled={submitting || !selectedTokoId} className="w-full py-3 bg-gradient-to-r from-purple-600 to-indigo-700 text-white rounded-xl font-bold text-sm transition-all duration-300 flex items-center justify-center gap-3 disabled:opacity-50 disabled:cursor-not-allowed shadow-lg focus-ring group">
+                                <button type="submit" form="order-form" disabled={submitting || !selectedTokoId} className="w-full py-3.5 bg-gradient-to-r from-purple-600 to-indigo-700 text-white rounded-xl font-bold text-base transition-all duration-300 flex items-center justify-center gap-3 disabled:opacity-50 disabled:cursor-not-allowed shadow-lg focus-ring group active:scale-95">
                                     {submitting ? (
                                         <>
                                             <svg className="animate-spin h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">

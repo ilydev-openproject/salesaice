@@ -629,7 +629,7 @@ export default function TokoPage({ orderList = [], kunjunganList = [], onModalCh
                 ) : (
                     <div className="space-y-4">
                         {filteredAndSortedToko.map((toko) => (
-                            <div key={toko.id} className="bg-white rounded-xl p-4 border border-gray-200 shadow-sm">
+                            <div key={toko.id} className="bg-white rounded-xl p-4 border border-gray-200 shadow-sm transition-all duration-200 active:scale-[0.98] active:bg-slate-50">
                                 <div className="flex justify-between items-start">
                                     <div className="flex-grow">
                                         <h3 className="font-bold text-base text-slate-800 pr-4">{toko.nama}</h3>
